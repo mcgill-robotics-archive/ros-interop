@@ -152,6 +152,9 @@ class InteroperabilityClient(object):
             (std_msgs/String, std_msgs/Time, std_msgs/Time) tuple.
             The first is the server message, the second is the message
             timestamp and the last is the server time.
+
+        Raises:
+            HTTPError: On failure or timeout.
         """
         response = yield self._get("/api/server_info")
         json = json_decode(response.body)
@@ -165,10 +168,32 @@ class InteroperabilityClient(object):
             Tuple of two visualization_msgs/MarkerArray, MarkerArray) tuple.
             The first is of moving obstacles, and the latter is of stationary
             obstacles.
+
+        Raises:
+            HTTPError: On failure or timeout.
         """
         response = yield self._get("/api/obstacles")
         json = json_decode(response.body)
         raise Return(serializers.ObstaclesDeserializer.from_json(json))
+
+    @coroutine
+    def post_telemetry(self, navsat_msg, compass_msg):
+        """Uploads telemetry information to Interoperability server.
+
+        Args:
+            navsat_msg: sensor_msgs/NavSatFix message.
+            compass_msg: std_msgs/Float64 message in degrees.
+
+        Returns:
+            HTTPResponse.
+
+        Raises:
+            HTTPError: On failure or timeout.
+        """
+        json = serializers.TelemetrySerializer.from_msg(navsat_msg,
+                                                        compass_msg)
+        response = yield self._post("/api/telemetry", body=json)
+        raise Return(response)
 
 
 if __name__ == "__main__":
