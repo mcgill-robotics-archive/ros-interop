@@ -157,6 +157,19 @@ class InteroperabilityClient(object):
         json = json_decode(response.body)
         raise Return(serializers.ServerInfoDeserializer.from_json(json))
 
+    @coroutine
+    def get_obstacles(self):
+        """Returns obstacles as Markers.
+
+        Returns:
+            Tuple of two visualization_msgs/MarkerArray, MarkerArray) tuple.
+            The first is of moving obstacles, and the latter is of stationary
+            obstacles.
+        """
+        response = yield self._get("/api/obstacles")
+        json = json_decode(response.body)
+        raise Return(serializers.ObstaclesDeserializer.from_json(json))
+
 
 if __name__ == "__main__":
     from tornado.ioloop import IOLoop
