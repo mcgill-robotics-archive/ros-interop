@@ -43,11 +43,11 @@ class InteroperabilityClient(object):
         Raises:
             HTTPError: On failure or timeout.
         """
-        yield self.post("/api/login",
-                        body={"username": username, "password": password})
+        yield self._post("/api/login",
+                         body={"username": username, "password": password})
 
     @coroutine
-    def get(self, uri, **kwargs):
+    def _get(self, uri, **kwargs):
         """Sends GET request to Interoperability server at specified URI.
 
         Args:
@@ -69,7 +69,7 @@ class InteroperabilityClient(object):
         raise Return(response)
 
     @coroutine
-    def put(self, uri, body=None, **kwargs):
+    def _put(self, uri, body=None, **kwargs):
         """Sends PUT request to Interoperability server at specified URI.
 
         Args:
@@ -95,7 +95,7 @@ class InteroperabilityClient(object):
         raise Return(response)
 
     @coroutine
-    def post(self, uri, body=None, **kwargs):
+    def _post(self, uri, body=None, **kwargs):
         """Sends POST request to Interoperability server at specified URI.
 
         Args:
@@ -121,7 +121,7 @@ class InteroperabilityClient(object):
         raise Return(response)
 
     @coroutine
-    def delete(self, uri, **kwargs):
+    def _delete(self, uri, **kwargs):
         """Sends DELETE request to Interoperability server at specified URI.
 
         Args:
@@ -157,7 +157,7 @@ if __name__ == "__main__":
     @coroutine
     def print_targets():
         """Print out targets."""
-        r = yield client.get("/api/targets")
+        r = yield client._get("/api/targets")
         print(r.body)
 
     # Test out authentication and basic request synchronously.
