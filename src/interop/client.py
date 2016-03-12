@@ -3,6 +3,8 @@
 """Asynchronous Interoperability HTTP Client."""
 
 import urllib
+import serializers
+from tornado.escape import json_decode
 from httpclient_session import Session
 from tornado.gen import coroutine, Return
 from tornado.httpclient import AsyncHTTPClient, HTTPRequest
@@ -142,6 +144,19 @@ class InteroperabilityClient(object):
         response = yield self.session.fetch(request)
         raise Return(response)
 
+    @coroutine
+    def get_server_info(self):
+        """Returns server information.
+
+        Returns:
+            (std_msgs/String, std_msgs/Time, std_msgs/Time) tuple.
+            The first is the server message, the second is the message
+            timestamp and the last is the server time.
+        """
+        response = yield self._get("/api/server_info")
+        json = json_decode(response.body)
+        raise Return(serializers.ServerInfoDeserializer.from_json(json))
+
 
 if __name__ == "__main__":
     from tornado.ioloop import IOLoop
@@ -155,11 +170,11 @@ if __name__ == "__main__":
         yield client.authenticate("testadmin", "testpass")
 
     @coroutine
-    def print_targets():
-        """Print out targets."""
-        r = yield client._get("/api/targets")
-        print(r.body)
+    def print_server_info():
+        """Print out server information."""
+        r = yield client.get_server_info()
+        print(r)
 
     # Test out authentication and basic request synchronously.
     IOLoop.current().run_sync(authenticate)
-    IOLoop.current().run_sync(print_targets)
+    IOLoop.current().run_sync(print_server_info)
