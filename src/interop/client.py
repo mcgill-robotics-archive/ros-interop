@@ -2,11 +2,8 @@
 
 """Asynchronous Interoperability HTTP Client."""
 
-import urllib
+import requests
 import serializers
-from tornado.escape import json_decode
-from httpclient_session import Session
-from tornado.httpclient import HTTPClient, HTTPRequest
 
 
 class InteroperabilityClient(object):
@@ -15,106 +12,89 @@ class InteroperabilityClient(object):
 
     Attributes:
         url: Base URL of the Interoperability server.
-        session: AsyncHTTPClient session.
+        session: Requests session.
         timeout: Timeout in seconds for individual requests.
     """
 
-    def __init__(self, url, timeout=1.0):
+    def __init__(self, url, username, password, timeout=1.0):
         """Initializes InteroperabilityClient.
-
-        Note: You must authenticate() before using any other methods.
 
         Args:
             url: Interoperability server base URL (e.g. http://127.0.0.1:8080).
-            timeout: Timeout in seconds for individual requests.
+            username: Interoperability server username.
+            password: Interoperability server password.
+            timeout: Timeout in seconds for individual requests, default: 1s.
         """
         self.timeout = timeout
         self.url = url[:-1] if url.endswith('/') else url
-        self.session = Session(HTTPClient)
+        self.session = requests.Session()
 
-    def authenticate(self, username, password):
-        """Authenticates with the Interoperability server with given
-        credentials.
-
-        Args:
-            username: Interoperability server username.
-            password: Interoperability server password.
-
-        Raises:
-            HTTPError: On failure or timeout.
-        """
         self._post("/api/login",
-                   body={"username": username, "password": password})
+                   data={"username": username, "password": password})
 
     def _get(self, uri, **kwargs):
         """Sends GET request to Interoperability server at specified URI.
 
         Args:
             uri: Server URI to access.
-            **kwargs: Arguments to HTTPRequest.
+            **kwargs: Arguments to HTTP Request.
 
         Returns:
-            HTTPResponse.
+            HTTP Response.
 
         Raises:
-            HTTPError: On failure or timeout.
+            Timeout: On timeout.
+            HTTPError: On request failure.
         """
-        request = HTTPRequest(
-            url=self.url + (uri if uri.startswith('/') else '/' + uri),
+        response = self.session.request(
             method="GET",
-            request_timeout=self.timeout,
+            url=self.url + (uri if uri.startswith('/') else '/' + uri),
+            timeout=self.timeout,
             **kwargs)
-        response = self.session.fetch(request)
+        response.raise_for_status()
         return response
 
-    def _put(self, uri, body=None, **kwargs):
+    def _put(self, uri, **kwargs):
         """Sends PUT request to Interoperability server at specified URI.
 
         Args:
             uri: Server URI to access.
-            body: Dictionary of request's body.
-            **kwargs: Arguments to HTTPRequest.
+            **kwargs: Arguments to HTTP Request.
 
         Returns:
-            HTTPResponse.
+            HTTP Response.
 
         Raises:
-            HTTPError: On failure or timeout.
+            Timeout: On timeout.
+            HTTPError: On request failure.
         """
-        if isinstance(body, dict):
-            body = urllib.urlencode(body)
-        request = HTTPRequest(
-            url=self.url + (uri if uri.startswith('/') else '/' + uri),
+        response = self.session.request(
             method="PUT",
-            body=body,
-            request_timeout=self.timeout,
+            url=self.url + (uri if uri.startswith('/') else '/' + uri),
+            timeout=self.timeout,
             **kwargs)
-        response = self.session.fetch(request)
+        response.raise_for_status()
         return response
 
-    def _post(self, uri, body=None, **kwargs):
+    def _post(self, uri, **kwargs):
         """Sends POST request to Interoperability server at specified URI.
 
         Args:
             uri: Server URI to access.
-            body: Dictionary of request's body.
-            **kwargs: Arguments to HTTPRequest.
+            **kwargs: Arguments to HTTP Request.
 
         Returns:
-            HTTPResponse.
+            HTTP Response.
 
         Raises:
-            HTTPError: On failure or timeout.
+            Timeout: On timeout.
+            HTTPError: On request failure.
         """
-        if isinstance(body, dict):
-            body = urllib.urlencode(body)
-        request = HTTPRequest(
-            url=self.url + (uri if uri.startswith('/') else '/' + uri),
+        response = self.session.request(
             method="POST",
-            body=body,
-            request_timeout=self.timeout,
+            url=self.url + (uri if uri.startswith('/') else '/' + uri),
             **kwargs)
-        response = self.session.fetch(request)
+        response.raise_for_status()
         return response
 
     def _delete(self, uri, **kwargs):
@@ -122,20 +102,21 @@ class InteroperabilityClient(object):
 
         Args:
             uri: Server URI to access.
-            **kwargs: Arguments to HTTPRequest.
+            **kwargs: Arguments to HTTP Request.
 
         Returns:
-            HTTPResponse.
+            HTTP Response.
 
         Raises:
-            HTTPError: On failure or timeout.
+            Timeout: On timeout.
+            HTTPError: On request failure.
         """
-        request = HTTPRequest(
-            url=self.url + (uri if uri.startswith('/') else '/' + uri),
+        response = self.session.request(
             method="DELETE",
-            request_timeout=self.timeout,
+            url=self.url + (uri if uri.startswith('/') else '/' + uri),
+            timeout=self.timeout,
             **kwargs)
-        response = self.session.fetch(request)
+        response.raise_for_status()
         return response
 
     def get_server_info(self):
@@ -147,26 +128,28 @@ class InteroperabilityClient(object):
             timestamp and the last is the server time.
 
         Raises:
-            HTTPError: On failure or timeout.
+            Timeout: On timeout.
+            HTTPError: On request failure.
+            JSONDecodeError: On JSON decoding failure.
         """
         response = self._get("/api/server_info")
-        json = json_decode(response.body)
-        return serializers.ServerInfoDeserializer.from_json(json)
+        return serializers.ServerInfoDeserializer.from_json(response.json())
 
     def get_obstacles(self):
         """Returns obstacles as Markers.
 
         Returns:
-            Tuple of two visualization_msgs/MarkerArray, MarkerArray) tuple.
+            Tuple of two visualization_msgs/MarkerArray tuple.
             The first is of moving obstacles, and the latter is of stationary
             obstacles.
 
         Raises:
-            HTTPError: On failure or timeout.
+            Timeout: On timeout.
+            HTTPError: On request failure.
+            JSONDecodeError: On JSON decoding failure.
         """
         response = self._get("/api/obstacles")
-        json = json_decode(response.body)
-        return serializers.ObstaclesDeserializer.from_json(json)
+        return serializers.ObstaclesDeserializer.from_json(response.json())
 
     def post_telemetry(self, navsat_msg, compass_msg):
         """Uploads telemetry information to Interoperability server.
@@ -176,14 +159,16 @@ class InteroperabilityClient(object):
             compass_msg: std_msgs/Float64 message in degrees.
 
         Returns:
-            HTTPResponse.
+            HTTP Response.
 
         Raises:
-            HTTPError: On failure or timeout.
+            Timeout: On timeout.
+            HTTPError: On request failure.
+            JSONDecodeError: On JSON decoding failure.
         """
         json = serializers.TelemetrySerializer.from_msg(navsat_msg,
                                                         compass_msg)
-        response = self._post("/api/telemetry", body=json)
+        response = self._post("/api/telemetry", data=json)
         return response
 
 
@@ -195,16 +180,16 @@ if __name__ == "__main__":
     rospy.init_node("test_interop_client")
 
     # Setup publishers.
-    rate = rospy.Rate(24)
+    rate = rospy.Rate(12)
     moving = rospy.Publisher("/moving_obstacles", MarkerArray, queue_size=1)
     stationary = rospy.Publisher("/stationary_obstacles",
                                  MarkerArray, queue_size=1)
 
     # Initialize client.
-    client = InteroperabilityClient("http://localhost:80")
+    client = InteroperabilityClient("http://interop:80",
+                                    "testadmin", "testpass")
 
-    # Test out authentication and basic request.
-    client.authenticate("testadmin", "testpass")
+    # Test out basic request.
     print(client.get_server_info())
 
     # Publish obstacles.
