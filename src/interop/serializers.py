@@ -52,9 +52,14 @@ def iso8601_to_rostime(iso):
     # Convert to time from epoch in UTC.
     epoch = datetime.utcfromtimestamp(0)
     epoch = epoch.replace(tzinfo=tzutc())
-    ctime = (t - epoch).total_seconds()
+    dt = t - epoch
 
-    return Time(ctime)
+    # Create ROS message.
+    time = Time()
+    time.data.secs = int(dt.total_seconds())
+    time.data.nsecs = dt.microseconds * 1000
+
+    return time
 
 
 class ServerInfoDeserializer(object):
