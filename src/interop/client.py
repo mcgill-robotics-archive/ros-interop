@@ -135,8 +135,11 @@ class InteroperabilityClient(object):
         response = self._get("/api/server_info")
         return serializers.ServerInfoDeserializer.from_json(response.json())
 
-    def get_obstacles(self):
+    def get_obstacles(self, lifetime):
         """Returns obstacles as Markers.
+
+        Args:
+            lifetime: Lifetime of every Marker in seconds.
 
         Returns:
             Tuple of two visualization_msgs/MarkerArray tuple.
@@ -149,7 +152,8 @@ class InteroperabilityClient(object):
             JSONDecodeError: On JSON decoding failure.
         """
         response = self._get("/api/obstacles")
-        return serializers.ObstaclesDeserializer.from_json(response.json())
+        return serializers.ObstaclesDeserializer.from_json(response.json(),
+                                                           lifetime)
 
     def post_telemetry(self, navsat_msg, compass_msg):
         """Uploads telemetry information to Interoperability server.

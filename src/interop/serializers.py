@@ -90,9 +90,6 @@ class ObstaclesDeserializer(object):
 
     """Obstacles message deserializer."""
 
-    # Rate to display obstacles in Hz.
-    RATE = 10
-
     # McGill Robotics red, because we have big egos.
     OBSTACLE_COLOR = ColorRGBA(
         r=218 / 255.0,
@@ -101,11 +98,12 @@ class ObstaclesDeserializer(object):
         a=1.0)
 
     @classmethod
-    def from_json(cls, json):
+    def from_json(cls, json, lifetime):
         """Deserializes obstacle data into two MarkerArrays.
 
         Args:
             json: JSON dictionary.
+            lifetime: Lifetime of every Marker in seconds.
 
         Returns:
             Tuple of two visualization_msgs/MarkerArray, MarkerArray) tuple.
@@ -127,7 +125,7 @@ class ObstaclesDeserializer(object):
                 marker.type = marker.SPHERE
                 marker.color = cls.OBSTACLE_COLOR
                 marker.ns = "stationary_obstacles"
-                marker.lifetime = rospy.Duration(1.0 / cls.RATE)
+                marker.lifetime = rospy.Duration(lifetime)
 
                 # Set scale as radius.
                 radius = feet_to_meters(obj["sphere_radius"])
@@ -152,7 +150,7 @@ class ObstaclesDeserializer(object):
                 marker.type = marker.CYLINDER
                 marker.color = cls.OBSTACLE_COLOR
                 marker.ns = "stationary_obstacles"
-                marker.lifetime = rospy.Duration(1.0 / cls.RATE)
+                marker.lifetime = rospy.Duration(lifetime)
 
                 # Set scale to define size.
                 radius = feet_to_meters(obj["cylinder_radius"])
