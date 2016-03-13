@@ -170,31 +170,3 @@ class InteroperabilityClient(object):
                                                         compass_msg)
         response = self._post("/api/telemetry", data=json)
         return response
-
-
-if __name__ == "__main__":
-    import rospy
-    from visualization_msgs.msg import MarkerArray
-
-    # Initialize node.
-    rospy.init_node("test_interop_client")
-
-    # Setup publishers.
-    rate = rospy.Rate(12)
-    moving = rospy.Publisher("/moving_obstacles", MarkerArray, queue_size=1)
-    stationary = rospy.Publisher("/stationary_obstacles",
-                                 MarkerArray, queue_size=1)
-
-    # Initialize client.
-    client = InteroperabilityClient("http://interop:80",
-                                    "testadmin", "testpass", 1.0)
-
-    # Test out basic request.
-    print(client.get_server_info())
-
-    # Publish obstacles.
-    while not rospy.is_shutdown():
-        moving_obj, stationary_obj = client.get_obstacles()
-        moving.publish(moving_obj)
-        stationary.publish(stationary_obj)
-        rate.sleep()
