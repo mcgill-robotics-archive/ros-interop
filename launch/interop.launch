@@ -1,0 +1,87 @@
+<launch>
+  <!-- Login credentials and request parameters -->
+  <arg name="base_url" default="http://interop:80"/>
+  <arg name="username" default="testadmin"/>
+  <arg name="password" default="testpass"/>
+  <arg name="timeout" default="1.0"/>
+
+  <!-- Synchronization settings -->
+  <arg name="sync_queue_size" default="2"/>
+  <arg name="max_sync_delay" default="1"/>
+
+  <!-- Subscribed topics -->
+  <arg name="navsat_topic" default="/mavros/global_position/global"/>
+  <arg name="compass_topic" default="/mavros/global_position/compass_hdg"/>
+
+  <!-- Published topics -->
+  <arg name="msg_topic" default="~message"/>
+  <arg name="timestamp_topic" default="~message_timestamp"/>
+  <arg name="server_time_topic" default="~time"/>
+  <arg name="moving_topic" default="~moving"/>
+  <arg name="stationary_topic" default="~stationary"/>
+
+  <!-- Publication periods -->
+  <arg name="obstacles_period" default="0.05"/>
+  <arg name="server_info_period" default="0.05"/>
+
+  <group ns="interop">
+    <!-- Obstacles client -->
+    <node name="obstacles"
+          pkg="interop"
+          type="obstacles_client.py"
+          output="screen">
+      <!-- Login credentials and request parameters -->
+      <param name="base_url" value="$(arg base_url)"/>
+      <param name="username" value="$(arg username)"/>
+      <param name="password" value="$(arg password)"/>
+      <param name="timeout" value="$(arg timeout)"/>
+
+      <!-- Published topics -->
+      <param name="moving_topic" value="$(arg moving_topic)"/>
+      <param name="stationary_topic" value="$(arg stationary_topic)"/>
+
+      <!-- Publication period -->
+      <param name="period" value="$(arg obstacles_period)"/>
+    </node>
+
+    <!-- Server information client -->
+    <node name="server_info"
+          pkg="interop"
+          type="server_info_client.py"
+          output="screen">
+      <!-- Login credentials and request parameters -->
+      <param name="base_url" value="$(arg base_url)"/>
+      <param name="username" value="$(arg username)"/>
+      <param name="password" value="$(arg password)"/>
+      <param name="timeout" value="$(arg timeout)"/>
+
+      <!-- Published topics -->
+      <param name="msg_topic" value="$(arg msg_topic)"/>
+      <param name="timestamp_topic" value="$(arg timestamp_topic)"/>
+      <param name="server_time_topic" value="$(arg server_time_topic)"/>
+
+      <!-- Publication period -->
+      <param name="period" value="$(arg server_info_period)"/>
+    </node>
+
+    <!-- Telemetry client -->
+    <node name="telemetry"
+          pkg="interop"
+          type="telemetry_client.py"
+          output="screen">
+      <!-- Login credentials and request parameters -->
+      <param name="base_url" value="$(arg base_url)"/>
+      <param name="username" value="$(arg username)"/>
+      <param name="password" value="$(arg password)"/>
+      <param name="timeout" value="$(arg timeout)"/>
+
+      <!-- Synchronization settings -->
+      <param name="sync_queue_size" value="$(arg sync_queue_size)"/>
+      <param name="max_sync_delay" value="$(arg max_sync_delay)"/>
+
+      <!-- Subscribed topics -->
+      <param name="navsat_topic" value="$(arg navsat_topic)"/>
+      <param name="compass_topic" value="$(arg compass_topic)"/>
+    </node>
+  </group>
+</launch>

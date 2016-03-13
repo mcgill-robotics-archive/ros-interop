@@ -81,14 +81,14 @@ if __name__ == "__main__":
     base_url = rospy.get_param("~base_url")
     username = rospy.get_param("~username")
     password = rospy.get_param("~password")
-    timeout = rospy.get_param("~timeout", 1.0)
+    timeout = rospy.get_param("~timeout")
 
     # Initialize interoperability client.
     client = InteroperabilityClient(base_url, username, password, timeout)
 
     # Get ROS parameters for synchronization queue size and time delay.
-    sync_queue = rospy.get_param("~sync_queue_size", 2)
-    sync_delay = rospy.get_param("~max_sync_delay", 1)
+    sync_queue = rospy.get_param("~sync_queue_size")
+    sync_delay = rospy.get_param("~max_sync_delay")
 
     # Get ROS parameters for subscribed topic names.
     navsat_topic = rospy.get_param("~navsat_topic")

@@ -16,14 +16,14 @@ class InteroperabilityClient(object):
         timeout: Timeout in seconds for individual requests.
     """
 
-    def __init__(self, url, username, password, timeout=1.0):
+    def __init__(self, url, username, password, timeout):
         """Initializes InteroperabilityClient.
 
         Args:
             url: Interoperability server base URL (e.g. http://127.0.0.1:8080).
             username: Interoperability server username.
             password: Interoperability server password.
-            timeout: Timeout in seconds for individual requests, default: 1s.
+            timeout: Timeout in seconds for individual requests.
         """
         self.timeout = timeout
         self.url = url[:-1] if url.endswith('/') else url
@@ -187,7 +187,7 @@ if __name__ == "__main__":
 
     # Initialize client.
     client = InteroperabilityClient("http://interop:80",
-                                    "testadmin", "testpass")
+                                    "testadmin", "testpass", 1.0)
 
     # Test out basic request.
     print(client.get_server_info())

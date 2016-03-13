@@ -37,14 +37,14 @@ if __name__ == "__main__":
     base_url = rospy.get_param("~base_url")
     username = rospy.get_param("~username")
     password = rospy.get_param("~password")
-    timeout = rospy.get_param("~timeout", 1.0)
+    timeout = rospy.get_param("~timeout")
 
     # Initialize interoperability client.
     client = InteroperabilityClient(base_url, username, password, timeout)
 
     # Get ROS parameters for published topic names.
-    moving_topic = rospy.get_param("~moving_topic", "~moving")
-    stationary_topic = rospy.get_param("~stationary_topic", "~stationary")
+    moving_topic = rospy.get_param("~moving_topic")
+    stationary_topic = rospy.get_param("~stationary_topic")
 
     # Setup publishers.
     moving_pub = rospy.Publisher(moving_topic, MarkerArray, queue_size=1)
@@ -52,8 +52,7 @@ if __name__ == "__main__":
                                      MarkerArray, queue_size=1)
 
     # Get ROS parameter for publishing period.
-    # The default is a rate of 20Hz as a buffer.
-    period = float(rospy.get_param("~period", 0.05))
+    period = float(rospy.get_param("~period"))
 
     # Set up ROS timer for publishing at the specified rates.
     rospy.Timer(rospy.Duration(period), publish_obstacles)
