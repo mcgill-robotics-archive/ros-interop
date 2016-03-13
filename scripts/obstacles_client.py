@@ -4,8 +4,10 @@
 """Interoperability Obstacles ROS Client."""
 
 import rospy
+from simplejson import JSONDecodeError
 from interop import InteroperabilityClient
 from visualization_msgs.msg import MarkerArray
+from requests.exceptions import HTTPError, Timeout
 
 
 def publish_obstacles(timer_event):
@@ -14,7 +16,15 @@ def publish_obstacles(timer_event):
     Args:
         timer_event: ROS TimerEvent.
     """
-    moving_obstacles, stationary_obstacles = client.get_obstacles()
+    try:
+        moving_obstacles, stationary_obstacles = client.get_obstacles()
+    except Timeout as e:
+        rospy.logwarn(e)
+        return
+    except (JSONDecodeError, HTTPError) as e:
+        rospy.logerr(e)
+        return
+
     moving_pub.publish(moving_obstacles)
     stationary_pub.publish(stationary_obstacles)
 
@@ -27,9 +37,10 @@ if __name__ == "__main__":
     base_url = rospy.get_param("~base_url")
     username = rospy.get_param("~username")
     password = rospy.get_param("~password")
+    timeout = rospy.get_param("~timeout", 1.0)
 
     # Initialize interoperability client.
-    client = InteroperabilityClient(base_url, username, password)
+    client = InteroperabilityClient(base_url, username, password, timeout)
 
     # Get ROS parameters for published topic names.
     moving_topic = rospy.get_param("~moving_topic", "~moving")

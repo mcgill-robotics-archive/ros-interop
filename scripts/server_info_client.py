@@ -5,12 +5,22 @@
 
 import rospy
 from std_msgs.msg import String, Time
+from simplejson import JSONDecodeError
 from interop import InteroperabilityClient
+from requests.exceptions import HTTPError, Timeout
 
 
 def publish_server_info(timer_event):
     """Requests and publishes server information."""
-    message, message_timestamp, server_time = client.get_server_info()
+    try:
+        message, message_timestamp, server_time = client.get_server_info()
+    except Timeout as e:
+        rospy.logwarn(e)
+        return
+    except (JSONDecodeError, HTTPError) as e:
+        rospy.logerr(e)
+        return
+
     msg_pub.publish(message)
     msg_timestamp_pub.publish(message_timestamp)
     time_pub.publish(server_time)
@@ -24,9 +34,10 @@ if __name__ == "__main__":
     base_url = rospy.get_param("~base_url")
     username = rospy.get_param("~username")
     password = rospy.get_param("~password")
+    timeout = rospy.get_param("~timeout", 1.0)
 
     # Initialize interoperability client.
-    client = InteroperabilityClient(base_url, username, password)
+    client = InteroperabilityClient(base_url, username, password, timeout)
 
     # Get ROS parameters for published topic names.
     msg_topic = rospy.get_param("~msg_topic", "~message")
