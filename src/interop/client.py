@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""Asynchronous Interoperability HTTP Client."""
+"""Interoperability HTTP Client."""
 
 import requests
 import serializers
