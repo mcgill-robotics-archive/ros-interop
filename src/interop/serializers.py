@@ -98,11 +98,12 @@ class ObstaclesDeserializer(object):
         a=1.0)
 
     @classmethod
-    def from_json(cls, json, lifetime):
+    def from_json(cls, json, frame, lifetime):
         """Deserializes obstacle data into two MarkerArrays.
 
         Args:
             json: JSON dictionary.
+            frame: Frame ID of every Marker.
             lifetime: Lifetime of every Marker in seconds.
 
         Returns:
@@ -113,7 +114,7 @@ class ObstaclesDeserializer(object):
         # Generate base header.
         header = Header()
         header.stamp = rospy.get_rostime()
-        header.frame_id = "odom"
+        header.frame_id = frame
 
         # Parse moving obstacles, and populate markers with spheres.
         moving_obstacles = MarkerArray()

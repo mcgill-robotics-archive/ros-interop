@@ -78,6 +78,10 @@ The following are the run-time ROS launch arguments available:
 - `server_info_period`: Period to request and publish server information at in
   seconds, default: `0.05` (i.e., 20 Hz).
 
+### Frame IDs
+- `obstacles_frame`: Frame ID of the obstacles' `MarkerArray` messages,
+  default: `odom`.
+
 ### Synchronization settings
 *Advanced: shouldn't need to be modified.* This tweaks how incoming messages
 are synchronized in order to be properly paired. For more information, see

@@ -135,10 +135,11 @@ class InteroperabilityClient(object):
         response = self._get("/api/server_info")
         return serializers.ServerInfoDeserializer.from_json(response.json())
 
-    def get_obstacles(self, lifetime):
+    def get_obstacles(self, frame, lifetime):
         """Returns obstacles as Markers.
 
         Args:
+            frame: Frame ID of every Marker.
             lifetime: Lifetime of every Marker in seconds.
 
         Returns:
@@ -153,7 +154,7 @@ class InteroperabilityClient(object):
         """
         response = self._get("/api/obstacles")
         return serializers.ObstaclesDeserializer.from_json(response.json(),
-                                                           lifetime)
+                                                           frame, lifetime)
 
     def post_telemetry(self, navsat_msg, compass_msg):
         """Uploads telemetry information to Interoperability server.

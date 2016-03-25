@@ -24,6 +24,9 @@
   <arg name="obstacles_period" default="0.05"/>
   <arg name="server_info_period" default="0.05"/>
 
+  <!-- Frame IDs -->
+  <arg name="obstacles_frame" default="odom"/>
+
   <group ns="interop">
     <!-- Obstacles client -->
     <node name="obstacles"
@@ -42,6 +45,9 @@
 
       <!-- Publication period -->
       <param name="period" value="$(arg obstacles_period)"/>
+
+      <!-- Frame ID -->
+      <param name="frame" value="$(arg obstacles_frame)"/>
     </node>
 
     <!-- Server information client -->

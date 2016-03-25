@@ -17,7 +17,8 @@ def publish_obstacles(timer_event):
         timer_event: ROS TimerEvent.
     """
     try:
-        moving_obstacles, stationary_obstacles = client.get_obstacles(lifetime)
+        moving_obstacles, stationary_obstacles = client.get_obstacles(frame,
+                                                                      lifetime)
     except Timeout as e:
         rospy.logwarn(e)
         return
@@ -51,8 +52,9 @@ if __name__ == "__main__":
     stationary_pub = rospy.Publisher(stationary_topic,
                                      MarkerArray, queue_size=1)
 
-    # Get ROS parameter for publishing period.
+    # Get ROS parameter for publishing period and frame ID.
     period = float(rospy.get_param("~period"))
+    frame = str(rospy.get_param("~frame"))
     lifetime = 2 * period
 
     # Set up ROS timer for publishing at the specified rates.
