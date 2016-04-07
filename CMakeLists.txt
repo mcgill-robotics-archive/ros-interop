@@ -12,6 +12,8 @@ find_package(catkin REQUIRED COMPONENTS
 
 catkin_python_setup()
 
+add_message_files(FILES Color.msg Orientation.msg Shape.msg)
+
 catkin_package(
   CATKIN_DEPENDS
   rospy
