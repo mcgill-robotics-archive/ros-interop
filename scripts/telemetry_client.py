@@ -75,7 +75,7 @@ class UnstampedTimeSynchronizer(message_filters.ApproximateTimeSynchronizer):
 
 if __name__ == "__main__":
     # Initialize node.
-    rospy.init_node("interop")
+    rospy.init_node("telemetry")
 
     # Get ROS parameters for client.
     base_url = rospy.get_param("~base_url")
