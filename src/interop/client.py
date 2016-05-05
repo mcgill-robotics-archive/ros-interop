@@ -24,13 +24,70 @@ class InteroperabilityClient(object):
             username: Interoperability server username.
             password: Interoperability server password.
             timeout: Timeout in seconds for individual requests.
+
+        Raises:
+            Timeout: On timeout.
+            HTTPError: On request failure.
         """
         self.timeout = timeout
         self.url = url[:-1] if url.endswith('/') else url
         self.session = requests.Session()
 
-        self._post("/api/login",
-                   data={"username": username, "password": password})
+        self.__credentials = {"username": username, "password": password}
+
+        # Login.
+        self.__login()
+
+    def __login(self):
+        """Authenticates with the server."""
+        response = self.session.request(
+            method="POST",
+            url=self.url + "/api/login",
+            timeout=self.timeout,
+            data=self.__credentials)
+        response.raise_for_status()
+
+    def __request(self, method, uri, **kwargs):
+        """Sends request to Interoperability server at specified URI.
+
+        Args:
+            method: HTTP method.
+            uri: Server URI to access.
+            **kwargs: Arguments to HTTP Request.
+
+        Returns:
+            HTTP Response.
+
+        Raises:
+            Timeout: On timeout.
+            HTTPError: On request failure.
+        """
+        # Try until authenticated.
+        while True:
+            # Send request.
+            response = self.session.request(
+                method=method,
+                url=self.url + (uri if uri.startswith('/') else '/' + uri),
+                timeout=self.timeout,
+                **kwargs)
+
+            # Relogin if session expired, and try again.
+            if response.status_code == requests.codes.FORBIDDEN:
+                # Start a new session.
+                self.session.close()
+                self.session = requests.Session()
+
+                # Relogin.
+                self.__login()
+                continue
+
+            # Notify of other errors.
+            response.raise_for_status()
+
+            # All is good.
+            break
+
+        return response
 
     def _get(self, uri, **kwargs):
         """Sends GET request to Interoperability server at specified URI.
@@ -46,13 +103,7 @@ class InteroperabilityClient(object):
             Timeout: On timeout.
             HTTPError: On request failure.
         """
-        response = self.session.request(
-            method="GET",
-            url=self.url + (uri if uri.startswith('/') else '/' + uri),
-            timeout=self.timeout,
-            **kwargs)
-        response.raise_for_status()
-        return response
+        return self.__request("GET", uri, **kwargs)
 
     def _put(self, uri, **kwargs):
         """Sends PUT request to Interoperability server at specified URI.
@@ -68,13 +119,7 @@ class InteroperabilityClient(object):
             Timeout: On timeout.
             HTTPError: On request failure.
         """
-        response = self.session.request(
-            method="PUT",
-            url=self.url + (uri if uri.startswith('/') else '/' + uri),
-            timeout=self.timeout,
-            **kwargs)
-        response.raise_for_status()
-        return response
+        return self.__request("PUT", uri, **kwargs)
 
     def _post(self, uri, **kwargs):
         """Sends POST request to Interoperability server at specified URI.
@@ -90,12 +135,7 @@ class InteroperabilityClient(object):
             Timeout: On timeout.
             HTTPError: On request failure.
         """
-        response = self.session.request(
-            method="POST",
-            url=self.url + (uri if uri.startswith('/') else '/' + uri),
-            **kwargs)
-        response.raise_for_status()
-        return response
+        return self.__request("POST", uri, **kwargs)
 
     def _delete(self, uri, **kwargs):
         """Sends DELETE request to Interoperability server at specified URI.
@@ -111,13 +151,7 @@ class InteroperabilityClient(object):
             Timeout: On timeout.
             HTTPError: On request failure.
         """
-        response = self.session.request(
-            method="DELETE",
-            url=self.url + (uri if uri.startswith('/') else '/' + uri),
-            timeout=self.timeout,
-            **kwargs)
-        response.raise_for_status()
-        return response
+        return self.__request("DELETE", uri, **kwargs)
 
     def get_server_info(self):
         """Returns server information.
@@ -169,7 +203,6 @@ class InteroperabilityClient(object):
         Raises:
             Timeout: On timeout.
             HTTPError: On request failure.
-            JSONDecodeError: On JSON decoding failure.
         """
         json = serializers.TelemetrySerializer.from_msg(navsat_msg,
                                                         compass_msg)
