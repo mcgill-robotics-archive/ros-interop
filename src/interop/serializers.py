@@ -4,6 +4,7 @@
 
 import utm
 import rospy
+import interop.msg
 import dateutil.parser
 from dateutil.tz import tzutc
 from datetime import datetime
@@ -198,6 +199,13 @@ class TargetSerializer(object):
 
     """Target message serializer."""
 
+    # Enumeration message types.
+    ENUMERATION_TYPES = {
+        interop.msg.Color,
+        interop.msg.Orientation,
+        interop.msg.Shape
+    }
+
     @classmethod
     def from_msg(cls, msg):
         """Serializes target data into a dictionary.
@@ -208,7 +216,30 @@ class TargetSerializer(object):
         Returns:
             JSON dictionary.
         """
-        raise NotImplementedError()
+        json = {}
+
+        # Set target type.
+        msg_type = type(msg)
+        if msg_type == interop.msg.StandardTarget:
+            json["type"] = "standard"
+        elif msg_type == interop.msg.QRCTarget:
+            json["type"] = "qrc"
+        elif msg_type == interop.msg.OffAxisTarget:
+            json["type"] = "off_axis"
+        elif msg_type == interop.msg.EmergentTarget:
+            json["type"] = "emergent"
+        else:
+            raise NotImplementedError
+
+        # Set all fields.
+        for attribute in msg.__slots__:
+            value = getattr(msg, attribute)
+            if type(value) in cls.ENUMERATION_TYPES:
+                value = value.data
+
+            json[attribute] = value
+
+        return json
 
     @classmethod
     def from_json(cls, json):
@@ -218,6 +249,28 @@ class TargetSerializer(object):
             json: JSON dictionary.
 
         Returns:
-            Some ROS message (TBD).
+            A StandardTarget, QRCTarget, OffAxisTarget or EmergentTarget ROS
+            message.
         """
-        raise NotImplementedError()
+        # Determine ROS message type.
+        msg = None
+        msg_type = json["type"]
+        if msg_type == "standard":
+            msg = interop.msg.StandardTarget()
+        elif msg_type == "qrc":
+            msg = interop.msg.QRCTarget()
+        elif msg_type == "off_axis":
+            msg = interop.msg.OffAxisTarget()
+        elif msg_type == "emergent":
+            msg = interop.msg.EmergentTarget()
+        else:
+            raise NotImplementedError
+
+        for attribute in msg.__slots__:
+            # Get corresponding type of slot.
+            attribute_type = type(getattr(msg, attribute))
+
+            # Set 'casted' value.
+            setattr(msg, attribute_type(json[attribute]))
+
+        return msg
