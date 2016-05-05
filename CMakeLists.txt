@@ -12,7 +12,18 @@ find_package(catkin REQUIRED COMPONENTS
 
 catkin_python_setup()
 
-add_message_files(FILES Color.msg Orientation.msg Shape.msg)
+add_message_files(FILES
+  # Enumeration types.
+  Color.msg
+  Orientation.msg
+  Shape.msg
+  
+  # Target types.
+  StandardTarget.msg
+  QRCTarget.msg
+  OffAxisTarget.msg
+  EmergentTarget.msg)
+generate_messages(DEPENDENCIES std_msgs)
 
 catkin_package(
   CATKIN_DEPENDS
