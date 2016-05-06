@@ -205,24 +205,6 @@ class InteroperabilityClient(object):
                                                         compass_msg)
         self._post("/api/telemetry", data=json)
 
-    def get_targets(self):
-        """Returns first 100 submitted targets.
-
-        Returns:
-            Dictionary of Target IDs to Target ROS messages.
-
-        Raises:
-            Timeout: On timeout.
-            HTTPError: On request failure.
-            JSONDecodeError: On JSON decoding failure.
-        """
-        response = self._get("/api/targets")
-        targets = {
-            t["id"]: serializers.TargetSerializer.from_json(t)
-            for t in response.json()
-        }
-        return targets
-
     def post_target(self, target):
         """Uploads new target for submission.
 
@@ -241,6 +223,24 @@ class InteroperabilityClient(object):
         response = self._post("/api/targets", data=json)
         return response.json()["id"]
 
+    def get_targets(self):
+        """Returns first 100 submitted targets.
+
+        Returns:
+            Dictionary of Target IDs to Target ROS messages.
+
+        Raises:
+            Timeout: On timeout.
+            HTTPError: On request failure.
+            JSONDecodeError: On JSON decoding failure.
+        """
+        response = self._get("/api/targets")
+        targets = {
+            t["id"]: serializers.TargetSerializer.from_json(t)
+            for t in response.json()
+        }
+        return targets
+
     def get_target(self, id):
         """Returns target with matching ID.
 
@@ -255,7 +255,7 @@ class InteroperabilityClient(object):
             HTTPError: On request failure.
             JSONDecodeError: On JSON decoding failure.
         """
-        response = self._get("/api/targets/" + int(id))
+        response = self._get("/api/targets/{:d}".format(id))
         target = serializers.TargetSerializer.from_json(response.json())
         return target
 
@@ -271,7 +271,7 @@ class InteroperabilityClient(object):
             HTTPError: On request failure.
         """
         json = serializers.TargetSerializer.from_msg(target)
-        self._put("/api/targets/" + int(id), data=json)
+        self._put("/api/targets/{:d}".format(id), data=json)
 
     def delete_target(self, id):
         """Deletes target with matching ID.
@@ -284,3 +284,48 @@ class InteroperabilityClient(object):
             HTTPError: On request failure.
         """
         self._delete("/api/targets/" + int(id))
+
+    def post_target_image(self, id, img):
+        """Adds or updates target image thumbnail as a compressed PNG.
+
+        Args:
+            id: Target ID.
+            img: Target ROS message.
+
+        Raises:
+            Timeout: On timeout.
+            HTTPError: On request failure.
+            CvBridgeError: On image conversion error.
+        """
+        png = serializers.TargetImageSerializer.from_msg(img)
+        self._post("/api/targets/{:d}/image".format(id), data=png)
+
+    def get_target_image(self, id):
+        """Retrieves target image thumbnail.
+
+        Args:
+            id: Target ID.
+
+        Returns:
+            A ROS Image message.
+
+        Raises:
+            Timeout: On timeout.
+            HTTPError: On request failure.
+            CvBridgeError: On image conversion error.
+        """
+        response = self._get("/api/targets/{:d}/image".format(id))
+        img = serializers.TargetImageSerializer.from_raw(response.content)
+        return img
+
+    def delete_target_image(self, id):
+        """Deletes target image thumbnail.
+
+        Args:
+            id: Target ID.
+
+        Raises:
+            Timeout: On timeout.
+            HTTPError: On request failure.
+        """
+        self._delete("/api/targets/{:d}/image".format(id))
