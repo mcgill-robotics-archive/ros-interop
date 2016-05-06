@@ -116,9 +116,9 @@ def get_all_targets(req):
     response.success = False
 
     try:
-        for id, target in client.get_targets():
+        for id, target in client.get_all_targets().iteritems():
             response.ids.append(id)
-            response.targets.append(id)
+            response.targets.append(target)
 
         response.success = True
     except Timeout as e:
