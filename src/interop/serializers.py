@@ -2,11 +2,14 @@
 
 """Interoperability API message serializer."""
 
+import cv2
 import utm
 import rospy
+import numpy as np
 import dateutil.parser
 from dateutil.tz import tzutc
 from datetime import datetime
+from cv_bridge import CvBridge
 from visualization_msgs.msg import Marker, MarkerArray
 from std_msgs.msg import ColorRGBA, Header, String, Time
 from interop.msg import Color, Orientation, Shape, Target, TargetType
@@ -231,7 +234,7 @@ class TargetSerializer(object):
 
     @classmethod
     def from_json(cls, json):
-        """Deserializes target data into relevant ROS message.
+        """Deserializes target data into Target ROS message.
 
         Args:
             json: JSON dictionary.
@@ -249,5 +252,58 @@ class TargetSerializer(object):
 
                 # Set 'casted' value.
                 setattr(msg, attribute_type(json[attribute]))
+
+        return msg
+
+
+class TargetImageSerializer(object):
+
+    """Target image message serializer."""
+
+    @classmethod
+    def from_msg(cls, msg):
+        """Serializes a ROS Image message into a compressed PNG image.
+
+        Args:
+            msg: ROS Image message.
+
+        Returns:
+            Compressed PNG image.
+
+        Raises:
+            CvBridgeError: On image conversion error.
+        """
+        # Convert ROS Image to OpenCV image.
+        bridge = CvBridge()
+        img = bridge.imgmsg_to_cv2(msg)
+
+        # Convert to PNG with highest level of compression to limit bandwidth
+        # usage. PNG is used since it is a lossless format, so this can later
+        # be retrieved as a ROS image without issue.
+        compression = [cv2.IMWRITE_PNG_COMPRESSION, 9]
+        png = cv2.imencode(".png", img, compression)[1].tostring()
+
+        return png
+
+    @classmethod
+    def from_raw(cls, raw):
+        """Deserializes binary-encoded image data into a ROS Image message.
+
+        Args:
+            raw: Binary encoded image data.
+
+        Returns:
+            ROS Image message.
+
+        Raises:
+            CvBridgeError: On image conversion error.
+        """
+        # Convert to OpenCV image.
+        nparr = np.fromstring(raw, np.uint8)
+        img = cv2.imdecode(nparr, cv2.CV_LOAD_IMAGE_COLOR)
+
+        # Convert to ROS message.
+        bridge = CvBridge()
+        msg = bridge.cv2_to_imgmsg(img)
 
         return msg
