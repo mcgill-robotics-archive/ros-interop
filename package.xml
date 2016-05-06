@@ -24,6 +24,7 @@
   <run_depend>geometry_msgs</run_depend>
 
   <!-- Python dependencies -->
+  <run_depend>python-numpy</run_depend>
   <run_depend>python-requests</run_depend>
   <run_depend>python-dateutil</run_depend>
   <run_depend>python-utm-pip</run_depend>
