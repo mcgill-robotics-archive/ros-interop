@@ -1,0 +1,19 @@
+# This service is used to retrieve all existing targets from the
+# interoperability server.
+
+# No inputs necessary.
+
+---
+
+# Whether the request was successful.
+bool success
+
+# The target IDs.
+# The ith element of this array corresponds to the ith element of the targets
+# array.
+uint64[] ids
+
+# The targets.
+# The ith element of this array corresponds to the ith element of the ids
+# array.
+Target[] targets

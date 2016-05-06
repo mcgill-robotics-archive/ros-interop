@@ -1,0 +1,10 @@
+# This service is used to delete an existing image thumbnail from an existing
+# target on the interoperability server.
+
+# Target ID.
+uint64 id
+
+---
+
+# Whether the request was successful.
+bool success

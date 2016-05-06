@@ -1,0 +1,13 @@
+# This service is used to retrieve an existing target from the interoperability
+# server.
+
+# The target ID.
+uint64 id
+
+---
+
+# Whether the request was successful.
+bool success
+
+# The requested target.
+Target target
