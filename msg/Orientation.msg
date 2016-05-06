@@ -7,7 +7,7 @@ string SOUTHEAST="SE"
 string SOUTH="S"
 string SOUTHWEST="SW"
 string WEST="W"
-string NOTHWEST="NW"
+string NORTHWEST="NW"
 
 # Target orientation.
 # Must be one of the constants defined above.
