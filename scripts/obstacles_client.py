@@ -7,7 +7,7 @@ import rospy
 from simplejson import JSONDecodeError
 from interop import InteroperabilityClient
 from visualization_msgs.msg import MarkerArray
-from requests.exceptions import HTTPError, Timeout
+from requests.exceptions import ConnectionError, HTTPError, Timeout
 
 
 def publish_obstacles(timer_event):
@@ -19,7 +19,7 @@ def publish_obstacles(timer_event):
     try:
         moving_obstacles, stationary_obstacles = client.get_obstacles(frame,
                                                                       lifetime)
-    except Timeout as e:
+    except (ConnectionError, Timeout) as e:
         rospy.logwarn(e)
         return
     except (JSONDecodeError, HTTPError) as e:
@@ -42,6 +42,10 @@ if __name__ == "__main__":
 
     # Initialize interoperability client.
     client = InteroperabilityClient(base_url, username, password, timeout)
+
+    # Wait for server to be reachable, then login.
+    client.wait_for_server()
+    client.login()
 
     # Get ROS parameters for published topic names.
     moving_topic = rospy.get_param("~moving_topic")

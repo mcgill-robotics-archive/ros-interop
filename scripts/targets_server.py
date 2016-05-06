@@ -8,7 +8,7 @@ import interop.srv
 from cv_bridge import CvBridgeError
 from simplejson import JSONDecodeError
 from interop import InteroperabilityClient
-from requests.exceptions import HTTPError, Timeout
+from requests.exceptions import ConnectionError, HTTPError, Timeout
 
 
 def add_target(req):
@@ -26,7 +26,7 @@ def add_target(req):
     try:
         response.id = client.post_target(req.target)
         response.success = True
-    except Timeout as e:
+    except (ConnectionError, Timeout) as e:
         rospy.logwarn(e)
     except (JSONDecodeError, HTTPError) as e:
         rospy.logerr(e)
@@ -49,7 +49,7 @@ def get_target(req):
     try:
         response.target = client.get_target(req.id)
         response.success = True
-    except Timeout as e:
+    except (ConnectionError, Timeout) as e:
         rospy.logwarn(e)
     except (JSONDecodeError, HTTPError) as e:
         rospy.logerr(e)
@@ -72,7 +72,7 @@ def update_target(req):
     try:
         client.put_target(req.id, req.target)
         response.success = True
-    except Timeout as e:
+    except (ConnectionError, Timeout) as e:
         rospy.logwarn(e)
     except HTTPError as e:
         rospy.logerr(e)
@@ -95,7 +95,7 @@ def delete_target(req):
     try:
         client.delete_target(req.id)
         response.success = True
-    except Timeout as e:
+    except (ConnectionError, Timeout) as e:
         rospy.logwarn(e)
     except HTTPError as e:
         rospy.logerr(e)
@@ -121,7 +121,7 @@ def get_all_targets(req):
             response.targets.append(target)
 
         response.success = True
-    except Timeout as e:
+    except (ConnectionError, Timeout) as e:
         rospy.logwarn(e)
     except (JSONDecodeError, HTTPError) as e:
         rospy.logerr(e)
@@ -144,7 +144,7 @@ def add_target_image(req):
     try:
         client.post_target_image(req.id, req.image)
         response.success = True
-    except Timeout as e:
+    except (ConnectionError, Timeout) as e:
         rospy.logwarn(e)
     except (CvBridgeError, HTTPError) as e:
         rospy.logerr(e)
@@ -167,7 +167,7 @@ def get_target_image(req):
     try:
         response.image = client.get_target_image(req.id)
         response.success = True
-    except Timeout as e:
+    except (ConnectionError, Timeout) as e:
         rospy.logwarn(e)
     except (CvBridgeError, HTTPError) as e:
         rospy.logerr(e)
@@ -190,7 +190,7 @@ def delete_target_image(req):
     try:
         client.delete_target_image(req.id)
         response.success = True
-    except Timeout as e:
+    except (ConnectionError, Timeout) as e:
         rospy.logwarn(e)
     except HTTPError as e:
         rospy.logerr(e)
@@ -210,6 +210,10 @@ if __name__ == "__main__":
 
     # Initialize interoperability client.
     client = InteroperabilityClient(base_url, username, password, timeout)
+
+    # Wait for server to be reachable, then login.
+    client.wait_for_server()
+    client.login()
 
     # Initialize target ROS services.
     rospy.Service("~add", interop.srv.AddTarget, add_target)

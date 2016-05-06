@@ -19,7 +19,10 @@ class InteroperabilityClient(object):
     """
 
     def __init__(self, url, username, password, timeout):
-        """Initializes InteroperabilityClient and authenticates with server.
+        """Initializes InteroperabilityClient.
+
+        Note: the client must wait_for_server() and login() to the server
+        before first use.
 
         Args:
             url: Interoperability server base URL (e.g. http://127.0.0.1:8080).
@@ -35,19 +38,8 @@ class InteroperabilityClient(object):
         self.url = url[:-1] if url.endswith('/') else url
         self.session = requests.Session()
 
+        # Set up credentials for login.
         self.__credentials = {"username": username, "password": password}
-
-        # Login.
-        self.__login()
-
-    def __login(self):
-        """Authenticates with the server."""
-        response = self.session.request(
-            method="POST",
-            url=self.url + "/api/login",
-            timeout=self.timeout,
-            data=self.__credentials)
-        response.raise_for_status()
 
     def __request(self, method, uri, **kwargs):
         """Sends request to Interoperability server at specified URI.
@@ -63,9 +55,10 @@ class InteroperabilityClient(object):
         Raises:
             Timeout: On timeout.
             HTTPError: On request failure.
+            ConnectionError: On connection failure.
         """
         # Try until authenticated.
-        while True:
+        while not rospy.is_shutdown():
             # Send request.
             response = self.session.request(
                 method=method,
@@ -82,7 +75,7 @@ class InteroperabilityClient(object):
                 self.session = requests.Session()
 
                 # Relogin.
-                self.__login()
+                self.login()
                 continue
 
             # Notify of other errors.
@@ -106,6 +99,7 @@ class InteroperabilityClient(object):
         Raises:
             Timeout: On timeout.
             HTTPError: On request failure.
+            ConnectionError: On connection failure.
         """
         return self.__request("GET", uri, **kwargs)
 
@@ -122,6 +116,7 @@ class InteroperabilityClient(object):
         Raises:
             Timeout: On timeout.
             HTTPError: On request failure.
+            ConnectionError: On connection failure.
         """
         return self.__request("PUT", uri, **kwargs)
 
@@ -138,6 +133,7 @@ class InteroperabilityClient(object):
         Raises:
             Timeout: On timeout.
             HTTPError: On request failure.
+            ConnectionError: On connection failure.
         """
         return self.__request("POST", uri, **kwargs)
 
@@ -154,8 +150,35 @@ class InteroperabilityClient(object):
         Raises:
             Timeout: On timeout.
             HTTPError: On request failure.
+            ConnectionError: On connection failure.
         """
         return self.__request("DELETE", uri, **kwargs)
+
+    def wait_for_server(self):
+        """Waits until interoperability server is reachable."""
+        reachable = False
+        while not reachable and not rospy.is_shutdown():
+            try:
+                response = requests.get(self.url, timeout=self.timeout)
+                response.raise_for_status()
+                reachable = response.ok
+            except:
+                continue
+
+    def login(self):
+        """Authenticates with the server.
+
+        Raises:
+            Timeout: On timeout.
+            HTTPError: On request failure.
+            ConnectionError: On connection failure.
+        """
+        response = self.session.request(
+            method="POST",
+            url=self.url + "/api/login",
+            timeout=self.timeout,
+            data=self.__credentials)
+        response.raise_for_status()
 
     def get_server_info(self):
         """Returns server information.
@@ -168,6 +191,7 @@ class InteroperabilityClient(object):
         Raises:
             Timeout: On timeout.
             HTTPError: On request failure.
+            ConnectionError: On connection failure.
             JSONDecodeError: On JSON decoding failure.
         """
         response = self._get("/api/server_info")
@@ -188,6 +212,7 @@ class InteroperabilityClient(object):
         Raises:
             Timeout: On timeout.
             HTTPError: On request failure.
+            ConnectionError: On connection failure.
             JSONDecodeError: On JSON decoding failure.
         """
         response = self._get("/api/obstacles")
@@ -204,6 +229,7 @@ class InteroperabilityClient(object):
         Raises:
             Timeout: On timeout.
             HTTPError: On request failure.
+            ConnectionError: On connection failure.
         """
         json_telem = serializers.TelemetrySerializer.from_msg(navsat_msg,
                                                               compass_msg)
@@ -221,6 +247,7 @@ class InteroperabilityClient(object):
         Raises:
             Timeout: On timeout.
             HTTPError: On request failure.
+            ConnectionError: On connection failure.
             JSONDecodeError: On JSON decoding failure.
         """
         json_target = serializers.TargetSerializer.from_msg(target)
@@ -236,6 +263,7 @@ class InteroperabilityClient(object):
         Raises:
             Timeout: On timeout.
             HTTPError: On request failure.
+            ConnectionError: On connection failure.
             JSONDecodeError: On JSON decoding failure.
         """
         response = self._get("/api/targets")
@@ -257,6 +285,7 @@ class InteroperabilityClient(object):
         Raises:
             Timeout: On timeout.
             HTTPError: On request failure.
+            ConnectionError: On connection failure.
             JSONDecodeError: On JSON decoding failure.
         """
         response = self._get("/api/targets/{:d}".format(id))
@@ -273,6 +302,7 @@ class InteroperabilityClient(object):
         Raises:
             Timeout: On timeout.
             HTTPError: On request failure.
+            ConnectionError: On connection failure.
         """
         json_target = serializers.TargetSerializer.from_msg(target)
         self._put("/api/targets/{:d}".format(id), data=json.dumps(json_target))
@@ -286,6 +316,7 @@ class InteroperabilityClient(object):
         Raises:
             Timeout: On timeout.
             HTTPError: On request failure.
+            ConnectionError: On connection failure.
         """
         self._delete("/api/targets/{:d}".format(id))
 
@@ -299,7 +330,8 @@ class InteroperabilityClient(object):
         Raises:
             Timeout: On timeout.
             HTTPError: On request failure.
-            CvBridgeError: On image conversion error.
+            ConnectionError: On connection failure.
+            CvBridgeError: On image conversion failure.
         """
         png = serializers.TargetImageSerializer.from_msg(img)
         self._post("/api/targets/{:d}/image".format(id), data=png)
@@ -316,7 +348,8 @@ class InteroperabilityClient(object):
         Raises:
             Timeout: On timeout.
             HTTPError: On request failure.
-            CvBridgeError: On image conversion error.
+            ConnectionError: On connection failure.
+            CvBridgeError: On image conversion failure.
         """
         response = self._get("/api/targets/{:d}/image".format(id))
         img = serializers.TargetImageSerializer.from_raw(response.content)
@@ -331,5 +364,6 @@ class InteroperabilityClient(object):
         Raises:
             Timeout: On timeout.
             HTTPError: On request failure.
+            ConnectionError: On connection failure.
         """
         self._delete("/api/targets/{:d}/image".format(id))
