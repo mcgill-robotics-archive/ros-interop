@@ -2,6 +2,8 @@
 
 """Interoperability HTTP Client."""
 
+import json
+import rospy
 import requests
 import serializers
 
@@ -73,6 +75,8 @@ class InteroperabilityClient(object):
 
             # Relogin if session expired, and try again.
             if response.status_code == requests.codes.FORBIDDEN:
+                rospy.logwarn("Session expired: reauthenticating...")
+
                 # Start a new session.
                 self.session.close()
                 self.session = requests.Session()
@@ -201,9 +205,9 @@ class InteroperabilityClient(object):
             Timeout: On timeout.
             HTTPError: On request failure.
         """
-        json = serializers.TelemetrySerializer.from_msg(navsat_msg,
-                                                        compass_msg)
-        self._post("/api/telemetry", data=json)
+        json_telem = serializers.TelemetrySerializer.from_msg(navsat_msg,
+                                                              compass_msg)
+        self._post("/api/telemetry", data=json.dumps(json_telem))
 
     def post_target(self, target):
         """Uploads new target for submission.
@@ -219,11 +223,11 @@ class InteroperabilityClient(object):
             HTTPError: On request failure.
             JSONDecodeError: On JSON decoding failure.
         """
-        json = serializers.TargetSerializer.from_msg(target)
-        response = self._post("/api/targets", data=json)
+        json_target = serializers.TargetSerializer.from_msg(target)
+        response = self._post("/api/targets", data=json.dumps(json_target))
         return response.json()["id"]
 
-    def get_targets(self):
+    def get_all_targets(self):
         """Returns first 100 submitted targets.
 
         Returns:
@@ -270,8 +274,8 @@ class InteroperabilityClient(object):
             Timeout: On timeout.
             HTTPError: On request failure.
         """
-        json = serializers.TargetSerializer.from_msg(target)
-        self._put("/api/targets/{:d}".format(id), data=json)
+        json_target = serializers.TargetSerializer.from_msg(target)
+        self._put("/api/targets/{:d}".format(id), data=json.dumps(json_target))
 
     def delete_target(self, id):
         """Deletes target with matching ID.
@@ -283,7 +287,7 @@ class InteroperabilityClient(object):
             Timeout: On timeout.
             HTTPError: On request failure.
         """
-        self._delete("/api/targets/" + int(id))
+        self._delete("/api/targets/{:d}".format(id))
 
     def post_target_image(self, id, img):
         """Adds or updates target image thumbnail as a compressed PNG.
