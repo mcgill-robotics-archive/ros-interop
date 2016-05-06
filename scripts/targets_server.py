@@ -129,16 +129,16 @@ def get_all_targets(req):
     return response
 
 
-def add_target_image(req):
-    """Handles AddTargetImage service request.
+def set_target_image(req):
+    """Handles SetTargetImage service request.
 
     Args:
-        req: AddTargetImageRequest message.
+        req: SetTargetImageRequest message.
 
     Returns:
-        AddTargetImageResponse.
+        SetTargetImageResponse.
     """
-    response = interop.srv.AddTargetImageResponse()
+    response = interop.srv.SetTargetImageResponse()
     response.success = False
 
     try:
@@ -223,7 +223,7 @@ if __name__ == "__main__":
     rospy.Service("~all", interop.srv.GetAllTargets, get_all_targets)
 
     # Initialize target image ROS services.
-    rospy.Service("~image/add", interop.srv.AddTargetImage, add_target_image)
+    rospy.Service("~image/set", interop.srv.SetTargetImage, set_target_image)
     rospy.Service("~image/get", interop.srv.GetTargetImage, get_target_image)
     rospy.Service("~image/delete", interop.srv.DeleteTargetImage,
                   delete_target_image)

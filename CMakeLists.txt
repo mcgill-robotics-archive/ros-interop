@@ -35,7 +35,7 @@ add_service_files(FILES
   GetAllTargets.srv
 
   # Target image services.
-  AddTargetImage.srv
+  SetTargetImage.srv
   GetTargetImage.srv
   DeleteTargetImage.srv
 )
