@@ -39,7 +39,61 @@ To run, simply launch the package with:
 roslaunch interop interop.launch base_url:=<base_url> username:=<username> password:=<password>
 ```
 
-### Arguments
+## Nodes
+
+This package has the following nodes available:
+
+### `obstacles`
+
+This by default publishes both moving and stationary obstacles at 20 Hz to the
+following topics:
+
+-   `~moving`: Moving obstacles, `visualization_msgs/MarkerArray`.
+-   `~stationary`: Stationary obstacles, `visualization_msgs/MarkerArray`.
+
+#### Visualizing
+
+Stationary and moving obstacles can be visualized in `rviz` as `MarkerArray`s
+relative to the `odom` frame in UTM coordinates.
+
+### `server_info`
+
+This by default publishes server information at 20 Hz to the following topics:
+
+-   `~message`: Message data, `std_msgs/String`.
+-   `~message_timestamp`: Message timestamp, `std_msgs/Time`.
+-   `~time`: Server time, `std_msgs/Time`.
+
+### `telemetry`
+
+This by default subscribes to telemetry data on the following topics, and
+uploads them to the interoperability server:
+
+-   `/mavros/global_position/global`: GPS and altitude data,
+    `sensor_msgs/NavSatFix`.
+-   `/mavros/global_position/compass_hdg`: Current heading in degrees relative
+    to true north, `std_msgs/Float64`.
+
+### `targets`
+
+This by default serves ROS services to interact with the interoperability
+targets API with the following:
+
+#### Targets
+
+-   `~add`: Adds new target, `AddTarget`.
+-   `~get`: Retrieves specific target, `GetTarget`.
+-   `~update`: Updates specific target with new characteristics `UpdateTarget`.
+-   `~delete`: Deletes specific target, `DeleteTarget`.
+-   `~all`: Gets all submitted targets, `GetAllTargets`.
+
+#### Thumbnails
+
+-   `~image/set`: Sets or updates target image thumbnail, `SetTargetImage`.
+-   `~image/get`: Retrieves target image thumbnail, `GetTargetImage`.
+-   `~image/delete`: Deletes target image thumbnail, `DeleteTargetImage`.
+
+## Arguments
 
 The following are the run-time ROS launch arguments available:
 
@@ -94,7 +148,3 @@ are synchronized in order to be properly paired. For more information, see
 -   `max_sync_delay`: Maximum message synchronization delay in seconds,
     default: `1`.
 
-## Visualizing
-
-Stationary and moving obstacles can be visualized in `rviz` as `MarkerArray`s
-relative to the `odom` frame in UTM coordinates.
