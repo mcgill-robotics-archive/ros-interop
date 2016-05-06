@@ -17,12 +17,10 @@ add_message_files(FILES
   Color.msg
   Orientation.msg
   Shape.msg
+  TargetType.msg
   
-  # Target types.
-  StandardTarget.msg
-  QRCTarget.msg
-  OffAxisTarget.msg
-  EmergentTarget.msg)
+  # Target.
+  Target.msg)
 generate_messages(DEPENDENCIES std_msgs)
 
 catkin_package(
