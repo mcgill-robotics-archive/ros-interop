@@ -89,5 +89,17 @@
       <param name="navsat_topic" value="$(arg navsat_topic)"/>
       <param name="compass_topic" value="$(arg compass_topic)"/>
     </node>
+
+    <!-- Target client -->
+    <node name="targets"
+          pkg="interop"
+          type="targets_server.py"
+          output="screen">
+      <!-- Login credentials and request parameters -->
+      <param name="base_url" value="$(arg base_url)"/>
+      <param name="username" value="$(arg username)"/>
+      <param name="password" value="$(arg password)"/>
+      <param name="timeout" value="$(arg timeout)"/>
+    </node>
   </group>
 </launch>
