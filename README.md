@@ -2,6 +2,7 @@
 
 This ROS package provides a client to communicate with the
 [AUVSI SUAS Interopability server](https://github.com/auvsi-suas/interop).
+*This package has been tested on ROS Indigo and ROS Jade.*
 
 ## Setting up
 
@@ -29,7 +30,16 @@ by running:
 catkin_make
 ```
 
-from the root of your workspace.
+from the root of your `catkin` workspace.
+
+### Testing
+
+You can run the ROS tests to make sure the package is indeed functional by
+running the following from the root of your `catkin` workspace:
+
+```bash
+catkin_make run_tests
+```
 
 ## Running
 
