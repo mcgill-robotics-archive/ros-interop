@@ -127,9 +127,9 @@ class ObstaclesDeserializer(object):
                 # Moving obstacles are spheres.
                 marker = Marker()
                 marker.header = header
-                marker.type = marker.SPHERE
+                marker.type = Marker.SPHERE
                 marker.color = cls.OBSTACLE_COLOR
-                marker.ns = "stationary_obstacles"
+                marker.ns = "moving_obstacles"
                 marker.lifetime = rospy.Duration(lifetime)
 
                 # Set scale as radius.
@@ -152,7 +152,7 @@ class ObstaclesDeserializer(object):
                 # Stationary obstacles are cylinders.
                 marker = Marker()
                 marker.header = header
-                marker.type = marker.CYLINDER
+                marker.type = Marker.CYLINDER
                 marker.color = cls.OBSTACLE_COLOR
                 marker.ns = "stationary_obstacles"
                 marker.lifetime = rospy.Duration(lifetime)
