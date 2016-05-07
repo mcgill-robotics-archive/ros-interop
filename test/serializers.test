@@ -1,0 +1,5 @@
+<launch>
+  <test test-name="serializers"
+    pkg="interop"
+    type="test_serializers.py" />
+</launch>

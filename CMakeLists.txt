@@ -46,3 +46,8 @@ catkin_package(
   CATKIN_DEPENDS
   rospy
 )
+
+if(CATKIN_ENABLE_TESTING)
+  find_package(rostest)
+  add_rostest(test/serializers.test)
+endif()
