@@ -50,4 +50,5 @@ catkin_package(
 if(CATKIN_ENABLE_TESTING)
   find_package(rostest)
   add_rostest(test/serializers.test)
+  add_rostest(test/client.test)
 endif()

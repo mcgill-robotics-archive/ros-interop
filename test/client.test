@@ -1,0 +1,5 @@
+<launch>
+  <test test-name="client"
+    pkg="interop"
+    type="test_client.py" />
+</launch>
