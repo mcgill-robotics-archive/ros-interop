@@ -70,7 +70,22 @@ following topics:
 #### Visualizing
 
 Stationary and moving obstacles can be visualized in `rviz` as `MarkerArray`s
-relative to the `odom` frame in UTM coordinates.
+relative to the `odom` frame in UTM coordinates. Note that the marker's
+positions are in UTM coordinates, so you will likely not be able to see the
+obstacles in `rviz` (they will be *very* far away) without a static
+transformation to cancel this out. For example, you could have a static
+transformation `map -> odom` of your drone's starting position or your ground
+station's position in UTM coordinates, and then visualize the obstacles
+relative to the `map` frame.
+
+If set up properly, it should look like this:
+
+<img width="1680" alt="rviz"
+ src="https://cloud.githubusercontent.com/assets/723610/15096449/d68b0ca2-14ac-11e6-82dc-8513809f7510.png">
+
+where the cylinder is a stationary obstacle, and the sphere is a moving
+obstacle.
+
 
 ### `server_info`
 
