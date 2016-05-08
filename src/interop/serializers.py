@@ -251,7 +251,9 @@ class TargetSerializer(object):
                 attribute_type = type(getattr(msg, attribute))
 
                 # Set 'casted' value.
-                setattr(msg, attribute, attribute_type(json[attribute]))
+                value = json[attribute]
+                if value is not None:
+                    setattr(msg, attribute, attribute_type(value))
 
         return msg
 
