@@ -2,7 +2,9 @@
 
 This ROS package provides a client to communicate with the
 [AUVSI SUAS Interopability server](https://github.com/auvsi-suas/interop).
-*This package has been tested on ROS Indigo and ROS Jade.*
+
+*This package has only been tested on ROS Indigo and ROS Jade on Ubuntu 14.04.
+Use at your own risk.*
 
 ## Setting up
 
@@ -158,3 +160,18 @@ are synchronized in order to be properly paired. For more information, see
 -   `max_sync_delay`: Maximum message synchronization delay in seconds,
     default: `1`.
 
+## Contributing
+
+Contributions are welcome. Simply open an issue or pull request on the matter,
+and it will be accepted as long as it does not complicate the code base too
+much.
+
+As for style guides, we follow the ROS Python Style Guide for ROS-specifics and
+the Google Python Style Guide for everything else.
+
+Finally, we have a strict 80 character line limit and four spaces per
+indentation.
+
+## License
+
+See [LICENSE](LICENSE).
