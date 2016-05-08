@@ -179,6 +179,10 @@ are synchronized in order to be properly paired. For more information, see
 -   `max_sync_delay`: Maximum message synchronization delay in seconds,
     default: `1`.
 
+## Known issues
+
+- Obstacles flicker in `rviz`.
+
 ## Contributing
 
 Contributions are welcome. Simply open an issue or pull request on the matter,
