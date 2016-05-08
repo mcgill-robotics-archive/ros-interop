@@ -1,5 +1,9 @@
 # AUVSI SUAS Interopability ROS Client
 
+[master]: http://dev.mcgillrobotics.com/buildStatus/icon?job=ros-interop_master
+[master url]: http://dev.mcgillrobotics.com/job/ros-interop_master
+[![master]][master url]
+
 This ROS package provides a client to communicate with the
 [AUVSI SUAS Interopability server](https://github.com/auvsi-suas/interop).
 
