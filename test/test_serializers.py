@@ -20,24 +20,153 @@ class TestSerializers(TestCase):
 
     """Tests interoperability serializers."""
 
-    def test_server_info_deserializer(self):
-        """Tests server information deserializer."""
-        # Set up test data.
-        json = {
-            "message": "Fly Safe",
-            "message_timestamp": "2015-06-14 18:18:55.642000+00:00",
-            "server_time": "2015-08-14 03:37:13.331402"
+    def test_mission_deserializer(self):
+        """Tests the mission deserializer."""
+        json =   {
+            "id": 1,
+            "active": True,
+            "air_drop_pos": {
+                "latitude": 38.141833,
+                "longitude": -76.425263
+            },
+            "fly_zones": [
+                {
+                    "altitude_msl_max": 200.0,
+                    "altitude_msl_min": 100.0,
+                    "boundary_pts": [
+                        {
+                             "latitude": 38.142544,
+                             "longitude": -76.434088,
+                             "order": 1
+                        },
+                        {
+                             "latitude": 38.141833,
+                             "longitude": -76.425263,
+                             "order": 2
+                        },
+                        {
+                             "latitude": 38.144678,
+                             "longitude": -76.427995,
+                             "order": 3
+                        }
+                    ]
+                }
+            ],
+            "home_pos": 
+            {
+                "latitude": 38.14792,
+                "longitude": -76.427995
+            },
+            "mission_waypoints": 
+            [
+                {
+                    "altitude_msl": 200.0,
+                    "latitude": 38.142544,
+                    "longitude": -76.434088,
+                    "order": 1
+                }
+            ],
+            "off_axis_target_pos": 
+            {
+                "latitude": 38.142544,
+                "longitude": -76.434088
+            },
+            "emergent_last_known_pos": 
+            {
+                "latitude": 38.145823,
+                "longitude": -76.422396
+            },
+            "search_grid_points": 
+            [
+                {
+                    "altitude_msl": 200.0,
+                    "latitude": 38.142544,
+                    "longitude": -76.434088,
+                    "order": 1
+                }
+            ]
         }
 
-        # Deserialize server information.
-        server_info = serializers.ServerInfoDeserializer.from_json(json)
+        mission = serializers.MissionDeserializer.from_json(json,"map")
+        flyzones = mission[0]
+        search_grid = mission[1]
+        waypoints = mission[2]
+        air_drop_pos = mission[3]
+        off_axis_targ = mission[4]
+        emergent_obj = mission[5]
 
-        # Compare properties
-        self.assertEqual(server_info[0].data, json["message"])
-        msg_time = serializers.iso8601_to_rostime(json["message_timestamp"])
-        self.assertEqual(server_info[1], msg_time)
-        server_time = serializers.iso8601_to_rostime(json["server_time"])
-        self.assertEqual(server_info[2], server_time)
+        # Test flyzones.
+        self.assertEqual(len(json["fly_zones"]), len(flyzones.flyzones))
+        for i, flyzone in enumerate(flyzones.flyzones):
+            zone = json["fly_zones"][i]
+            max_alt = serializers.feet_to_meters(zone["altitude_msl_max"])
+            min_alt = serializers.feet_to_meters(zone["altitude_msl_min"])
+
+            self.assertEqual(flyzone.max_alt, max_alt)
+            self.assertEqual(flyzone.min_alt, min_alt)
+            self.assertEqual(len(flyzone.zone.polygon.points),
+                             len(zone["boundary_pts"]))
+
+            bound = zone["boundary_pts"]
+            for k, pnt in enumerate(flyzone.zone.polygon.points):
+                self.assertEqual(k+1, bound[k]["order"])
+                
+                easting, northing, _, _ = utm.from_latlon(
+                    bound[k]["latitude"], bound[k]["longitude"])
+
+                self.assertEqual(pnt.x, easting)
+                self.assertEqual(pnt.y, northing)
+        
+        # Test search grid.
+        grid = json["search_grid_points"]
+        self.assertEqual(len(search_grid.polygon.points), len(grid))
+        for i, pnt in enumerate(search_grid.polygon.points):
+            self.assertEqual(i+1, grid[i]["order"])
+            
+            altitude = serializers.feet_to_meters(grid[i]["altitude_msl"])
+            easting, northing, _, _ = utm.from_latlon(grid[i]["latitude"],
+                                                      grid[i]["longitude"])
+
+            self.assertEqual(pnt.x, easting)
+            self.assertEqual(pnt.y, northing)
+            self.assertEqual(pnt.z, altitude)
+
+        # Test waypoints.
+        points = json["mission_waypoints"]
+        self.assertEqual(len(waypoints.points), len(points))
+        
+        for i, pnt in enumerate(waypoints.points):
+            self.assertEqual(i+1, points[i]["order"])
+
+            altitude = serializers.feet_to_meters(points[i]["altitude_msl"])
+            easting, northing, _, _ = utm.from_latlon(points[i]["latitude"],
+                                                      points[i]["longitude"])
+
+            self.assertEqual(pnt.x, easting)
+            self.assertEqual(pnt.y, northing)
+            self.assertEqual(pnt.z, altitude)
+
+        # Test airdrop pos.
+        easting, northing, _, _ = utm.from_latlon(
+                                            json["air_drop_pos"]["latitude"],
+                                            json["air_drop_pos"]["longitude"])
+        self.assertEqual(air_drop_pos.point.x, easting)
+        self.assertEqual(air_drop_pos.point.y, northing)
+
+        # Test off axis target.
+        easting, northing, _, _ = utm.from_latlon(
+                                    json["off_axis_target_pos"]["latitude"],
+                                    json["off_axis_target_pos"]["longitude"])
+        self.assertEqual(off_axis_targ.point.x, easting)
+        self.assertEqual(off_axis_targ.point.y, northing)
+
+        # Test emergent object.
+        easting, northing, _, _ = utm.from_latlon(
+                                  json["emergent_last_known_pos"]["latitude"],
+                                  json["emergent_last_known_pos"]["longitude"])
+        self.assertEqual(emergent_obj.point.x, easting)
+        self.assertEqual(emergent_obj.point.y, northing)
+        
 
     def test_obstacles_deserializer(self):
         """Tests obstacles deserializer."""

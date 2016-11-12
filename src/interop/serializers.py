@@ -10,9 +10,11 @@ import dateutil.parser
 from dateutil.tz import tzutc
 from datetime import datetime
 from cv_bridge import CvBridge
+from geometry_msgs.msg import Point, PointStamped, PolygonStamped, Polygon
 from visualization_msgs.msg import Marker, MarkerArray
-from std_msgs.msg import ColorRGBA, Header, String, Time
-from interop.msg import Color, Orientation, Shape, Target, TargetType
+from std_msgs.msg import ColorRGBA, Float64, Header, String, Time
+from interop.msg import (Color, FlyZone, FlyZoneArray, 
+                         Orientation, Shape, Target, TargetType)
 
 
 def meters_to_feet(m):
@@ -66,28 +68,233 @@ def iso8601_to_rostime(iso):
     return time
 
 
-class ServerInfoDeserializer(object):
+class MissionDeserializer(object):
 
-    """Server information deserializer."""
+    """Mission information deserializer."""
 
     @classmethod
-    def from_json(cls, json):
-        """Deserializes server information into a tuple of standard ROS
-        messages.
-
+    def __get_flyzone(cls, json, frame):
+        """
+        Deserializes flight boundary data into a FlyZoneArray message.
+            
         Args:
-            json: JSON dictionary.
+            json: List of JSON dicts.
+            frame: Frame id for the boundaries.
 
         Returns:
-            (std_msgs/String, std_msgs/Time, std_msgs/Time) tuple.
-            The first is the server message, the second is the message
-            timestamp and the last is the server time.
+            A FlyzoneArray message type which contains an array of FlyZone
+            messages, which contains a polygon for the boundary, a max 
+            altitude and a min altitude.
         """
-        message = String(data=json["message"])
-        message_timestamp = iso8601_to_rostime(json["message_timestamp"])
-        server_time = iso8601_to_rostime(json["server_time"])
+        flyzones = FlyZoneArray()
+        for zone in json:
+            header = Header()
+            header.stamp = rospy.get_time()
+            header.frame_id = frame
 
-        return (message, message_timestamp, server_time)
+            flyzone = FlyZone()
+
+            flyzone.max_alt = feet_to_meters(zone["altitude_msl_max"])
+            flyzone.min_alt = feet_to_meters(zone["altitude_msl_min"])
+
+            # Change boundary points to ros message of type polygon.
+            boundary = PolygonStamped()
+            boundary.header = header
+            for waypoint in zone["boundary_pts"]:
+                point = Point()
+                easting, northing, _, _ = utm.from_latlon(
+                                                      waypoint["latitude"],
+                                                      waypoint["longitude"])
+                point.x = easting
+                point.y = northing
+                flyzone.zone.polygon.points.append(point)
+
+            flyzones.flyzones.append(flyzone)
+
+        return flyzones
+
+    @classmethod
+    def __get_waypoints(cls, json, frame):
+        """
+        Deserializes a list of waypoints into a marker message.
+
+        Args:
+            json: List of JSON Dicts corresponding to waypoints.
+            frame: Frame of the markers.
+
+        Returns:
+            A marker message of type Points, with a list of points in order
+            corresponding to each waypoint.
+        """
+        waypoints = Marker()
+        waypoints.ns = "waypoints"
+        waypoints.type = Marker.POINTS
+
+        # Set lifetime to 0 because waypoints do not change.
+        waypoints.lifetime = rospy.Duration()
+
+        # Ensure there is no rotation by setting w to 1.
+        waypoints.pose.orientation.w = 1.0
+        waypoints.scale.x = waypoints.scale.y = waypoints.scale.z = 0.1
+        for point in json:
+            waypoint = Point()
+            easting, northing, _, _ = utm.from_latlon(point["latitude"],
+                                                      point["longitude"])
+            altitude = feet_to_meters(point["altitude_msl"])
+            
+            waypoint.x = easting
+            waypoint.y = northing
+            waypoint.z = altitude
+
+            waypoints.points.append(waypoint)
+
+        return waypoints
+
+    @classmethod
+    def __get_search_grid(cls, json, frame):
+        """
+        Deserializes a the search grid into a polygon message.
+
+        Args:
+            json: List of JSON dicts corresponding to the search grid points.
+            frame: Frame for the polygon.
+
+        Returns:
+            Message of type PolygonStamped with the bounds of the search grid.
+        """
+        header = Header()
+        header.stamp = rospy.get_time()
+        header.frame_id = frame
+
+        search_grid = PolygonStamped()
+        search_grid.header = header
+
+        for point in json:
+            boundary_pnt = Point()
+
+            easting, northing, _, _ = utm.from_latlon(point["latitude"],
+                                                      point["longitude"])
+            altitude = feet_to_meters(point["altitude_msl"])
+            
+            boundary_pnt.x = easting
+            boundary_pnt.y = northing
+            boundary_pnt.z = altitude
+
+            search_grid.polygon.points.append(boundary_pnt)
+
+        return search_grid
+
+    @classmethod
+    def __get_airdrop_loc(cls, json, frame):
+        """
+        Deserializes the airdrop location to a ros message of type 
+        PointStamped.
+
+        Args:
+            json: A JSON dict with the air drop location.
+            frame: Frame for the point.
+
+        Returns:
+            A PointStamped message with x and y corresponding to the airdrop
+            location.
+        """
+        header = Header()
+        header.stamp = rospy.get_time()
+        header.frame_id = frame
+
+        air_drop = PointStamped()
+        air_drop.header = header
+
+        easting, northing, _, _ = utm.from_latlon(json["latitude"],
+                                                  json["longitude"])
+        air_drop.point.x = easting
+        air_drop.point.y = northing
+
+        return air_drop
+
+    @classmethod
+    def __get_offaxis_targ(cls, json, frame):
+        """
+        Deserializes off axis target location to a message of type PointStamped.
+
+        Args:
+            json: JSON dict containing the off axis target location.
+            frame: Frame for the point.
+
+        Returns:
+            A message of type PointStamped with the location of the off axis
+            target.
+        """
+        header = Header()
+        header.stamp = rospy.get_time()
+        header.frame_id = frame
+        
+        off_axis_targ = PointStamped()
+        off_axis_targ.header = header
+
+        easting, northing, _, _ = utm.from_latlon(json["latitude"],
+                                                  json["longitude"])
+
+        off_axis_targ.point.x = easting
+        off_axis_targ.point.y = northing
+
+        return off_axis_targ
+
+    @classmethod
+    def __emergent_object(cls, json, frame):
+        """
+        Deserializes the last known location of the emergent target to a 
+        ros message of type PointStamped.
+
+        Args:
+            json: JSON dict with the corresponding location.
+            frame: Frame for the point.
+
+        Returns:
+            A PointStamped message with the information about the last known
+            location of the emergent target.
+        """
+        header = Header()
+        header.stamp = rospy.get_rostime()
+        header.frame_id = frame
+
+        emergent_obj = PointStamped()
+        emergent_obj.header = header
+
+        easting, northing, _, _ = utm.from_latlon(json["latitude"],
+                                                  json["longitude"])
+
+        emergent_obj.point.x = easting
+        emergent_obj.point.y = northing
+
+        return emergent_obj
+
+    @classmethod
+    def from_json(cls, json, frame):
+        """
+        Deserializes the mission object from json to several ros messages.
+
+        Args:
+            json: JSON Dict.
+            frame: frame id for the messages.
+
+        Returns:
+            A tuple of (FlyZoneArray, PolygonStamped, Marker, PointStamped,
+            PointStamped, PointStamped) corresponding to the flyzones, search
+            grid, waypoints, air drop position, off axis target location, and
+            the emergent object location.
+        """
+        flyzones = cls.__get_flyzone(json["fly_zones"], frame)
+        search_grid = cls.__get_search_grid(json["search_grid_points"], frame)
+        waypoints = cls.__get_waypoints(json["mission_waypoints"], frame)
+        air_drop_pos = cls.__get_airdrop_loc(json["air_drop_pos"], frame)
+        off_axis_targ = cls.__get_offaxis_targ(json["off_axis_target_pos"], 
+                                               frame)
+        emergent_obj = cls.__emergent_object(json["emergent_last_known_pos"],
+                                             frame)
+    
+        return (flyzones, search_grid, waypoints, air_drop_pos,
+                off_axis_targ, emergent_obj)
 
 
 class ObstaclesDeserializer(object):

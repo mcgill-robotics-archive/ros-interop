@@ -180,23 +180,6 @@ class InteroperabilityClient(object):
             data=self.__credentials)
         response.raise_for_status()
 
-    def get_server_info(self):
-        """Returns server information.
-
-        Returns:
-            (std_msgs/String, std_msgs/Time, std_msgs/Time) tuple.
-            The first is the server message, the second is the message
-            timestamp and the last is the server time.
-
-        Raises:
-            Timeout: On timeout.
-            HTTPError: On request failure.
-            ConnectionError: On connection failure.
-            JSONDecodeError: On JSON decoding failure.
-        """
-        response = self._get("/api/server_info")
-        return serializers.ServerInfoDeserializer.from_json(response.json())
-
     def get_obstacles(self, frame, lifetime):
         """Returns obstacles as Markers.
 

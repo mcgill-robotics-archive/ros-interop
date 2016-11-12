@@ -19,30 +19,6 @@ class TestInteroperabilityClient(TestCase):
 
     """Tests interoperability client."""
 
-    def test_get_server_info(self):
-        """Tests getting server information through client."""
-        # Set up test data.
-        json = {
-            "message": "Fly Safe",
-            "message_timestamp": "2015-06-14 18:18:55.642000+00:00",
-            "server_time": "2015-08-14 03:37:13.331402"
-        }
-
-        url = "http://interop"
-        client_args = (url, "testuser", "testpass", 1.0)
-
-        with InteroperabilityMockServer(url) as server:
-            # Setup mock server.
-            server.set_root_response()
-            server.set_login_response()
-            server.set_get_server_info_response(**json)
-
-            # Connect client.
-            client = InteroperabilityClient(*client_args)
-            client.wait_for_server()
-            client.login()
-            client.get_server_info()
-
     def test_get_obstacles(self):
         """Tests getting obstacle data through client."""
         # Set up test data.

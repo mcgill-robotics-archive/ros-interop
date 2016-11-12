@@ -23,6 +23,10 @@ add_message_files(FILES
   
   # Target.
   Target.msg
+
+  #Flyzones
+  FlyZone.msg
+  FlyZoneArray.msg
 )
 
 # Custom ROS services.
