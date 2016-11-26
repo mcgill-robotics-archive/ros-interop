@@ -86,20 +86,20 @@ class MissionDeserializer(object):
             messages, which contains a polygon for the boundary, a max 
             altitude and a min altitude.
         """
+        # Generate header for all zones.
+        header = Header()
+        header.stamp = rospy.get_rostime()
+        header.frame_id = frame
+
         flyzones = FlyZoneArray()
         for zone in json:
-            header = Header()
-            header.stamp = rospy.get_time()
-            header.frame_id = frame
-
             flyzone = FlyZone()
+            flyzone.zone.header = header
 
             flyzone.max_alt = feet_to_meters(zone["altitude_msl_max"])
             flyzone.min_alt = feet_to_meters(zone["altitude_msl_min"])
 
             # Change boundary points to ros message of type polygon.
-            boundary = PolygonStamped()
-            boundary.header = header
             for waypoint in zone["boundary_pts"]:
                 point = Point()
                 easting, northing, _, _ = utm.from_latlon(
@@ -126,7 +126,12 @@ class MissionDeserializer(object):
             A marker message of type Points, with a list of points in order
             corresponding to each waypoint.
         """
+        header = Header()
+        header.stamp = rospy.get_rostime()
+        header.frame_id = frame
+
         waypoints = Marker()
+        waypoints.header = header
         waypoints.ns = "waypoints"
         waypoints.type = Marker.POINTS
 
@@ -163,7 +168,7 @@ class MissionDeserializer(object):
             Message of type PolygonStamped with the bounds of the search grid.
         """
         header = Header()
-        header.stamp = rospy.get_time()
+        header.stamp = rospy.get_rostime()
         header.frame_id = frame
 
         search_grid = PolygonStamped()
@@ -199,7 +204,7 @@ class MissionDeserializer(object):
             location.
         """
         header = Header()
-        header.stamp = rospy.get_time()
+        header.stamp = rospy.get_rostime()
         header.frame_id = frame
 
         air_drop = PointStamped()
@@ -226,7 +231,7 @@ class MissionDeserializer(object):
             target.
         """
         header = Header()
-        header.stamp = rospy.get_time()
+        header.stamp = rospy.get_rostime()
         header.frame_id = frame
         
         off_axis_targ = PointStamped()
