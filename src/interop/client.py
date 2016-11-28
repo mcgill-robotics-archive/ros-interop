@@ -274,6 +274,76 @@ class InteroperabilityClient(object):
         response = self._get("/api/targets/{:d}".format(id))
         target = serializers.TargetSerializer.from_json(response.json())
         return target
+	
+    def get_active_mission(self, frame):
+        """Gets active mission.
+
+        Args:
+            frame: Frame ID.
+
+        Returns
+            A tuple of (FlyZoneArray, PolygonStamped, Marker, PointStamped, PointStamped, 
+            Pointstamped) corresponding to the flyzones, search grid, waypoints, air drop position,
+            off axis target location, and the emergent object location of the active mission.
+
+        Raises:
+            Timeout: On timeout.
+            HTTPError: On request failure.
+            ConnectionError: On connection failure.
+            JSONDecodeError: On JSON decoding failure.
+            LookupError: On no active missions found.
+        """	
+        response = self._get("/api/missions")
+        for m in response.json():
+            if m["active"]:
+                return serializers.MissionDeserializer.from_json(m, frame)
+        raise LookupError("No active missions found")
+
+    def get_all_missions(self, frame):
+        """Gets all missions.
+
+        Args: 
+            frame: Frame ID.
+
+        Returns:
+            A list of tuples of (FlyZoneArray, PolygonStamped, Marker, PointStamped, PointStamped, 
+            Pointstamped) corresponding to the flyzones, search grid, waypoints, air drop position,
+            off axis target location, and the emergent object location.
+
+        Raises:
+            Timeout: On timeout.
+            HTTPError: On request failure.
+            ConnectionError: On connection failure.
+            JSONDecodeError: On JSON decoding failure.
+        """
+        response = self._get("/api/missions")
+        missions = {
+            m["id"]: serializers.MissionDeserializer.from_json(m, frame)
+            for m in response.json()
+        }
+        return missions
+
+    def get_mission(self, id, frame):
+        """Returns mission with the matching ID.
+           
+        Args:
+            id: Mission ID.
+            frame: Frame ID.
+
+        Returns:
+            A tuple of (FlyZoneArray, PolygonStamped, Marker, PointStamped, PointStamped, 
+            Pointstamped) corresponding to the flyzones, search grid, waypoints, air drop position,
+            off axis target location, and the emergent object location of the corresponding mission
+
+        Raises: 
+            Timeout: On Timeout.
+            HTTPError: On request failure.
+            ConnectionError: On connection failure.
+            JSONDecodeError: On JSON decoding failure.            
+        """
+        response = self._get("/api/missions/{:d}".format(id))
+        mission = serializers.MissionDeserializer.from_json(response.json(), frame)
+        return mission
 
     def put_target(self, id, target):
         """Updates target information.
