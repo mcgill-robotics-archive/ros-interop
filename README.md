@@ -87,13 +87,24 @@ where the cylinder is a stationary obstacle, and the sphere is a moving
 obstacle.
 
 
-### `server_info`
+### `mission_info`
 
-This by default publishes server information at 20 Hz to the following topics:
+This by default publishes mission information at 1 Hz to the following topics:
 
--   `~message`: Message data, `std_msgs/String`.
--   `~message_timestamp`: Message timestamp, `std_msgs/Time`.
--   `~time`: Server time, `std_msgs/Time`.
+-   `~flyzones`: Flight boundaries, `FlyZoneArray`.
+-   `~search_grid`: Search grid area, `geometry_msgs/PolygonStamped`.
+-   `~waypoints`: List of waypoints, `visualization_msgs/Marker`.
+-   `~air_drop_pos`: Air drop position, `geometry_msgs/PointStamped`.
+-   `~off_axis_targ`: Off axis target position, `geometry_msgs/PointStamped`.
+-   `~emergent_targ_loc`: Emergent target last known location, 
+                          `geometry_msgs/PointStamped`
+
+This also provides the following services to change missions:
+
+-   `~get_active_mission`: Change the mission being published to the current 
+                           active mission, `std_srvs/Trigger`
+-   `~get_mission_by_id` : Change the mission being published to the mission of
+                           the given id, `GetMissionByID`
 
 ### `telemetry`
 
@@ -146,12 +157,18 @@ The following are the run-time ROS launch arguments available:
 
 #### Published topics
 
--   `msg_topic`: `std_msgs/String` feed of the server message,
-    default: `~server_info/message`.
--   `timestamp_topic`: `std_msgs/Time` feed of the server message timestamp,
-    default: `~server_info/message_timestamp`.
--   `server_time_topic`: `std_msgs/Time` feed of the server's current time,
-    default: `~server_info/time`.
+-   `flyzones_topic`: `FlyZoneArray` flight boundaries,
+    default: `~mission_info/flyzones`.
+-   `search_grid_topic`: `geometry_msgs/PolygonStamped` search grid polygon,
+    default: `~mission_info/search_grid`.
+-   `waypoints_topic`: `visualization_msgs/Marker` list of waypoints,
+    default: `~mission_info/waypoints`.
+-   `air_drop_topic`: `geometry_msgs/PointStamped` position of the air drop target,
+    default: `~mission_info/air_drop_loc`.
+-   `emergent_targ_topc`: `geometry_msgs/PointStamped` last known position of the emergent target,
+    default: `~mission_info/emergent_targ_loc`.
+-   `off_axis_targ_topic`: `geometry_msgs/PointStamped` position of the off axis target,
+    default: `~mission_info/off_axis_targ`.
 -   `moving_topic`: `visualization_msgs/MarkerArray` feed of the moving
     obstacles, default: `~obstacles/moving`.
 -   `stationary_topic`: `visualization_msgs/MarkerArray` feed of the stationary
@@ -161,13 +178,20 @@ The following are the run-time ROS launch arguments available:
 
 -   `obstacles_period`: Period to request and publish obstacles at in seconds,
     default: `0.05` (i.e., 20 Hz).
--   `server_info_period`: Period to request and publish server information at
-    in seconds, default: `0.05` (i.e., 20 Hz).
+-   `mission_info_period`: Period to publish mission information at
+    in seconds, default: `1` (i.e., 1 Hz).
 
 #### Frame IDs
 
 -   `obstacles_frame`: Frame ID of the obstacles' `MarkerArray` messages,
     default: `odom`.
+-   `missions_frame`: Frame ID for the mission messages, default: `odom`.
+
+#### Mission IDs
+
+-   `mission_id`: ID for the first mission to access. Negative numbers 
+                  will retrieve active mission instead
+                  , default: `-1`.
 
 #### Synchronization settings
 
