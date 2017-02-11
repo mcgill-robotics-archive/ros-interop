@@ -1,0 +1,10 @@
+# Service for getting mission by ID from the interop server.
+
+# ID for the mission.
+uint64 id
+
+---
+
+# Response indicating success or failure with string for information.
+bool response
+string message

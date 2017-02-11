@@ -514,7 +514,7 @@ class TargetImageSerializer(object):
         """
         # Convert to OpenCV image.
         nparr = np.fromstring(raw, np.uint8)
-        img = cv2.imdecode(nparr, cv2.CV_LOAD_IMAGE_COLOR)
+        img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
         # Convert to ROS message.
         bridge = CvBridge()

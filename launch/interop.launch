@@ -14,18 +14,25 @@
   <arg name="compass_topic" default="/mavros/global_position/compass_hdg"/>
 
   <!-- Published topics -->
-  <arg name="msg_topic" default="~message"/>
-  <arg name="timestamp_topic" default="~message_timestamp"/>
-  <arg name="server_time_topic" default="~time"/>
   <arg name="moving_topic" default="~moving"/>
   <arg name="stationary_topic" default="~stationary"/>
+  <arg name="flyzones_topic" default="~flyzones" />
+  <arg name="search_grid_topic" default="~search_grid"/>
+  <arg name="waypoints_topic" default="~waypoints"/>
+  <arg name="air_drop_topic" default="~air_drop_loc"/>
+  <arg name="emergent_targ_topic" default="~emergent_targ_loc"/>
+  <arg name="off_axis_targ_topic" default="~off_axis_targ"/>
 
   <!-- Publication periods -->
   <arg name="obstacles_period" default="0.05"/>
-  <arg name="server_info_period" default="0.05"/>
+  <arg name="mission_info_period" default="1.00"/>
 
   <!-- Frame IDs -->
   <arg name="obstacles_frame" default="odom"/>
+  <arg name="missions_frame" default="odom"/>      
+
+  <!-- Mission ID -->
+  <arg name="mission_id" default="-1"/>
 
   <group ns="interop">
     <!-- Obstacles client -->
@@ -50,10 +57,10 @@
       <param name="frame" value="$(arg obstacles_frame)"/>
     </node>
 
-    <!-- Server information client -->
-    <node name="server_info"
+    <!-- Mission Information Client -->
+    <node name="mission_info"
           pkg="interop"
-          type="server_info_client.py"
+          type="missions_client.py"
           output="screen">
       <!-- Login credentials and request parameters -->
       <param name="base_url" value="$(arg base_url)"/>
@@ -62,12 +69,21 @@
       <param name="timeout" value="$(arg timeout)"/>
 
       <!-- Published topics -->
-      <param name="msg_topic" value="$(arg msg_topic)"/>
-      <param name="timestamp_topic" value="$(arg timestamp_topic)"/>
-      <param name="server_time_topic" value="$(arg server_time_topic)"/>
+      <param name="flyzones_topic" value="$(arg flyzones_topic)"/>
+      <param name="search_grid_topic" value="$(arg search_grid_topic)"/>
+      <param name="waypoints_topic" value="$(arg waypoints_topic)"/>
+      <param name="air_drop_loc_topic" value="$(arg air_drop_topic)"/>
+      <param name="emergent_targ_topic" value="$(arg emergent_targ_topic)"/>
+      <param name="off_axis_targ_topic" value="$(arg off_axis_targ_topic)"/>
 
       <!-- Publication period -->
-      <param name="period" value="$(arg server_info_period)"/>
+      <param name="period" value="$(arg mission_info_period)"/>
+
+      <!-- Frame ID -->
+      <param name="frame" value="$(arg missions_frame)"/>
+
+      <!-- Mission ID -->
+      <param name="id" value="$(arg mission_id)"/>
     </node>
 
     <!-- Telemetry client -->

@@ -42,6 +42,9 @@ add_service_files(FILES
   SetTargetImage.srv
   GetTargetImage.srv
   DeleteTargetImage.srv
+
+  # Missions services.
+  GetMissionByID.srv
 )
 
 generate_messages(DEPENDENCIES std_msgs sensor_msgs)
