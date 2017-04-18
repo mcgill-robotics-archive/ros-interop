@@ -31,6 +31,7 @@
   <run_depend>python-dateutil</run_depend>
   <run_depend>python-utm-pip</run_depend>
   <run_depend>python-simplejson</run_depend>
+  <run_depend>python-imaging</run_depend>
 
   <!-- Unit tests -->
   <test_depend>rostest</test_depend>

@@ -20,7 +20,7 @@ add_message_files(FILES
   Orientation.msg
   Shape.msg
   TargetType.msg
-  
+
   # Target.
   Target.msg
 
@@ -58,4 +58,5 @@ if(CATKIN_ENABLE_TESTING)
   find_package(rostest)
   add_rostest(test/serializers.test)
   add_rostest(test/client.test)
+  add_rostest(test/local_targets.test)
 endif()

@@ -7,8 +7,7 @@
 This ROS package provides a client to communicate with the
 [AUVSI SUAS Interopability server](https://github.com/auvsi-suas/interop).
 
-*This package has only been tested on ROS Indigo and ROS Jade on Ubuntu 14.04.
-Use at your own risk.*
+*This package has been tested on ROS Kinetic Kame on Ubuntu 16.04.*
 
 ## Setting up
 
@@ -145,6 +144,11 @@ The following are the run-time ROS launch arguments available:
 -   `username`: AUVSI SUAS interop server username, default: `testadmin`.
 -   `password`: AUVSI SUAS interop server password, default: `testpass`.
 -   `timeout`: Timeout for each request in seconds, default: `1.0`.
+
+#### Local object file directory
+
+-   `targets_root`: The parent of all timestamped directories containing object files, default: `~/object_files/`.
+-   `interop_update_period`: Duration between attempts to sync the object files of the current run to the interop server, default: `10.0` (i.e. 10.0 s).
 
 #### Subscribed topics
 

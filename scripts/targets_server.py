@@ -3,199 +3,238 @@
 
 """Interoperability Target ROS Server."""
 
+import json
 import rospy
 import interop.srv
-from cv_bridge import CvBridgeError
-from simplejson import JSONDecodeError
 from interop import InteroperabilityClient
-from requests.exceptions import ConnectionError, HTTPError, Timeout
+from interop import serializers, local_targets
+from cv_bridge import CvBridgeError
 
 
-def add_target(req):
-    """Handles AddTarget service request.
+class TargetsServer(object):
 
-    Args:
-        req: AddTargetRequest message.
-
-    Returns:
-        AddTargetResponse.
+    """Represents the ROS node for adding, updating, and deleting targets
+    and images.
+    Targets and images are stored locally and periodically synced
+    to the interop server.
     """
-    response = interop.srv.AddTargetResponse()
-    response.success = False
 
-    try:
-        response.id = client.post_target(req.target)
-        response.success = True
-    except (ConnectionError, Timeout) as e:
-        rospy.logwarn(e)
-    except (JSONDecodeError, HTTPError) as e:
-        rospy.logerr(e)
+    def __init__(self, targets_dir):
+        """Initialize the targets server.
 
-    return response
+        Args:
+            targets_dir (interop.local_targets.TargetsDirectory):
+                The directory used to store the target files and images.
+        """
+        self.targets_dir = targets_dir
 
+    def add_target(self, req):
+        """Handles AddTarget service requests.
 
-def get_target(req):
-    """Handles GetTarget service request.
+        Args:
+            req: AddTargetRequest message.
 
-    Args:
-        req: GetTargetRequest message.
+        Returns:
+            AddTargetResponse.
+        """
+        response = interop.srv.AddTargetResponse()
 
-    Returns:
-        GetTargetResponse.
-    """
-    response = interop.srv.GetTargetResponse()
-    response.success = False
+        dict_target = serializers.TargetSerializer.from_msg(req.target)
+        json_target = json.dumps(dict_target)
 
-    try:
-        response.target = client.get_target(req.id)
-        response.success = True
-    except (ConnectionError, Timeout) as e:
-        rospy.logwarn(e)
-    except (JSONDecodeError, HTTPError) as e:
-        rospy.logerr(e)
+        try:
+            file_id = self.targets_dir.add_target(json_target)
+        except IOError as e:
+            rospy.logerr(e)
+            response.success = False
+        else:
+            response.id = file_id
+            response.success = True
 
-    return response
+        return response
 
+    def get_target(self, req):
+        """Handles GetTarget service requests.
 
-def update_target(req):
-    """Handles UpdateTarget service request.
+        Args:
+            req: GetTargetRequest message.
 
-    Args:
-        req: UpdateTargetRequest message.
+        Returns:
+            GetTargetResponse.
+        """
+        response = interop.srv.GetTargetResponse()
 
-    Returns:
-        UpdateTargetResponse.
-    """
-    response = interop.srv.UpdateTargetResponse()
-    response.success = False
+        try:
+            json_target = self.targets_dir.get_target(req.id)
+        except (KeyError, IOError) as e:
+            rospy.logerr(e)
+            response.success = False
+        else:
+            dict_target = json.loads(json_target)
+            response.target = serializers.TargetSerializer.from_dict(dict_target)
+            response.success = True
 
-    try:
-        client.put_target(req.id, req.target)
-        response.success = True
-    except (ConnectionError, Timeout) as e:
-        rospy.logwarn(e)
-    except HTTPError as e:
-        rospy.logerr(e)
+        return response
 
-    return response
+    def update_target(self, req):
+        """Handles UpdateTarget service requests.
 
+        Args:
+            req: UpdateTargetRequest message.
 
-def delete_target(req):
-    """Handles DeleteTarget service request.
+        Returns:
+            UpdateTargetResponse.
+        """
+        response = interop.srv.UpdateTargetResponse()
 
-    Args:
-        req: DeleteTargetRequest message.
+        dict_target = serializers.TargetSerializer.from_msg(req.target)
+        json_target = json.dumps(dict_target)
 
-    Returns:
-        DeleteTargetResponse.
-    """
-    response = interop.srv.DeleteTargetResponse()
-    response.success = False
+        try:
+            self.targets_dir.update_target(req.id, json_target)
+        except (KeyError, IOError) as e:
+            rospy.logerr(e)
+            response.success = False
+        else:
+            response.success = True
 
-    try:
-        client.delete_target(req.id)
-        response.success = True
-    except (ConnectionError, Timeout) as e:
-        rospy.logwarn(e)
-    except HTTPError as e:
-        rospy.logerr(e)
+        return response
 
-    return response
+    def delete_target(self, req):
+        """Handles DeleteTarget service requests.
 
+        Args:
+            req: DeleteTargetRequest message.
 
-def get_all_targets(req):
-    """Handles GetAllTargets service request.
+        Returns:
+            DeleteTargetResponse.
+        """
+        response = interop.srv.DeleteTargetResponse()
 
-    Args:
-        req: GetAllTargetsRequest message.
+        try:
+            self.targets_dir.delete_target(req.id)
+        except (KeyError, OSError) as e:
+            rospy.logerr(e)
+            response.success = False
+        else:
+            response.success = True
 
-    Returns:
-        GetAllTargetsResponse.
-    """
-    response = interop.srv.GetAllTargetsResponse()
-    response.success = False
+        return response
 
-    try:
-        for id, target in client.get_all_targets().iteritems():
-            response.ids.append(id)
-            response.targets.append(target)
+    def get_all_targets(self, req):
+        """Handles GetAllTargets service requests.
 
-        response.success = True
-    except (ConnectionError, Timeout) as e:
-        rospy.logwarn(e)
-    except (JSONDecodeError, HTTPError) as e:
-        rospy.logerr(e)
+        Args:
+            req: GetAllTargetsRequest message.
 
-    return response
+        Returns:
+            GetAllTargetsResponse.
+        """
+        response = interop.srv.GetAllTargetsResponse()
 
+        try:
+            json_targets = self.targets_dir.get_all_targets()
+        except IOError as e:
+            rospy.logerr(e)
+            response.success = False
+        else:
+            for str_file_id, json_target in json_targets.iteritems():
+                file_id = int(str_file_id)
+                dict_target = json.loads(json_target)
+                ros_target = serializers.TargetSerializer.from_dict(dict_target)
 
-def set_target_image(req):
-    """Handles SetTargetImage service request.
+                response.ids.append(file_id)
+                response.targets.append(ros_target)
 
-    Args:
-        req: SetTargetImageRequest message.
+            response.success = True
 
-    Returns:
-        SetTargetImageResponse.
-    """
-    response = interop.srv.SetTargetImageResponse()
-    response.success = False
+        return response
 
-    try:
-        client.post_target_image(req.id, req.image)
-        response.success = True
-    except (ConnectionError, Timeout) as e:
-        rospy.logwarn(e)
-    except (CvBridgeError, HTTPError) as e:
-        rospy.logerr(e)
+    def set_target_image(self, req):
+        """Handles SetTargetImage service requests.
 
-    return response
+        Args:
+            req: SetTargetImageRequest message.
 
+        Returns:
+            SetTargetImageResponse.
+        """
+        response = interop.srv.SetTargetImageResponse()
 
-def get_target_image(req):
-    """Handles GetTargetImage service request.
+        try:
+            png_image = serializers.TargetImageSerializer.from_msg(req.image)
+        except CvBridgeError as e:
+            rospy.logerr(e)
+            response.success = False
+        else:
+            try:
+                self.targets_dir.set_target_image(req.id, png_image)
+            except (KeyError, IOError) as e:
+                rospy.logerr(e)
+                response.success = False
+            else:
+                response.success = True
 
-    Args:
-        req: GetTargetImageRequest message.
+        return response
 
-    Returns:
-        GetTargetImageResponse.
-    """
-    response = interop.srv.GetTargetImageResponse()
-    response.success = False
+    def get_target_image(self, req):
+        """Handles GetTargetImage service requests.
 
-    try:
-        response.image = client.get_target_image(req.id)
-        response.success = True
-    except (ConnectionError, Timeout) as e:
-        rospy.logwarn(e)
-    except (CvBridgeError, HTTPError) as e:
-        rospy.logerr(e)
+        Args:
+            req: GetTargetImageRequest message.
 
-    return response
+        Returns:
+            GetTargetImageResponse.
+        """
+        response = interop.srv.GetTargetImageResponse()
 
+        try:
+            png = self.targets_dir.get_target_image(req.id)
+        except (KeyError, IOError) as e:
+            rospy.logerr(e)
+            response.success = False
+        else:
+            try:
+                response.image = serializers.TargetImageSerializer.from_raw(png)
+            except CvBridgeError as e:
+                rospy.logerr(e)
+                response.success = False
+            else:
+                response.success = True
 
-def delete_target_image(req):
-    """Handles DeleteTargetImage service request.
+        return response
 
-    Args:
-        req: DeleteTargetImageRequest message.
+    def delete_target_image(self, req):
+        """Handles DeleteTargetImage service requests.
 
-    Returns:
-        DeleteTargetImageResponse.
-    """
-    response = interop.srv.DeleteTargetImageResponse()
-    response.success = False
+        Args:
+            req: DeleteTargetImageRequest message.
 
-    try:
-        client.delete_target_image(req.id)
-        response.success = True
-    except (ConnectionError, Timeout) as e:
-        rospy.logwarn(e)
-    except HTTPError as e:
-        rospy.logerr(e)
+        Returns:
+            DeleteTargetImageResponse.
+        """
+        response = interop.srv.DeleteTargetImageResponse()
 
-    return response
+        try:
+            self.targets_dir.delete_target_image(req.id)
+        except (KeyError, IOError) as e:
+            response.success = False
+            rospy.logerr(e)
+        else:
+            response.success = True
+
+        return response
+
+    def sync(self, rospy_timer_event):
+        """Handles calls from rospy.Timer to sync the local targets and images
+        to the interop server.
+
+        Args:
+            rospy_timer_event (rospy.TimerEvent): Unused formal parameter
+                necessary for making this function work as a callback for
+                rospy.Timer.
+        """
+        self.targets_dir.sync()
 
 
 if __name__ == "__main__":
@@ -215,18 +254,38 @@ if __name__ == "__main__":
     client.wait_for_server()
     client.login()
 
+    # Initialize a directory for storing the targets.
+    targets_root = rospy.get_param("~targets_root")
+    try:
+        targets_dir = local_targets.TargetsDirectory(targets_root, client)
+    except OSError as e:
+        rospy.logfatal(e)
+        raise
+
+    # Set up the targets server.
+    targets_server = TargetsServer(targets_dir)
+
+    # Set up a timer to periodically update the targets and images
+    # on the interop server.
+    update_period = rospy.get_param("~interop_update_period")
+    rospy.Timer(rospy.Duration(update_period), targets_server.sync)
+
     # Initialize target ROS services.
-    rospy.Service("~add", interop.srv.AddTarget, add_target)
-    rospy.Service("~get", interop.srv.GetTarget, get_target)
-    rospy.Service("~update", interop.srv.UpdateTarget, update_target)
-    rospy.Service("~delete", interop.srv.DeleteTarget, delete_target)
-    rospy.Service("~all", interop.srv.GetAllTargets, get_all_targets)
+    rospy.Service("~add", interop.srv.AddTarget, targets_server.add_target)
+    rospy.Service("~get", interop.srv.GetTarget, targets_server.get_target)
+    rospy.Service("~update", interop.srv.UpdateTarget,
+                  targets_server.update_target)
+    rospy.Service("~delete", interop.srv.DeleteTarget,
+                  targets_server.delete_target)
+    rospy.Service("~all", interop.srv.GetAllTargets,
+                  targets_server.get_all_targets)
 
     # Initialize target image ROS services.
-    rospy.Service("~image/set", interop.srv.SetTargetImage, set_target_image)
-    rospy.Service("~image/get", interop.srv.GetTargetImage, get_target_image)
+    rospy.Service("~image/set", interop.srv.SetTargetImage,
+                  targets_server.set_target_image)
+    rospy.Service("~image/get", interop.srv.GetTargetImage,
+                  targets_server.get_target_image)
     rospy.Service("~image/delete", interop.srv.DeleteTargetImage,
-                  delete_target_image)
+                  targets_server.delete_target_image)
 
-    # Spin forever.
     rospy.spin()

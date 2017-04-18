@@ -5,6 +5,10 @@
   <arg name="password" default="testpass"/>
   <arg name="timeout" default="1.0"/>
 
+  <!-- Targets directory settings -->
+  <arg name="targets_root" default="~/object_files/"/>
+  <arg name="interop_update_period" default="10.0"/>
+
   <!-- Synchronization settings -->
   <arg name="sync_queue_size" default="2"/>
   <arg name="max_sync_delay" default="1"/>
@@ -29,7 +33,7 @@
 
   <!-- Frame IDs -->
   <arg name="obstacles_frame" default="odom"/>
-  <arg name="missions_frame" default="odom"/>      
+  <arg name="missions_frame" default="odom"/>
 
   <!-- Mission ID -->
   <arg name="mission_id" default="-1"/>
@@ -116,6 +120,10 @@
       <param name="username" value="$(arg username)"/>
       <param name="password" value="$(arg password)"/>
       <param name="timeout" value="$(arg timeout)"/>
+
+      <!-- Targets directory settings -->
+      <param name="targets_root" value="$(arg targets_root)"/>
+      <param name="interop_update_period" value="$(arg interop_update_period)"/>
     </node>
   </group>
 </launch>

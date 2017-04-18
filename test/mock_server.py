@@ -34,7 +34,8 @@ class InteroperabilityMockServer(object):
         """Constructs InteroperabilityMockServer.
 
         Args:
-            url: Interoperability server base URL (e.g. http://127.0.0.1:8000)
+            url (str): Interoperability server base URL
+                (e.g. http://127.0.0.1:8000)
 
         Returns:
             InteroperabilityServer.
@@ -72,7 +73,7 @@ class InteroperabilityMockServer(object):
         work.
 
         Args:
-            code: Status code to respond with.
+            code (int): Status code to respond with.
         """
         self.rsps.add(responses.GET, self.url, status=code)
 
@@ -80,7 +81,8 @@ class InteroperabilityMockServer(object):
         """Sets mock POST /api/login response.
 
         Args:
-            success: Whether the authentication attempt should be successful.
+            success (bool): Whether the authentication attempt should be
+                successful.
         """
         code = 200 if success else 400
         self.rsps.add(responses.POST, self.url + "/api/login", status=code,
@@ -91,10 +93,10 @@ class InteroperabilityMockServer(object):
         """Sets mock GET /api/server_info response.
 
         Args:
-            message: Message string in response.
-            message_timestamp: Message timestamp in ISO8601.
-            server_time: Server time in ISO8601.
-            code: Status code to respond with.
+            message (str): Message string in response.
+            message_timestamp (str): Message timestamp in ISO8601.
+            server_time (str): Server time in ISO8601.
+            code (int): Status code to respond with.
         """
         content = json.dumps({
             "message": message,
@@ -103,25 +105,26 @@ class InteroperabilityMockServer(object):
         })
 
         self.rsps.add(responses.GET, self.url + "/api/server_info",
-                      status=code, body=content,
+                      status=code, body=content if code == 200 else "",
                       content_type="application/json")
 
     def set_get_obstacles_response(self, obstacles, code=200):
         """Sets mock GET /api/obstacles response.
 
         Args:
-            obstacles: JSON serialized obstacles to respond with.
-            code: Status code to respond with.
+            obstacles (dict): Obstacles to respond with.
+            code (int): Status code to respond with.
         """
         content = json.dumps(obstacles)
         self.rsps.add(responses.GET, self.url + "/api/obstacles", status=code,
-                      body=content, content_type="application/json")
+                      body=content if code == 200 else "",
+                      content_type="application/json")
 
     def set_telemetry_response(self, code=200):
         """Sets mock POST /api/telemetry response.
 
         Args:
-            code: Status code to respond with.
+            code (int): Status code to respond with.
         """
         self.rsps.add(responses.POST, self.url + "/api/telemetry", status=code,
                       body="UAS Telemetry Successfully Posted."
@@ -131,60 +134,62 @@ class InteroperabilityMockServer(object):
         """Sets mock POST /api/targets response.
 
         Args:
-            target: Target message to post.
-            id: Target ID to return.
-            user: User number to respond with.
-            code: Status code to respond with.
+            target (dict): Target to post.
+            id (int): Target ID to return.
+            user (int): User number to respond with.
+            code (int): Status code to respond with.
         """
-        target_json = serializers.TargetSerializer.from_msg(target)
-        target_json.update({"id": id, "user": user})
-        content = json.dumps(target_json)
+        target.update({"id": id, "user": user})
+        content = json.dumps(target)
 
         self.rsps.add(responses.POST, self.url + "/api/targets", status=code,
-                      body=content, content_type="application/json")
+                      body=content if code == 200 else "",
+                      content_type="application/json")
 
     def set_get_targets_response(self, targets, code=200):
         """Sets mock GET /api/targets and GET /api/targets/<id> responses.
 
         Args:
-            targets: JSON serialized target list.
-            code: Status code to respond with.
+            targets (list): List of targets.
+            code (int): Status code to respond with.
         """
         content = json.dumps(targets)
 
         # Add all targets.
         self.rsps.add(responses.GET, self.url + "/api/targets", status=code,
-                      body=content, content_type="application/json")
+                      body=content if code == 200 else "",
+                      content_type="application/json")
 
         # Add individual targets.
         for t in targets:
             self.rsps.add(responses.GET,
                           "{}/api/targets/{:d}".format(self.url, t["id"]),
-                          body=json.dumps(t), content_type="application/json")
+                          body=json.dumps(t) if code == 200 else "",
+                          content_type="application/json")
 
     def set_put_target_response(self, id, target, user=1, code=200):
         """Sets mock PUT /api/targets/<id> response.
 
         Args:
-            id: Target ID.
-            target: Target message to update with.
-            user: User number to respond with.
-            code: Status code to respond with.
+            id (int): Target ID.
+            target (dict): Target data to update with.
+            user (int): User number to respond with.
+            code (int): Status code to respond with.
         """
-        target_json = serializers.TargetSerializer.from_msg(target)
-        target_json.update({"id": id, "user": user})
-        content = json.dumps(target_json)
+        target.update({"id": id, "user": user})
+        content = json.dumps(target)
 
         self.rsps.add(responses.PUT,
                       "{}/api/targets/{:d}".format(self.url, id), status=code,
-                      body=content, content_type="application/json")
+                      body=content if code == 200 else "",
+                      content_type="application/json")
 
     def set_delete_target_response(self, id, code=200):
         """Sets mock DELETE /api/targets/<id> response.
 
         Args:
-            id: Target ID.
-            code: Status code to respond with.
+            id (int): Target ID.
+            code (int): Status code to respond with.
         """
         self.rsps.add(responses.DELETE,
                       "{}/api/targets/{:d}".format(self.url, id), status=code,
@@ -194,8 +199,8 @@ class InteroperabilityMockServer(object):
         """Sets mock POST /api/targets/<id>/image response.
 
         Args:
-            id: Target ID.
-            code: Status code to respond with.
+            id (int): Target ID.
+            code (int): Status code to respond with.
         """
         self.rsps.add(responses.POST,
                       "{}/api/targets/{:d}/image".format(self.url, id),
@@ -206,10 +211,10 @@ class InteroperabilityMockServer(object):
         """Sets mock GET /api/targets/<id>/image response.
 
         Args:
-            id: Target ID.
-            image: Binary image string.
-            content_type: Image type, either "image/jpeg" or "image/png".
-            code: Status code to respond with.
+            id (int): Target ID.
+            image (str): Binary image string.
+            content_type (str): Image type, either "image/jpeg" or "image/png".
+            code (int): Status code to respond with.
         """
         self.rsps.add(responses.GET,
                       "{}/api/targets/{:d}/image".format(self.url, id),
@@ -220,8 +225,8 @@ class InteroperabilityMockServer(object):
         """Sets mock DELETE /api/targets/<id>/image response.
 
         Args:
-            id: Target ID.
-            code: Status code to respond with.
+            id (int): Target ID.
+            code (str): Status code to respond with.
         """
         self.rsps.add(responses.DELETE,
                       "{}/api/targets/{:d}/image".format(self.url, id),

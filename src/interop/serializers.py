@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-"""Interoperability API message serializer."""
+"""Interoperability API message serializer.
+Serializes from ROS messages to python dictionaries and vice versa."""
 
 import cv2
 import utm
@@ -13,7 +14,7 @@ from cv_bridge import CvBridge
 from geometry_msgs.msg import Point, PointStamped, PolygonStamped, Polygon
 from visualization_msgs.msg import Marker, MarkerArray
 from std_msgs.msg import ColorRGBA, Float64, Header, String, Time
-from interop.msg import (Color, FlyZone, FlyZoneArray, 
+from interop.msg import (Color, FlyZone, FlyZoneArray,
                          Orientation, Shape, Target, TargetType)
 
 
@@ -73,17 +74,17 @@ class MissionDeserializer(object):
     """Mission information deserializer."""
 
     @classmethod
-    def __get_flyzone(cls, json, frame):
+    def __get_flyzone(cls, data, frame):
         """
         Deserializes flight boundary data into a FlyZoneArray message.
-            
+
         Args:
-            json: List of JSON dicts.
+            data: List of dictionaries.
             frame: Frame id for the boundaries.
 
         Returns:
             A FlyzoneArray message type which contains an array of FlyZone
-            messages, which contains a polygon for the boundary, a max 
+            messages, which contains a polygon for the boundary, a max
             altitude and a min altitude.
         """
         # Generate header for all zones.
@@ -92,7 +93,7 @@ class MissionDeserializer(object):
         header.frame_id = frame
 
         flyzones = FlyZoneArray()
-        for zone in json:
+        for zone in data:
             flyzone = FlyZone()
             flyzone.zone.header = header
 
@@ -114,12 +115,12 @@ class MissionDeserializer(object):
         return flyzones
 
     @classmethod
-    def __get_waypoints(cls, json, frame):
+    def __get_waypoints(cls, data, frame):
         """
         Deserializes a list of waypoints into a marker message.
 
         Args:
-            json: List of JSON Dicts corresponding to waypoints.
+            data: List of dictionaries corresponding to waypoints.
             frame: Frame of the markers.
 
         Returns:
@@ -141,12 +142,12 @@ class MissionDeserializer(object):
         # Ensure there is no rotation by setting w to 1.
         waypoints.pose.orientation.w = 1.0
         waypoints.scale.x = waypoints.scale.y = waypoints.scale.z = 0.1
-        for point in json:
+        for point in data:
             waypoint = Point()
             easting, northing, _, _ = utm.from_latlon(point["latitude"],
                                                       point["longitude"])
             altitude = feet_to_meters(point["altitude_msl"])
-            
+
             waypoint.x = easting
             waypoint.y = northing
             waypoint.z = altitude
@@ -156,12 +157,12 @@ class MissionDeserializer(object):
         return waypoints
 
     @classmethod
-    def __get_search_grid(cls, json, frame):
+    def __get_search_grid(cls, data, frame):
         """
         Deserializes a the search grid into a polygon message.
 
         Args:
-            json: List of JSON dicts corresponding to the search grid points.
+            data: List of dictionaries corresponding to the search grid points.
             frame: Frame for the polygon.
 
         Returns:
@@ -174,13 +175,13 @@ class MissionDeserializer(object):
         search_grid = PolygonStamped()
         search_grid.header = header
 
-        for point in json:
+        for point in data:
             boundary_pnt = Point()
 
             easting, northing, _, _ = utm.from_latlon(point["latitude"],
                                                       point["longitude"])
             altitude = feet_to_meters(point["altitude_msl"])
-            
+
             boundary_pnt.x = easting
             boundary_pnt.y = northing
             boundary_pnt.z = altitude
@@ -190,13 +191,13 @@ class MissionDeserializer(object):
         return search_grid
 
     @classmethod
-    def __get_airdrop_loc(cls, json, frame):
+    def __get_airdrop_loc(cls, data, frame):
         """
-        Deserializes the airdrop location to a ros message of type 
+        Deserializes the airdrop location to a ros message of type
         PointStamped.
 
         Args:
-            json: A JSON dict with the air drop location.
+            data: A dictionary with the air drop location.
             frame: Frame for the point.
 
         Returns:
@@ -210,20 +211,20 @@ class MissionDeserializer(object):
         air_drop = PointStamped()
         air_drop.header = header
 
-        easting, northing, _, _ = utm.from_latlon(json["latitude"],
-                                                  json["longitude"])
+        easting, northing, _, _ = utm.from_latlon(data["latitude"],
+                                                  data["longitude"])
         air_drop.point.x = easting
         air_drop.point.y = northing
 
         return air_drop
 
     @classmethod
-    def __get_offaxis_targ(cls, json, frame):
+    def __get_offaxis_targ(cls, data, frame):
         """
         Deserializes off axis target location to a message of type PointStamped.
 
         Args:
-            json: JSON dict containing the off axis target location.
+            data: A dictionary containing the off axis target location.
             frame: Frame for the point.
 
         Returns:
@@ -233,12 +234,12 @@ class MissionDeserializer(object):
         header = Header()
         header.stamp = rospy.get_rostime()
         header.frame_id = frame
-        
+
         off_axis_targ = PointStamped()
         off_axis_targ.header = header
 
-        easting, northing, _, _ = utm.from_latlon(json["latitude"],
-                                                  json["longitude"])
+        easting, northing, _, _ = utm.from_latlon(data["latitude"],
+                                                  data["longitude"])
 
         off_axis_targ.point.x = easting
         off_axis_targ.point.y = northing
@@ -246,13 +247,13 @@ class MissionDeserializer(object):
         return off_axis_targ
 
     @classmethod
-    def __emergent_object(cls, json, frame):
+    def __emergent_object(cls, data, frame):
         """
-        Deserializes the last known location of the emergent target to a 
+        Deserializes the last known location of the emergent target to a
         ros message of type PointStamped.
 
         Args:
-            json: JSON dict with the corresponding location.
+            data: A dictionary with the corresponding location.
             frame: Frame for the point.
 
         Returns:
@@ -266,8 +267,8 @@ class MissionDeserializer(object):
         emergent_obj = PointStamped()
         emergent_obj.header = header
 
-        easting, northing, _, _ = utm.from_latlon(json["latitude"],
-                                                  json["longitude"])
+        easting, northing, _, _ = utm.from_latlon(data["latitude"],
+                                                  data["longitude"])
 
         emergent_obj.point.x = easting
         emergent_obj.point.y = northing
@@ -275,12 +276,13 @@ class MissionDeserializer(object):
         return emergent_obj
 
     @classmethod
-    def from_json(cls, json, frame):
+    def from_dict(cls, data, frame):
         """
-        Deserializes the mission object from json to several ros messages.
+        Deserializes the mission object from a dictionary to several
+        ros messages.
 
         Args:
-            json: JSON Dict.
+            data: A dictionary.
             frame: frame id for the messages.
 
         Returns:
@@ -289,15 +291,15 @@ class MissionDeserializer(object):
             grid, waypoints, air drop position, off axis target location, and
             the emergent object location.
         """
-        flyzones = cls.__get_flyzone(json["fly_zones"], frame)
-        search_grid = cls.__get_search_grid(json["search_grid_points"], frame)
-        waypoints = cls.__get_waypoints(json["mission_waypoints"], frame)
-        air_drop_pos = cls.__get_airdrop_loc(json["air_drop_pos"], frame)
-        off_axis_targ = cls.__get_offaxis_targ(json["off_axis_target_pos"], 
+        flyzones = cls.__get_flyzone(data["fly_zones"], frame)
+        search_grid = cls.__get_search_grid(data["search_grid_points"], frame)
+        waypoints = cls.__get_waypoints(data["mission_waypoints"], frame)
+        air_drop_pos = cls.__get_airdrop_loc(data["air_drop_pos"], frame)
+        off_axis_targ = cls.__get_offaxis_targ(data["off_axis_target_pos"],
                                                frame)
-        emergent_obj = cls.__emergent_object(json["emergent_last_known_pos"],
+        emergent_obj = cls.__emergent_object(data["emergent_last_known_pos"],
                                              frame)
-    
+
         return (flyzones, search_grid, waypoints, air_drop_pos,
                 off_axis_targ, emergent_obj)
 
@@ -314,11 +316,11 @@ class ObstaclesDeserializer(object):
         a=1.0)
 
     @classmethod
-    def from_json(cls, json, frame, lifetime):
+    def from_dict(cls, data, frame, lifetime):
         """Deserializes obstacle data into two MarkerArrays.
 
         Args:
-            json: JSON dictionary.
+            data: A dictionary.
             frame: Frame ID of every Marker.
             lifetime: Lifetime of every Marker in seconds.
 
@@ -334,8 +336,8 @@ class ObstaclesDeserializer(object):
 
         # Parse moving obstacles, and populate markers with spheres.
         moving_obstacles = MarkerArray()
-        if "moving_obstacles" in json:
-            for obj in json["moving_obstacles"]:
+        if "moving_obstacles" in data:
+            for obj in data["moving_obstacles"]:
                 # Moving obstacles are spheres.
                 marker = Marker()
                 marker.header = header
@@ -359,8 +361,8 @@ class ObstaclesDeserializer(object):
 
         # Parse stationary obstacles, and populate markers with cylinders.
         stationary_obstacles = MarkerArray()
-        if "stationary_obstacles" in json:
-            for obj in json["stationary_obstacles"]:
+        if "stationary_obstacles" in data:
+            for obj in data["stationary_obstacles"]:
                 # Stationary obstacles are cylinders.
                 marker = Marker()
                 marker.header = header
@@ -400,7 +402,7 @@ class TelemetrySerializer(object):
             compass_msg: std_msgs/Float64 message in degrees.
 
         Returns:
-            JSON dictionary.
+            A dictionary.
         """
         return {
             "latitude": float(navsat_msg.latitude),
@@ -430,9 +432,9 @@ class TargetSerializer(object):
             msg: Target ROS message.
 
         Returns:
-            JSON dictionary.
+            A dictionary.
         """
-        json = {}
+        data = {}
 
         # Set all fields.
         for attribute in msg.__slots__:
@@ -440,16 +442,16 @@ class TargetSerializer(object):
             if type(value) in cls.ENUMERATION_TYPES:
                 value = value.data
 
-            json[attribute] = value
+            data[attribute] = value
 
-        return json
+        return data
 
     @classmethod
-    def from_json(cls, json):
+    def from_dict(cls, data):
         """Deserializes target data into Target ROS message.
 
         Args:
-            json: JSON dictionary.
+            data: A dictionary.
 
         Returns:
             A Target ROS message.
@@ -458,12 +460,12 @@ class TargetSerializer(object):
         msg = Target()
 
         for attribute in msg.__slots__:
-            if attribute in json:
+            if attribute in data:
                 # Get corresponding type of slot.
                 attribute_type = type(getattr(msg, attribute))
 
                 # Set 'casted' value.
-                value = json[attribute]
+                value = data[attribute]
                 if value is not None:
                     setattr(msg, attribute, attribute_type(value))
 

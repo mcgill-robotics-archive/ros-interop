@@ -90,7 +90,7 @@ class TestInteroperabilityClient(TestCase):
         # Set up test data.
         url = "http://interop"
         client_args = (url, "testuser", "testpass", 1.0)
-        target_json = {
+        data = {
             "type": "standard",
             "latitude": 38.1478,
             "longitude": -76.4275,
@@ -100,19 +100,18 @@ class TestInteroperabilityClient(TestCase):
             "alphanumeric": "C",
             "alphanumeric_color": "black"
         }
-        target = TargetSerializer.from_json(target_json)
 
         with InteroperabilityMockServer(url) as server:
             # Setup mock server.
             server.set_root_response()
             server.set_login_response()
-            server.set_post_target_response(target, id=1)
+            server.set_post_target_response(data, id=1)
 
             # Connect client.
             client = InteroperabilityClient(*client_args)
             client.wait_for_server()
             client.login()
-            client.post_target(target)
+            client.post_target(data)
 
     def test_targets(self):
         """Tests posting, updating, retrieving and deleting target data

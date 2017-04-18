@@ -199,7 +199,7 @@ class InteroperabilityClient(object):
             JSONDecodeError: On JSON decoding failure.
         """
         response = self._get("/api/obstacles")
-        return serializers.ObstaclesDeserializer.from_json(response.json(),
+        return serializers.ObstaclesDeserializer.from_dict(response.json(),
                                                            frame, lifetime)
 
     def post_telemetry(self, navsat_msg, compass_msg):
@@ -214,15 +214,15 @@ class InteroperabilityClient(object):
             HTTPError: On request failure.
             ConnectionError: On connection failure.
         """
-        json_telem = serializers.TelemetrySerializer.from_msg(navsat_msg,
+        dict_telem = serializers.TelemetrySerializer.from_msg(navsat_msg,
                                                               compass_msg)
-        self._post("/api/telemetry", data=json.dumps(json_telem))
+        self._post("/api/telemetry", data=json.dumps(dict_telem))
 
-    def post_target(self, target):
+    def post_target(self, json_target):
         """Uploads new target for submission.
 
         Args:
-            target: Target ROS message.
+            json_target: Target as a JSON string.
 
         Returns:
             Target ID.
@@ -231,17 +231,15 @@ class InteroperabilityClient(object):
             Timeout: On timeout.
             HTTPError: On request failure.
             ConnectionError: On connection failure.
-            JSONDecodeError: On JSON decoding failure.
         """
-        json_target = serializers.TargetSerializer.from_msg(target)
-        response = self._post("/api/targets", data=json.dumps(json_target))
+        response = self._post("/api/targets", data=json_target)
         return response.json()["id"]
 
     def get_all_targets(self):
         """Returns first 100 submitted targets.
 
         Returns:
-            Dictionary of Target IDs to Target ROS messages.
+            dict: Target IDs to target data (dict).
 
         Raises:
             Timeout: On timeout.
@@ -250,10 +248,7 @@ class InteroperabilityClient(object):
             JSONDecodeError: On JSON decoding failure.
         """
         response = self._get("/api/targets")
-        targets = {
-            t["id"]: serializers.TargetSerializer.from_json(t)
-            for t in response.json()
-        }
+        targets = {t["id"]: t for t in response.json()}
         return targets
 
     def get_target(self, id):
@@ -263,7 +258,7 @@ class InteroperabilityClient(object):
             id: Target ID.
 
         Returns:
-            A Target ROS message.
+            dict: The target data.
 
         Raises:
             Timeout: On timeout.
@@ -272,9 +267,8 @@ class InteroperabilityClient(object):
             JSONDecodeError: On JSON decoding failure.
         """
         response = self._get("/api/targets/{:d}".format(id))
-        target = serializers.TargetSerializer.from_json(response.json())
-        return target
-	
+        return response.json()
+
     def get_active_mission(self, frame):
         """Gets active mission.
 
@@ -282,7 +276,7 @@ class InteroperabilityClient(object):
             frame: Frame ID.
 
         Returns
-            A tuple of (FlyZoneArray, PolygonStamped, Marker, PointStamped, PointStamped, 
+            A tuple of (FlyZoneArray, PolygonStamped, Marker, PointStamped, PointStamped,
             Pointstamped) corresponding to the flyzones, search grid, waypoints, air drop position,
             off axis target location, and the emergent object location of the active mission.
 
@@ -292,21 +286,21 @@ class InteroperabilityClient(object):
             ConnectionError: On connection failure.
             JSONDecodeError: On JSON decoding failure.
             LookupError: On no active missions found.
-        """	
+        """
         response = self._get("/api/missions")
         for m in response.json():
             if m["active"]:
-                return serializers.MissionDeserializer.from_json(m, frame)
+                return serializers.MissionDeserializer.from_dict(m, frame)
         raise LookupError("No active missions found")
 
     def get_all_missions(self, frame):
         """Gets all missions.
 
-        Args: 
+        Args:
             frame: Frame ID.
 
         Returns:
-            A list of tuples of (FlyZoneArray, PolygonStamped, Marker, PointStamped, PointStamped, 
+            A list of tuples of (FlyZoneArray, PolygonStamped, Marker, PointStamped, PointStamped,
             Pointstamped) corresponding to the flyzones, search grid, waypoints, air drop position,
             off axis target location, and the emergent object location.
 
@@ -318,47 +312,46 @@ class InteroperabilityClient(object):
         """
         response = self._get("/api/missions")
         missions = {
-            m["id"]: serializers.MissionDeserializer.from_json(m, frame)
+            m["id"]: serializers.MissionDeserializer.from_dict(m, frame)
             for m in response.json()
         }
         return missions
 
     def get_mission(self, id, frame):
         """Returns mission with the matching ID.
-           
+
         Args:
             id: Mission ID.
             frame: Frame ID.
 
         Returns:
-            A tuple of (FlyZoneArray, PolygonStamped, Marker, PointStamped, PointStamped, 
+            A tuple of (FlyZoneArray, PolygonStamped, Marker, PointStamped, PointStamped,
             Pointstamped) corresponding to the flyzones, search grid, waypoints, air drop position,
             off axis target location, and the emergent object location of the corresponding mission
 
-        Raises: 
+        Raises:
             Timeout: On Timeout.
             HTTPError: On request failure.
             ConnectionError: On connection failure.
-            JSONDecodeError: On JSON decoding failure.            
+            JSONDecodeError: On JSON decoding failure.
         """
         response = self._get("/api/missions/{:d}".format(id))
-        mission = serializers.MissionDeserializer.from_json(response.json(), frame)
+        mission = serializers.MissionDeserializer.from_dict(response.json(), frame)
         return mission
 
-    def put_target(self, id, target):
+    def put_target(self, id, json_target):
         """Updates target information.
 
         Args:
             id: Target ID.
-            target: Target ROS message.
+            json_target: Target as a JSON string.
 
         Raises:
             Timeout: On timeout.
             HTTPError: On request failure.
             ConnectionError: On connection failure.
         """
-        json_target = serializers.TargetSerializer.from_msg(target)
-        self._put("/api/targets/{:d}".format(id), data=json.dumps(json_target))
+        self._put("/api/targets/{:d}".format(id), data=json_target)
 
     def delete_target(self, id):
         """Deletes target with matching ID.
@@ -373,12 +366,12 @@ class InteroperabilityClient(object):
         """
         self._delete("/api/targets/{:d}".format(id))
 
-    def post_target_image(self, id, img):
+    def post_target_image(self, id, png):
         """Adds or updates target image thumbnail as a compressed PNG.
 
         Args:
             id: Target ID.
-            img: Target ROS message.
+            png: Target PNG image from a file.
 
         Raises:
             Timeout: On timeout.
@@ -386,7 +379,6 @@ class InteroperabilityClient(object):
             ConnectionError: On connection failure.
             CvBridgeError: On image conversion failure.
         """
-        png = serializers.TargetImageSerializer.from_msg(img)
         self._post("/api/targets/{:d}/image".format(id), data=png)
 
     def get_target_image(self, id):

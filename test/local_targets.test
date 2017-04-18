@@ -1,0 +1,8 @@
+<launch>
+  <test test-name="target"
+    pkg="interop"
+    type="test_target.py" />
+  <test test-name="targets_directory"
+    pkg="interop"
+    type="test_targets_directory.py" />
+</launch>
