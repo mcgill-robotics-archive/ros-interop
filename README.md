@@ -54,6 +54,15 @@ To run, simply launch the package with:
 roslaunch interop interop.launch base_url:=<base_url> username:=<username> password:=<password>
 ```
 
+or, if you prefer:
+
+```bash
+export INTEROP_HOST=<base_url>
+export INTEROP_USERNAME=<username>
+export INTEROP PASSWORD=<password>
+roslaunch interop interop.launch
+```
+
 ## Nodes
 
 This package has the following nodes available:
@@ -140,9 +149,9 @@ The following are the run-time ROS launch arguments available:
 
 #### Interop server, credentials, and request parameters
 
--   `base_url`: AUVSI SUAS interop server url, default: `http://interop:80`.
--   `username`: AUVSI SUAS interop server username, default: `testadmin`.
--   `password`: AUVSI SUAS interop server password, default: `testpass`.
+-   `base_url`: AUVSI SUAS interop server url, default: `$INTEROP_HOST` if set, or `http://interop:80`.
+-   `username`: AUVSI SUAS interop server username, default: `$INTEROP_USERNAME` if set, or `testadmin`.
+-   `password`: AUVSI SUAS interop server password, default: `$INTEROP_PASSWORD` if set, or `testpass`.
 -   `timeout`: Timeout for each request in seconds, default: `1.0`.
 
 #### Local object file directory

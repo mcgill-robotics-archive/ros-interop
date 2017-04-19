@@ -1,8 +1,8 @@
 <launch>
   <!-- Login credentials and request parameters -->
-  <arg name="base_url" default="http://interop:80"/>
-  <arg name="username" default="testadmin"/>
-  <arg name="password" default="testpass"/>
+  <arg name="base_url" default="$(optenv INTEROP_HOST http://interop:80)"/>
+  <arg name="username" default="$(optenv INTEROP_USERNAME testadmin)"/>
+  <arg name="password" default="$(optenv INTEROP_PASSWORD testpass)"/>
   <arg name="timeout" default="1.0"/>
 
   <!-- Targets directory settings -->
