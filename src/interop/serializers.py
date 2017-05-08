@@ -13,8 +13,8 @@ from datetime import datetime
 from cv_bridge import CvBridge
 from geometry_msgs.msg import Point, PointStamped, PolygonStamped, Polygon
 from visualization_msgs.msg import Marker, MarkerArray
-from std_msgs.msg import ColorRGBA, Float64, Header, String, Time
-from interop.msg import (Color, FlyZone, FlyZoneArray,
+from std_msgs.msg import ColorRGBA, Float64, Header, String, Time, Int16
+from interop.msg import (Color, FlyZone, FlyZoneArray, UTMZone,
                          Orientation, Shape, Target, TargetType)
 
 
@@ -274,6 +274,25 @@ class MissionDeserializer(object):
         emergent_obj.point.y = northing
 
         return emergent_obj
+    
+    @classmethod
+    def __utm_zone(cls, json):
+        """
+        Deserializes the home position and retrieves the UTM zone.
+
+        Args:
+            json: JSON dict containing the home position.
+        
+        Returns:
+            A UTMZone message containing the UTM Zone.
+        """
+        ref_zone = UTMZone()
+        _, _, num, letter = utm.from_latlon(json["latitude"], 
+                                            json["longitude"])
+        ref_zone.letter = letter
+        ref_zone.number = num
+
+        return ref_zone
 
     @classmethod
     def from_dict(cls, data, frame):
@@ -287,9 +306,9 @@ class MissionDeserializer(object):
 
         Returns:
             A tuple of (FlyZoneArray, PolygonStamped, Marker, PointStamped,
-            PointStamped, PointStamped) corresponding to the flyzones, search
-            grid, waypoints, air drop position, off axis target location, and
-            the emergent object location.
+            PointStamped, PointStamped, UTMZone) corresponding to the flyzones, 
+            search grid, waypoints, air drop position, off axis target 
+            location, the emergent object location, and the UTM Zone.
         """
         flyzones = cls.__get_flyzone(data["fly_zones"], frame)
         search_grid = cls.__get_search_grid(data["search_grid_points"], frame)
@@ -299,9 +318,10 @@ class MissionDeserializer(object):
                                                frame)
         emergent_obj = cls.__emergent_object(data["emergent_last_known_pos"],
                                              frame)
+        utm_zone = cls.__utm_zone(data["home_pos"])
 
         return (flyzones, search_grid, waypoints, air_drop_pos,
-                off_axis_targ, emergent_obj)
+                off_axis_targ, emergent_obj, utm_zone)
 
 
 class ObstaclesDeserializer(object):

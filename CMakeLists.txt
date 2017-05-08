@@ -27,6 +27,9 @@ add_message_files(FILES
   #Flyzones
   FlyZone.msg
   FlyZoneArray.msg
+
+  #UTM Zone
+  UTMZone.msg
 )
 
 # Custom ROS services.

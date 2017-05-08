@@ -276,9 +276,11 @@ class InteroperabilityClient(object):
             frame: Frame ID.
 
         Returns
-            A tuple of (FlyZoneArray, PolygonStamped, Marker, PointStamped, PointStamped,
-            Pointstamped) corresponding to the flyzones, search grid, waypoints, air drop position,
-            off axis target location, and the emergent object location of the active mission.
+            A tuple of (FlyZoneArray, PolygonStamped, Marker, PointStamped, 
+            PointStamped, Pointstamped, UTMZone) corresponding to the flyzones, 
+            search grid, waypoints, air drop position, off axis target location, 
+            the emergent object location, and the utm zone of the active 
+            mission.
 
         Raises:
             Timeout: On timeout.
@@ -300,9 +302,11 @@ class InteroperabilityClient(object):
             frame: Frame ID.
 
         Returns:
-            A list of tuples of (FlyZoneArray, PolygonStamped, Marker, PointStamped, PointStamped,
-            Pointstamped) corresponding to the flyzones, search grid, waypoints, air drop position,
-            off axis target location, and the emergent object location.
+            A list of tuples of (FlyZoneArray, PolygonStamped, Marker, 
+            PointStamped, PointStamped, Pointstamped, UTMZone) corresponding to 
+            the flyzones, search grid, waypoints, air drop position,
+            off axis target location, the emergent object location, and the
+            UTM Zone.
 
         Raises:
             Timeout: On timeout.
@@ -325,9 +329,11 @@ class InteroperabilityClient(object):
             frame: Frame ID.
 
         Returns:
-            A tuple of (FlyZoneArray, PolygonStamped, Marker, PointStamped, PointStamped,
-            Pointstamped) corresponding to the flyzones, search grid, waypoints, air drop position,
-            off axis target location, and the emergent object location of the corresponding mission
+            A tuple of (FlyZoneArray, PolygonStamped, Marker, PointStamped, 
+            PointStamped, Pointstamped, UTMZone) corresponding to the flyzones, 
+            search grid, waypoints, air drop position, off axis target location,
+            the emergent object location, and the UTM zone of the corresponding
+            mission.
 
         Raises:
             Timeout: On Timeout.
