@@ -104,12 +104,13 @@ This by default publishes mission information at 1 Hz to the following topics:
 -   `~waypoints`: List of waypoints, `visualization_msgs/Marker`.
 -   `~air_drop_pos`: Air drop position, `geometry_msgs/PointStamped`.
 -   `~off_axis_targ`: Off axis target position, `geometry_msgs/PointStamped`.
--   `~emergent_targ_loc`: Emergent target last known location, 
-                          `geometry_msgs/PointStamped`
+-   `~emergent_targ_loc`: Emergent target last known location,
+                          `geometry_msgs/PointStamped`.
+-   `~utm_zone`: UTM zone number and UTM zone letter, `UTMZone`.
 
 This also provides the following services to change missions:
 
--   `~get_active_mission`: Change the mission being published to the current 
+-   `~get_active_mission`: Change the mission being published to the current
                            active mission, `std_srvs/Trigger`
 -   `~get_mission_by_id` : Change the mission being published to the mission of
                            the given id, `GetMissionByID`
@@ -182,6 +183,8 @@ The following are the run-time ROS launch arguments available:
     default: `~mission_info/emergent_targ_loc`.
 -   `off_axis_targ_topic`: `geometry_msgs/PointStamped` position of the off axis target,
     default: `~mission_info/off_axis_targ`.
+-   `utm_zone_topic`: `UTMZone` UTM zone number and UTM zone letter,
+    default: `~mission_info/utm_zone`.
 -   `moving_topic`: `visualization_msgs/MarkerArray` feed of the moving
     obstacles, default: `~obstacles/moving`.
 -   `stationary_topic`: `visualization_msgs/MarkerArray` feed of the stationary
@@ -202,7 +205,7 @@ The following are the run-time ROS launch arguments available:
 
 #### Mission IDs
 
--   `mission_id`: ID for the first mission to access. Negative numbers 
+-   `mission_id`: ID for the first mission to access. Negative numbers
                   will retrieve active mission instead
                   , default: `-1`.
 
