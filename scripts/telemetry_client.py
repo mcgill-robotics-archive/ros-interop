@@ -39,12 +39,13 @@ class UnstampedTimeSynchronizer(message_filters.ApproximateTimeSynchronizer):
     same, and the queue size is small.
     """
 
-    def add(self, msg, my_queue):
+    def add(self, msg, my_queue, my_queue_index=None):
         """Adds a message to the current queue, and matches them accordingly.
 
         Args:
             msg: Message.
             my_queue: Current message queue map from ROS Time to ROS message.
+            my_queue_index: Unused.
         """
         # Store when this message was received.
         received = rospy.get_rostime()
