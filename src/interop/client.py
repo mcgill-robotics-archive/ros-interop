@@ -216,7 +216,7 @@ class InteroperabilityClient(object):
         """
         dict_telem = serializers.TelemetrySerializer.from_msg(navsat_msg,
                                                               compass_msg)
-        self._post("/api/telemetry", data=json.dumps(dict_telem))
+        self._post("/api/telemetry", data=dict_telem)
 
     def post_target(self, json_target):
         """Uploads new target for submission.
@@ -276,10 +276,10 @@ class InteroperabilityClient(object):
             frame: Frame ID.
 
         Returns
-            A tuple of (FlyZoneArray, PolygonStamped, Marker, PointStamped, 
-            PointStamped, Pointstamped, UTMZone) corresponding to the flyzones, 
-            search grid, waypoints, air drop position, off axis target location, 
-            the emergent object location, and the utm zone of the active 
+            A tuple of (FlyZoneArray, PolygonStamped, Marker, PointStamped,
+            PointStamped, Pointstamped, UTMZone) corresponding to the flyzones,
+            search grid, waypoints, air drop position, off axis target location,
+            the emergent object location, and the utm zone of the active
             mission.
 
         Raises:
@@ -302,8 +302,8 @@ class InteroperabilityClient(object):
             frame: Frame ID.
 
         Returns:
-            A list of tuples of (FlyZoneArray, PolygonStamped, Marker, 
-            PointStamped, PointStamped, Pointstamped, UTMZone) corresponding to 
+            A list of tuples of (FlyZoneArray, PolygonStamped, Marker,
+            PointStamped, PointStamped, Pointstamped, UTMZone) corresponding to
             the flyzones, search grid, waypoints, air drop position,
             off axis target location, the emergent object location, and the
             UTM Zone.
@@ -329,8 +329,8 @@ class InteroperabilityClient(object):
             frame: Frame ID.
 
         Returns:
-            A tuple of (FlyZoneArray, PolygonStamped, Marker, PointStamped, 
-            PointStamped, Pointstamped, UTMZone) corresponding to the flyzones, 
+            A tuple of (FlyZoneArray, PolygonStamped, Marker, PointStamped,
+            PointStamped, Pointstamped, UTMZone) corresponding to the flyzones,
             search grid, waypoints, air drop position, off axis target location,
             the emergent object location, and the UTM zone of the corresponding
             mission.
