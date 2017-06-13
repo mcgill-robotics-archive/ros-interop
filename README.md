@@ -143,6 +143,8 @@ targets API with the following:
 -   `~image/set`: Sets or updates target image thumbnail, `SetTargetImage`.
 -   `~image/get`: Retrieves target image thumbnail, `GetTargetImage`.
 -   `~image/delete`: Deletes target image thumbnail, `DeleteTargetImage`.
+-   `~image/compressed/set`: Sets or updates target image thumbnail with a `CompressedImage`, `SetTargetCompressedImage`.
+-   `~image/compressed/get`: Retrieves target image thumbnail as a `CompressedImage`, `GetTargetCompressedImage`.
 
 ## Arguments
 
