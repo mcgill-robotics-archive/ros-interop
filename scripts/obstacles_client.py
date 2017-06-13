@@ -25,6 +25,9 @@ def publish_obstacles(timer_event):
     except (JSONDecodeError, HTTPError) as e:
         rospy.logerr(e)
         return
+    except Exception as e:
+        rospy.logfatal(e)
+        return
 
     moving_pub.publish(moving_obstacles)
     stationary_pub.publish(stationary_obstacles)

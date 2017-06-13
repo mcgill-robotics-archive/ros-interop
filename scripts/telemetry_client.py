@@ -28,6 +28,9 @@ def update_telemetry(navsat_msg, compass_msg):
     except (JSONDecodeError, HTTPError) as e:
         rospy.logerr(e)
         return
+    except Exception as e:
+        rospy.logfatal(e)
+        return
 
 
 class UnstampedTimeSynchronizer(message_filters.ApproximateTimeSynchronizer):

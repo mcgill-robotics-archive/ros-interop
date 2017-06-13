@@ -44,7 +44,8 @@
     <node name="obstacles"
           pkg="interop"
           type="obstacles_client.py"
-          output="screen">
+          output="screen"
+          respawn="true">
       <!-- Login credentials and request parameters -->
       <param name="base_url" value="$(arg base_url)"/>
       <param name="username" value="$(arg username)"/>
@@ -66,7 +67,8 @@
     <node name="mission_info"
           pkg="interop"
           type="missions_client.py"
-          output="screen">
+          output="screen"
+          respawn="true">
       <!-- Login credentials and request parameters -->
       <param name="base_url" value="$(arg base_url)"/>
       <param name="username" value="$(arg username)"/>
@@ -96,7 +98,8 @@
     <node name="telemetry"
           pkg="interop"
           type="telemetry_client.py"
-          output="screen">
+          output="screen"
+          respawn="true">
       <!-- Login credentials and request parameters -->
       <param name="base_url" value="$(arg base_url)"/>
       <param name="username" value="$(arg username)"/>
@@ -116,7 +119,8 @@
     <node name="targets"
           pkg="interop"
           type="targets_server.py"
-          output="screen">
+          output="screen"
+          respawn="true">
       <!-- Login credentials and request parameters -->
       <param name="base_url" value="$(arg base_url)"/>
       <param name="username" value="$(arg username)"/>

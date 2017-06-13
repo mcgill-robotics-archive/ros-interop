@@ -47,6 +47,9 @@ class TargetsServer(object):
         except IOError as e:
             rospy.logerr(e)
             response.success = False
+        except Exception as e:
+            rospy.logfatal(e)
+            response.success = False
         else:
             response.id = file_id
             response.success = True
@@ -68,6 +71,9 @@ class TargetsServer(object):
             json_target = self.targets_dir.get_target(req.id)
         except (KeyError, IOError) as e:
             rospy.logerr("Could not get target: {}".format(e))
+            response.success = False
+        except Exception as e:
+            rospy.logfatal(e)
             response.success = False
         else:
             dict_target = json.loads(json_target)
@@ -95,6 +101,9 @@ class TargetsServer(object):
         except (KeyError, IOError) as e:
             rospy.logerr("Could not update target: {}".format(e))
             response.success = False
+        except Exception as e:
+            rospy.logfatal(e)
+            response.success = False
         else:
             response.success = True
 
@@ -116,6 +125,9 @@ class TargetsServer(object):
         except (KeyError, OSError) as e:
             rospy.logerr("Could not delete target: {}".format(e))
             response.success = False
+        except Exception as e:
+            rospy.logfatal(e)
+            response.success = False
         else:
             response.success = True
 
@@ -136,6 +148,9 @@ class TargetsServer(object):
             json_targets = self.targets_dir.get_all_targets()
         except IOError as e:
             rospy.logerr("Could not get all targets: {}".format(e))
+            response.success = False
+        except Exception as e:
+            rospy.logfatal(e)
             response.success = False
         else:
             for str_file_id, json_target in json_targets.iteritems():
@@ -170,6 +185,9 @@ class TargetsServer(object):
         except CvBridgeError as e:
             rospy.logerr(e)
             response.success = False
+        except Exception as e:
+            rospy.logfatal(e)
+            response.success = False
         else:
             try:
                 self.targets_dir.set_target_image(req.id, png_image)
@@ -201,6 +219,9 @@ class TargetsServer(object):
         except (KeyError, IOError) as e:
             rospy.logerr("Could not get target image: {}".format(e))
             response.success = False
+        except Exception as e:
+            rospy.logfatal(e)
+            response.success = False
         else:
             try:
                 response.image = serializers.TargetImageSerializer.from_raw(
@@ -229,6 +250,9 @@ class TargetsServer(object):
             self.targets_dir.delete_target_image(req.id)
         except (KeyError, IOError) as e:
             rospy.logerr("Could not delete target image: {}".format(e))
+            response.success = False
+        except Exception as e:
+            rospy.logfatal(e)
             response.success = False
         else:
             response.success = True

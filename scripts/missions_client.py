@@ -14,6 +14,7 @@ from std_srvs.srv import Trigger
 from interop.srv import GetMissionByID
 from interop.msg import FlyZoneArray, UTMZone
 
+
 def publish_mission(timer):
     """Requests and publishes the mission information."""
     with lock:
@@ -24,6 +25,7 @@ def publish_mission(timer):
         off_axis_targ_pub.publish(msgs[4])
         emergent_targ_pub.publish(msgs[5])
         utm_zone_pub.publish(msgs[6])
+
 
 def get_active_mission(req):
     """ Service to update mission information with current active mission.
@@ -70,6 +72,9 @@ def get_mission_by_id(req):
             return False, str(e)
         except (JSONDecodeError, HTTPError) as e:
             rospy.logerr(e)
+            return False, str(e)
+        except Exception as e:
+            rospy.logfatal(e)
             return False, str(e)
 
     rospy.loginfo("Using mission ID: %d", req.id)
