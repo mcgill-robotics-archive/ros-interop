@@ -150,16 +150,20 @@ class TargetsServer(object):
 
         return response
 
-    def set_target_image(self, req):
+    def set_target_image(self, req, compress=False):
         """Handles SetTargetImage service requests.
 
         Args:
-            req: SetTargetImageRequest message.
+            req: SetTargetImageRequest/SetTargetCompressedImageRequest message.
+            compress: Whether to return a compressed image or not.
 
         Returns:
-            SetTargetImageResponse.
+            SetTargetImageResponse or SetTargetCompressedImageResponse.
         """
-        response = interop.srv.SetTargetImageResponse()
+        if compress:
+            response = interop.srv.SetTargetCompressedImageResponse()
+        else:
+            response = interop.srv.SetTargetImageResponse()
 
         try:
             png_image = serializers.TargetImageSerializer.from_msg(req.image)
@@ -177,16 +181,20 @@ class TargetsServer(object):
 
         return response
 
-    def get_target_image(self, req):
+    def get_target_image(self, req, compress=False):
         """Handles GetTargetImage service requests.
 
         Args:
-            req: GetTargetImageRequest message.
+            req: GetTargetImageRequest/GetTargetCompressedImageRequest message.
+            compress: Whether to return a compressed image or not.
 
         Returns:
-            GetTargetImageResponse.
+            GetTargetImageResponse or GetTargetCompressedImageResponse.
         """
-        response = interop.srv.GetTargetImageResponse()
+        if compress:
+            response = interop.srv.GetTargetCompressedImageResponse()
+        else:
+            response = interop.srv.GetTargetImageResponse()
 
         try:
             png = self.targets_dir.get_target_image(req.id)
@@ -195,7 +203,9 @@ class TargetsServer(object):
             response.success = False
         else:
             try:
-                response.image = serializers.TargetImageSerializer.from_raw(png)
+                response.image = serializers.TargetImageSerializer.from_raw(
+                    png,
+                    compress)
             except CvBridgeError as e:
                 rospy.logerr(e)
                 response.success = False
@@ -287,5 +297,11 @@ if __name__ == "__main__":
                   targets_server.get_target_image)
     rospy.Service("~image/delete", interop.srv.DeleteTargetImage,
                   targets_server.delete_target_image)
+
+    # Initialize target compressed image ROS services.
+    rospy.Service("~image/compressed/set", interop.srv.SetTargetCompressedImage,
+                  lambda r: targets_server.set_target_image(r, True))
+    rospy.Service("~image/compressed/get", interop.srv.GetTargetCompressedImage,
+                  lambda r: targets_server.get_target_image(r, True))
 
     rospy.spin()

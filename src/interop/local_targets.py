@@ -247,7 +247,7 @@ class Target(object):
             self.image_path = os.path.join(self.targets_dir, filename)
 
             try:
-                with open(self.image_path, "w", 0) as f:
+                with open(self.image_path, "wb", 0) as f:
                     f.write(png_image)
             except IOError as e:
                 raise
@@ -289,7 +289,7 @@ class Target(object):
             else:
                 try:
                     # png_image is expected to be of type str.
-                    with open(self.image_path, "r") as f:
+                    with open(self.image_path, "rb") as f:
                         png_image = f.read()
                 except IOError as e:
                     raise

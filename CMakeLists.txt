@@ -46,6 +46,10 @@ add_service_files(FILES
   GetTargetImage.srv
   DeleteTargetImage.srv
 
+  # Compressed target image services.
+  SetTargetCompressedImage.srv
+  GetTargetCompressedImage.srv
+
   # Missions services.
   GetMissionByID.srv
 )

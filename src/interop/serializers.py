@@ -11,6 +11,7 @@ import dateutil.parser
 from dateutil.tz import tzutc
 from datetime import datetime
 from cv_bridge import CvBridge
+from sensor_msgs.msg import CompressedImage, Image
 from geometry_msgs.msg import Point, PointStamped, PolygonStamped, Polygon
 from visualization_msgs.msg import Marker, MarkerArray
 from std_msgs.msg import ColorRGBA, Float64, Header, String, Time, Int16
@@ -274,7 +275,7 @@ class MissionDeserializer(object):
         emergent_obj.point.y = northing
 
         return emergent_obj
-    
+
     @classmethod
     def __utm_zone(cls, json):
         """
@@ -282,12 +283,12 @@ class MissionDeserializer(object):
 
         Args:
             json: JSON dict containing the home position.
-        
+
         Returns:
             A UTMZone message containing the UTM Zone.
         """
         ref_zone = UTMZone()
-        _, _, num, letter = utm.from_latlon(json["latitude"], 
+        _, _, num, letter = utm.from_latlon(json["latitude"],
                                             json["longitude"])
         ref_zone.letter = letter
         ref_zone.number = num
@@ -306,8 +307,8 @@ class MissionDeserializer(object):
 
         Returns:
             A tuple of (FlyZoneArray, PolygonStamped, Marker, PointStamped,
-            PointStamped, PointStamped, UTMZone) corresponding to the flyzones, 
-            search grid, waypoints, air drop position, off axis target 
+            PointStamped, PointStamped, UTMZone) corresponding to the flyzones,
+            search grid, waypoints, air drop position, off axis target
             location, the emergent object location, and the UTM Zone.
         """
         flyzones = cls.__get_flyzone(data["fly_zones"], frame)
@@ -501,7 +502,7 @@ class TargetImageSerializer(object):
         """Serializes a ROS Image message into a compressed PNG image.
 
         Args:
-            msg: ROS Image message.
+            msg: ROS Image or CompressedImage message.
 
         Returns:
             Compressed PNG image.
@@ -509,6 +510,10 @@ class TargetImageSerializer(object):
         Raises:
             CvBridgeError: On image conversion error.
         """
+        if isinstance(msg, CompressedImage):
+            # Decompress message.
+            msg = cls.from_raw(msg.data)
+
         # Convert ROS Image to OpenCV image.
         bridge = CvBridge()
         img = bridge.imgmsg_to_cv2(msg)
@@ -522,14 +527,15 @@ class TargetImageSerializer(object):
         return png
 
     @classmethod
-    def from_raw(cls, raw):
+    def from_raw(cls, raw, compress=False):
         """Deserializes binary-encoded image data into a ROS Image message.
 
         Args:
             raw: Binary encoded image data.
+            compress: Whether to return a compressed image or not.
 
         Returns:
-            ROS Image message.
+            ROS Image or CompressedImage message.
 
         Raises:
             CvBridgeError: On image conversion error.
@@ -541,5 +547,11 @@ class TargetImageSerializer(object):
         # Convert to ROS message.
         bridge = CvBridge()
         msg = bridge.cv2_to_imgmsg(img)
+
+        if compress:
+            data = cls.from_msg(msg)
+            msg = CompressedImage()
+            msg.format = "png"
+            msg.data = data
 
         return msg
