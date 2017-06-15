@@ -47,10 +47,10 @@
           output="screen"
           respawn="true">
       <!-- Login credentials and request parameters -->
-      <param name="base_url" value="$(arg base_url)"/>
-      <param name="username" value="$(arg username)"/>
-      <param name="password" value="$(arg password)"/>
-      <param name="timeout" value="$(arg timeout)"/>
+      <param name="base_url" value="$(arg base_url)" type="str"/>
+      <param name="username" value="$(arg username)" type="str"/>
+      <param name="password" value="$(arg password)" type="str"/>
+      <param name="timeout" value="$(arg timeout)" type="double"/>
 
       <!-- Published topics -->
       <param name="moving_topic" value="$(arg moving_topic)"/>
@@ -70,10 +70,10 @@
           output="screen"
           respawn="true">
       <!-- Login credentials and request parameters -->
-      <param name="base_url" value="$(arg base_url)"/>
-      <param name="username" value="$(arg username)"/>
-      <param name="password" value="$(arg password)"/>
-      <param name="timeout" value="$(arg timeout)"/>
+      <param name="base_url" value="$(arg base_url)" type="str"/>
+      <param name="username" value="$(arg username)" type="str"/>
+      <param name="password" value="$(arg password)" type="str"/>
+      <param name="timeout" value="$(arg timeout)" type="double"/>
 
       <!-- Published topics -->
       <param name="flyzones_topic" value="$(arg flyzones_topic)"/>
@@ -101,10 +101,10 @@
           output="screen"
           respawn="true">
       <!-- Login credentials and request parameters -->
-      <param name="base_url" value="$(arg base_url)"/>
-      <param name="username" value="$(arg username)"/>
-      <param name="password" value="$(arg password)"/>
-      <param name="timeout" value="$(arg timeout)"/>
+      <param name="base_url" value="$(arg base_url)" type="str"/>
+      <param name="username" value="$(arg username)" type="str"/>
+      <param name="password" value="$(arg password)" type="str"/>
+      <param name="timeout" value="$(arg timeout)" type="double"/>
 
       <!-- Synchronization settings -->
       <param name="sync_queue_size" value="$(arg sync_queue_size)"/>
@@ -122,10 +122,10 @@
           output="screen"
           respawn="true">
       <!-- Login credentials and request parameters -->
-      <param name="base_url" value="$(arg base_url)"/>
-      <param name="username" value="$(arg username)"/>
-      <param name="password" value="$(arg password)"/>
-      <param name="timeout" value="$(arg timeout)"/>
+      <param name="base_url" value="$(arg base_url)" type="str"/>
+      <param name="username" value="$(arg username)" type="str"/>
+      <param name="password" value="$(arg password)" type="str"/>
+      <param name="timeout" value="$(arg timeout)" type="double"/>
 
       <!-- Targets directory settings -->
       <param name="targets_root" value="$(arg targets_root)"/>
