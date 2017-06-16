@@ -280,6 +280,8 @@ if __name__ == "__main__":
     username = rospy.get_param("~username")
     password = rospy.get_param("~password")
     timeout = rospy.get_param("~timeout")
+    targets_root = rospy.get_param("~targets_root")
+    update_period = rospy.get_param("~interop_update_period")
 
     # Initialize interoperability client.
     client = InteroperabilityClient(base_url, username, password, timeout)
@@ -289,10 +291,17 @@ if __name__ == "__main__":
     client.login()
 
     # Initialize a directory for storing the targets.
-    targets_root = rospy.get_param("~targets_root")
     try:
         targets_dir = local_targets.TargetsDirectory(targets_root, client)
     except OSError as e:
+        rospy.logfatal(e)
+        raise
+
+    # Sync up the targets directory.
+    try:
+        rospy.loginfo("Loading all remote targets...")
+        targets_dir.load_all_remote_targets()
+    except Exception as e:
         rospy.logfatal(e)
         raise
 
@@ -301,7 +310,6 @@ if __name__ == "__main__":
 
     # Set up a timer to periodically update the targets and images
     # on the interop server.
-    update_period = rospy.get_param("~interop_update_period")
     rospy.Timer(rospy.Duration(update_period), targets_server.sync)
 
     # Initialize target ROS services.

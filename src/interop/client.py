@@ -58,6 +58,7 @@ class InteroperabilityClient(object):
             ConnectionError: On connection failure.
         """
         # Try until authenticated.
+        response = requests.Response()
         while not rospy.is_shutdown():
             # Send request.
             response = self.session.request(

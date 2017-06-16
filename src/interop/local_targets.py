@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 
 import os
-import os.path
+import json
 import errno
+import rospy
+import os.path
 import datetime
 import threading
-import rospy
+import serializers
 from cv_bridge import CvBridgeError
 from simplejson import JSONDecodeError
 from requests.exceptions import ConnectionError, HTTPError, Timeout
@@ -19,7 +21,7 @@ class Target(object):
     interop server.
     """
 
-    def __init__(self, targets_dir, file_id, data, client):
+    def __init__(self, targets_dir, file_id, data, client, interop_id=None):
         """Creates the target file with the specified data, inside the
         specified directory.
 
@@ -32,6 +34,7 @@ class Target(object):
             client (interop.InteroperabilityClient): Interoperability client
                 that will be used to sync the target and its image to the
                 server.
+            interop_id (int): Remote ID associated with this target, optional.
 
         Raises:
             IOError: If the target file could not be written.
@@ -46,7 +49,8 @@ class Target(object):
         self.targets_dir = targets_dir
 
         self.file_id = file_id
-        self.interop_id = None  # Also used to indicate presence on the server.
+        # Also used to indicate presence on the server.
+        self.interop_id = interop_id
         self.image_is_on_server = False
 
         # State variables used to decide how/what to sync to the interop server.
@@ -70,7 +74,7 @@ class Target(object):
             except IOError as e:
                 raise
 
-            self.needs_adding = True
+            self.needs_adding = interop_id is None
 
     @property
     def needs_adding(self):
@@ -233,11 +237,13 @@ class Target(object):
 
                 return data
 
-    def set_image(self, png_image):
+    def set_image(self, png_image, needs_adding=True):
         """Associate an image with this target, or update the existing image.
 
         Args:
             png_image (str): The PNG image to be written.
+            needs_adding (bool): Whether the image needs to be added to the
+                server or not.
 
         Raises:
             IOError: If the image could not be written.
@@ -252,7 +258,7 @@ class Target(object):
             except IOError as e:
                 raise
 
-            self.image_needs_setting = True
+            self.image_needs_setting = needs_adding
 
     def delete_image(self):
         """Delete the image associated with this target.
@@ -455,11 +461,26 @@ class TargetsDirectory(object):
         # {file_id (int): target (Target)}
         self.targets = {}
 
-    def add_target(self, data):
+    def load_all_remote_targets(self):
+        """Loads all targets stored remotely to sync up state on startup."""
+        remote_targets = self.client.get_all_targets()
+        for target_id, target in remote_targets.iteritems():
+            json_target = json.dumps(target)
+            file_id = self.add_target(json_target, target_id)
+            try:
+                img = self.client.get_target_image(target_id)
+                png = serializers.TargetImageSerializer.from_msg(img)
+                self.set_target_image(file_id, png, False)
+            except Exception as e:
+                rospy.logerr("Could not get target %d image: %r", target_id, e)
+                continue
+
+    def add_target(self, data, interop_id=None):
         """Adds a target.
 
         Args:
             data (str): The target data.
+            interop_id (int): The associated ID on the server, optional.
 
         Returns:
             The file_id (int) of the added target.
@@ -471,7 +492,8 @@ class TargetsDirectory(object):
             # New file_id.
             file_id = self.file_id + 1
 
-            target = Target(self.targets_dir, file_id, data, self.client)
+            target = Target(self.targets_dir, file_id, data,
+                            self.client, interop_id)
 
             self.targets[file_id] = target
             # Record the largest file_id so far.
@@ -550,7 +572,7 @@ class TargetsDirectory(object):
 
         return targets
 
-    def set_target_image(self, file_id, png_image):
+    def set_target_image(self, file_id, png_image, needs_adding=True):
         """Associates an image with a target or updates an existing target
         image.
 
@@ -558,6 +580,8 @@ class TargetsDirectory(object):
             file_id (int): The file id of the target to associate the image
                 with.
             png_image (str): The image to add or update.
+            needs_adding (bool): Whether we need to add the image to the
+                server.
 
         Raises:
             KeyError: If the file_id does not exist in the self.targets
@@ -567,7 +591,7 @@ class TargetsDirectory(object):
         with self.lock:
             target = self.targets[file_id]
 
-        target.set_image(png_image)
+        target.set_image(png_image, needs_adding)
 
     def delete_target_image(self, file_id):
         """Deletes an existing target image.
