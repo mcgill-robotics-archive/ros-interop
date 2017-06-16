@@ -9,6 +9,9 @@
   <arg name="targets_root" default="~/object_files/"/>
   <arg name="interop_update_period" default="10.0"/>
 
+  <!-- Whether to clear all targets on startup or not. -->
+  <arg name="clear_targets" default="false"/>
+
   <!-- Synchronization settings -->
   <arg name="sync_queue_size" default="2"/>
   <arg name="max_sync_delay" default="1"/>
@@ -130,6 +133,7 @@
       <!-- Targets directory settings -->
       <param name="targets_root" value="$(arg targets_root)"/>
       <param name="interop_update_period" value="$(arg interop_update_period)"/>
+      <param name="clear_targets" value="$(arg clear_targets)"/>
     </node>
   </group>
 </launch>

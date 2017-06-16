@@ -6,9 +6,10 @@
 import json
 import rospy
 import interop.srv
+from cv_bridge import CvBridgeError
 from interop import InteroperabilityClient
 from interop import serializers, local_targets
-from cv_bridge import CvBridgeError
+from std_srvs.srv import Trigger, TriggerResponse
 
 
 class TargetsServer(object):
@@ -259,6 +260,48 @@ class TargetsServer(object):
 
         return response
 
+    def reload_all_targets(self, req):
+        """Reloads all remote targets.
+
+        Args:
+            req: TriggerRequest message.
+
+        Returns:
+            TriggerResponse.
+        """
+        response = TriggerResponse()
+
+        try:
+            rospy.logwarn("Reloading all remote targets...")
+            self.targets_dir.load_all_remote_targets()
+            response.success = True
+        except Exception as e:
+            response.success = False
+            response.message = e.message
+
+        return response
+
+    def clear_all_targets(self, req):
+        """Reloads all remote targets.
+
+        Args:
+            req: TriggerRequest message.
+
+        Returns:
+            TriggerResponse.
+        """
+        response = TriggerResponse()
+
+        try:
+            rospy.logwarn("Clearing all targets...")
+            self.targets_dir.clear_all_targets()
+            response.success = True
+        except Exception as e:
+            response.success = False
+            response.message = e.message
+
+        return response
+
     def sync(self, rospy_timer_event):
         """Handles calls from rospy.Timer to sync the local targets and images
         to the interop server.
@@ -281,6 +324,7 @@ if __name__ == "__main__":
     password = rospy.get_param("~password")
     timeout = rospy.get_param("~timeout")
     targets_root = rospy.get_param("~targets_root")
+    clear_targets = rospy.get_param("~clear_targets")
     update_period = rospy.get_param("~interop_update_period")
 
     # Initialize interoperability client.
@@ -297,10 +341,18 @@ if __name__ == "__main__":
         rospy.logfatal(e)
         raise
 
-    # Sync up the targets directory.
     try:
-        rospy.loginfo("Loading all remote targets...")
-        targets_dir.load_all_remote_targets()
+        if clear_targets:
+            rospy.logwarn("Clearing all remote targets...")
+            targets_dir.clear_all_targets()
+
+            # Unset this parameter to avoid redoing it after a crash.
+            rospy.logwarn("Unsetting clear targets parameter...")
+            rospy.set_param("~clear_targets", False)
+        else:
+            # Sync up the targets directory.
+            rospy.loginfo("Loading all remote targets...")
+            targets_dir.load_all_remote_targets()
     except Exception as e:
         rospy.logfatal(e)
         raise
@@ -335,5 +387,9 @@ if __name__ == "__main__":
                   lambda r: targets_server.set_target_image(r, True))
     rospy.Service("~image/compressed/get", interop.srv.GetTargetCompressedImage,
                   lambda r: targets_server.get_target_image(r, True))
+
+    # Initialize reload and clear targets ROS services.
+    rospy.Service("~clear", Trigger, targets_server.clear_all_targets)
+    rospy.Service("~reload", Trigger, targets_server.reload_all_targets)
 
     rospy.spin()

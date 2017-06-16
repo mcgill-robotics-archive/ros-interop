@@ -146,6 +146,11 @@ targets API with the following:
 -   `~image/compressed/set`: Sets or updates target image thumbnail with a `CompressedImage`, `SetTargetCompressedImage`.
 -   `~image/compressed/get`: Retrieves target image thumbnail as a `CompressedImage`, `GetTargetCompressedImage`.
 
+#### Syncing
+
+-   `~clear`: Clears all local and remote targets, `Trigger`.
+-   `~reload`: Reloads all remote targets, `Trigger`.
+
 ## Arguments
 
 The following are the run-time ROS launch arguments available:
@@ -161,6 +166,7 @@ The following are the run-time ROS launch arguments available:
 
 -   `targets_root`: The parent of all timestamped directories containing object files, default: `~/object_files/`.
 -   `interop_update_period`: Duration between attempts to sync the object files of the current run to the interop server, default: `10.0` (i.e. 10.0 s).
+-   `clear_targets`: Automatically clear all remote targets on start up (**use with caution**), default: `false`.
 
 #### Subscribed topics
 

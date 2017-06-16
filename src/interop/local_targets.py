@@ -464,6 +464,7 @@ class TargetsDirectory(object):
     def load_all_remote_targets(self):
         """Loads all targets stored remotely to sync up state on startup."""
         remote_targets = self.client.get_all_targets()
+        rospy.loginfo("Found %d remote targets", len(remote_targets))
         for target_id, target in remote_targets.iteritems():
             json_target = json.dumps(target)
             file_id = self.add_target(json_target, target_id)
@@ -473,7 +474,22 @@ class TargetsDirectory(object):
                 self.set_target_image(file_id, png, False)
             except Exception as e:
                 rospy.logerr("Could not get target %d image: %r", target_id, e)
-                continue
+
+    def clear_all_targets(self):
+        """Clears all targets both remotely and locally."""
+        # Deal with locally stored targets first.
+        for target_id, target in self.targets.iteritems():
+            target.delete()
+            del self.targets[target_id]
+
+        # Need to load targets stored remotely.
+        remote_targets = self.client.get_all_targets()
+        for target_id, target in remote_targets.iteritems():
+            try:
+                self.client.delete_target(target_id)
+            except Exception as e:
+                rospy.logerr("Could not delete remote target %d: %r",
+                             target_id, e)
 
     def add_target(self, data, interop_id=None):
         """Adds a target.
