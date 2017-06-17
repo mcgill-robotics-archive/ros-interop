@@ -220,61 +220,31 @@ class MissionDeserializer(object):
         return air_drop
 
     @classmethod
-    def __get_offaxis_targ(cls, data, frame):
+    def __get_point_msg(cls, data, frame):
         """
-        Deserializes off axis target location to a message of type PointStamped.
+        Deserializes a location to a message of type PointStamped.
 
         Args:
-            data: A dictionary containing the off axis target location.
+            data: A dictionary containing the location.
             frame: Frame for the point.
 
         Returns:
-            A message of type PointStamped with the location of the off axis
-            target.
+            A message of type PointStamped with the location.
         """
         header = Header()
         header.stamp = rospy.get_rostime()
         header.frame_id = frame
 
-        off_axis_targ = PointStamped()
-        off_axis_targ.header = header
+        msg = PointStamped()
+        msg.header = header
 
         easting, northing, _, _ = utm.from_latlon(data["latitude"],
                                                   data["longitude"])
 
-        off_axis_targ.point.x = easting
-        off_axis_targ.point.y = northing
+        msg.point.x = easting
+        msg.point.y = northing
 
-        return off_axis_targ
-
-    @classmethod
-    def __emergent_object(cls, data, frame):
-        """
-        Deserializes the last known location of the emergent target to a
-        ros message of type PointStamped.
-
-        Args:
-            data: A dictionary with the corresponding location.
-            frame: Frame for the point.
-
-        Returns:
-            A PointStamped message with the information about the last known
-            location of the emergent target.
-        """
-        header = Header()
-        header.stamp = rospy.get_rostime()
-        header.frame_id = frame
-
-        emergent_obj = PointStamped()
-        emergent_obj.header = header
-
-        easting, northing, _, _ = utm.from_latlon(data["latitude"],
-                                                  data["longitude"])
-
-        emergent_obj.point.x = easting
-        emergent_obj.point.y = northing
-
-        return emergent_obj
+        return msg
 
     @classmethod
     def __utm_zone(cls, json):
@@ -307,22 +277,24 @@ class MissionDeserializer(object):
 
         Returns:
             A tuple of (FlyZoneArray, PolygonStamped, Marker, PointStamped,
-            PointStamped, PointStamped, UTMZone) corresponding to the flyzones,
-            search grid, waypoints, air drop position, off axis target
-            location, the emergent object location, and the UTM Zone.
+            PointStamped, PointStamped, PointStamped, UTMZone) corresponding to
+            the flyzones, search grid, waypoints, air drop position, off axis
+            target location, the emergent object location, the home position,
+            and the UTM Zone.
         """
         flyzones = cls.__get_flyzone(data["fly_zones"], frame)
         search_grid = cls.__get_search_grid(data["search_grid_points"], frame)
         waypoints = cls.__get_waypoints(data["mission_waypoints"], frame)
-        air_drop_pos = cls.__get_airdrop_loc(data["air_drop_pos"], frame)
-        off_axis_targ = cls.__get_offaxis_targ(data["off_axis_target_pos"],
-                                               frame)
-        emergent_obj = cls.__emergent_object(data["emergent_last_known_pos"],
-                                             frame)
+        air_drop_pos = cls.__get_point_msg(data["air_drop_pos"], frame)
+        off_axis_targ = cls.__get_point_msg(data["off_axis_target_pos"], frame)
+        emergent_obj = cls.__get_point_msg(data["emergent_last_known_pos"],
+                                           frame)
+
+        home_pos = cls.__get_point_msg(data["home_pos"], frame)
         utm_zone = cls.__utm_zone(data["home_pos"])
 
         return (flyzones, search_grid, waypoints, air_drop_pos,
-                off_axis_targ, emergent_obj, utm_zone)
+                off_axis_targ, emergent_obj, home_pos, utm_zone)
 
 
 class ObstaclesDeserializer(object):

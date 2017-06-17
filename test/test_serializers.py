@@ -89,6 +89,8 @@ class TestSerializers(TestCase):
         air_drop_pos = mission[3]
         off_axis_targ = mission[4]
         emergent_obj = mission[5]
+        home_pos = mission[6]
+        utm_zone = mission[7]
 
         # Test flyzones.
         self.assertEqual(len(data["fly_zones"]), len(flyzones.flyzones))
@@ -165,6 +167,16 @@ class TestSerializers(TestCase):
         self.assertEqual(emergent_obj.point.x, easting)
         self.assertEqual(emergent_obj.point.y, northing)
 
+        # Test home position.
+        easting, northing, zone_num, zone_letter = utm.from_latlon(
+            data["home_pos"]["latitude"],
+            data["home_pos"]["longitude"])
+        self.assertEqual(home_pos.point.x, easting)
+        self.assertEqual(home_pos.point.y, northing)
+
+        # Test UTM zone.
+        self.assertEqual(utm_zone.number, zone_num)
+        self.assertEqual(utm_zone.letter, zone_letter)
 
     def test_obstacles_deserializer(self):
         """Tests obstacles deserializer."""

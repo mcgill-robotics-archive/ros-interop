@@ -24,7 +24,8 @@ def publish_mission(timer):
         air_drop_pub.publish(msgs[3])
         off_axis_targ_pub.publish(msgs[4])
         emergent_targ_pub.publish(msgs[5])
-        utm_zone_pub.publish(msgs[6])
+        home_pos_pub.publish(msgs[6])
+        utm_zone_pub.publish(msgs[7])
 
 
 def get_active_mission(req):
@@ -102,6 +103,7 @@ if __name__ == "__main__":
     air_drop_topic = rospy.get_param("~air_drop_loc_topic")
     off_axis_targ_topic = rospy.get_param("~off_axis_targ_topic")
     emergent_targ_topic = rospy.get_param("~emergent_targ_topic")
+    home_pos_topic = rospy.get_param("~home_pos_topic")
     utm_zone_topic = rospy.get_param("~utm_zone_topic")
 
     # Setup publishers.
@@ -115,7 +117,8 @@ if __name__ == "__main__":
     off_axis_targ_pub = rospy.Publisher(off_axis_targ_topic, PointStamped,
                                         queue_size=1)
     emergent_targ_pub = rospy.Publisher(emergent_targ_topic, PointStamped,
-                                       queue_size=1)
+                                        queue_size=1)
+    home_pos_pub = rospy.Publisher(home_pos_topic, PointStamped, queue_size=1)
     utm_zone_pub = rospy.Publisher(utm_zone_topic, UTMZone, queue_size=1)
 
     # Get message parameters.

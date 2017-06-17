@@ -278,10 +278,10 @@ class InteroperabilityClient(object):
 
         Returns
             A tuple of (FlyZoneArray, PolygonStamped, Marker, PointStamped,
-            PointStamped, Pointstamped, UTMZone) corresponding to the flyzones,
-            search grid, waypoints, air drop position, off axis target location,
-            the emergent object location, and the utm zone of the active
-            mission.
+            PointStamped, PointStamped, PointStamped, UTMZone) corresponding to
+            the flyzones, search grid, waypoints, air drop position, off axis
+            target location, the emergent object location, the home position,
+            and the UTM Zone.
 
         Raises:
             Timeout: On timeout.
@@ -304,10 +304,10 @@ class InteroperabilityClient(object):
 
         Returns:
             A list of tuples of (FlyZoneArray, PolygonStamped, Marker,
-            PointStamped, PointStamped, Pointstamped, UTMZone) corresponding to
-            the flyzones, search grid, waypoints, air drop position,
-            off axis target location, the emergent object location, and the
-            UTM Zone.
+            PointStamped, PointStamped, PointStamped, PointStamped, UTMZone)
+            corresponding to the flyzones, search grid, waypoints, air drop
+            position, off axis target location, the emergent object location,
+            the home position, and the UTM Zone.
 
         Raises:
             Timeout: On timeout.
@@ -331,10 +331,10 @@ class InteroperabilityClient(object):
 
         Returns:
             A tuple of (FlyZoneArray, PolygonStamped, Marker, PointStamped,
-            PointStamped, Pointstamped, UTMZone) corresponding to the flyzones,
-            search grid, waypoints, air drop position, off axis target location,
-            the emergent object location, and the UTM zone of the corresponding
-            mission.
+            PointStamped, PointStamped, PointStamped, UTMZone) corresponding to
+            the flyzones, search grid, waypoints, air drop position, off axis
+            target location, the emergent object location, the home position,
+            and the UTM Zone.
 
         Raises:
             Timeout: On Timeout.
@@ -343,7 +343,8 @@ class InteroperabilityClient(object):
             JSONDecodeError: On JSON decoding failure.
         """
         response = self._get("/api/missions/{:d}".format(id))
-        mission = serializers.MissionDeserializer.from_dict(response.json(), frame)
+        mission = serializers.MissionDeserializer.from_dict(response.json(),
+                                                            frame)
         return mission
 
     def put_target(self, id, json_target):

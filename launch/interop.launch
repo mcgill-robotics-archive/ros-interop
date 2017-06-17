@@ -29,6 +29,7 @@
   <arg name="air_drop_topic" default="~air_drop_loc"/>
   <arg name="emergent_targ_topic" default="~emergent_targ_loc"/>
   <arg name="off_axis_targ_topic" default="~off_axis_targ"/>
+  <arg name="home_pos_topic" default="~home"/>
   <arg name="utm_zone_topic" default="~utm_zone"/>
 
   <!-- Publication periods -->
@@ -85,6 +86,7 @@
       <param name="air_drop_loc_topic" value="$(arg air_drop_topic)"/>
       <param name="emergent_targ_topic" value="$(arg emergent_targ_topic)"/>
       <param name="off_axis_targ_topic" value="$(arg off_axis_targ_topic)"/>
+      <param name="home_pos_topic" value="$(arg home_pos_topic)"/>
       <param name="utm_zone_topic" value="$(arg utm_zone_topic)"/>
 
       <!-- Publication period -->

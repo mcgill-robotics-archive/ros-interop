@@ -106,6 +106,7 @@ This by default publishes mission information at 1 Hz to the following topics:
 -   `~off_axis_targ`: Off axis target position, `geometry_msgs/PointStamped`.
 -   `~emergent_targ_loc`: Emergent target last known location,
                           `geometry_msgs/PointStamped`.
+-   `~home`: Home position, `geometry_msgs/PointStamped`.
 -   `~utm_zone`: UTM zone number and UTM zone letter, `UTMZone`.
 
 This also provides the following services to change missions:
