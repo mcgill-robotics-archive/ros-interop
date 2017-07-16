@@ -12,11 +12,14 @@ from dateutil.tz import tzutc
 from datetime import datetime
 from cv_bridge import CvBridge
 from sensor_msgs.msg import CompressedImage, Image
-from geometry_msgs.msg import Point, PointStamped, PolygonStamped, Polygon
+from geographic_msgs.msg import GeoPointStamped, GeoPoint
 from visualization_msgs.msg import Marker, MarkerArray
 from std_msgs.msg import ColorRGBA, Float64, Header, String, Time, Int16
-from interop.msg import (Color, FlyZone, FlyZoneArray, UTMZone,
-                         Orientation, Shape, Target, TargetType)
+from interop.msg import (Color, FlyZone, FlyZoneArray, 
+                         Orientation, Shape, Target, TargetType,
+                         GeoSphere, GeoCylinder,
+                         GeoPolygonStamped, GeoSphereArrayStamped,
+                         GeoCylinderArrayStamped, WayPoints)
 
 
 def meters_to_feet(m):
@@ -103,12 +106,9 @@ class MissionDeserializer(object):
 
             # Change boundary points to ros message of type polygon.
             for waypoint in zone["boundary_pts"]:
-                point = Point()
-                easting, northing, _, _ = utm.from_latlon(
-                                                      waypoint["latitude"],
-                                                      waypoint["longitude"])
-                point.x = easting
-                point.y = northing
+                point = GeoPoint()
+                point.latitude = waypoint["latitude"]
+                point.longitude = waypoint["longitude"]
                 flyzone.zone.polygon.points.append(point)
 
             flyzones.flyzones.append(flyzone)
@@ -132,28 +132,20 @@ class MissionDeserializer(object):
         header.stamp = rospy.get_rostime()
         header.frame_id = frame
 
-        waypoints = Marker()
+        waypoints = WayPoints()
         waypoints.header = header
-        waypoints.ns = "waypoints"
-        waypoints.type = Marker.POINTS
-
-        # Set lifetime to 0 because waypoints do not change.
-        waypoints.lifetime = rospy.Duration()
 
         # Ensure there is no rotation by setting w to 1.
-        waypoints.pose.orientation.w = 1.0
-        waypoints.scale.x = waypoints.scale.y = waypoints.scale.z = 0.1
         for point in data:
-            waypoint = Point()
-            easting, northing, _, _ = utm.from_latlon(point["latitude"],
-                                                      point["longitude"])
+            waypoint = GeoPoint()
+
             altitude = feet_to_meters(point["altitude_msl"])
 
-            waypoint.x = easting
-            waypoint.y = northing
-            waypoint.z = altitude
+            waypoint.latitude = point["latitude"]
+            waypoint.longitude = point["longitude"]
+            waypoint.altitude = altitude
 
-            waypoints.points.append(waypoint)
+            waypoints.waypoints.append(waypoint)
 
         return waypoints
 
@@ -173,52 +165,21 @@ class MissionDeserializer(object):
         header.stamp = rospy.get_rostime()
         header.frame_id = frame
 
-        search_grid = PolygonStamped()
+        search_grid = GeoPolygonStamped()
         search_grid.header = header
 
         for point in data:
-            boundary_pnt = Point()
+            boundary_pnt = GeoPoint()
 
-            easting, northing, _, _ = utm.from_latlon(point["latitude"],
-                                                      point["longitude"])
             altitude = feet_to_meters(point["altitude_msl"])
 
-            boundary_pnt.x = easting
-            boundary_pnt.y = northing
-            boundary_pnt.z = altitude
+            boundary_pnt.latitude = point["latitude"]
+            boundary_pnt.longitude = point["longitude"]
+            boundary_pnt.altitude = altitude
 
             search_grid.polygon.points.append(boundary_pnt)
 
         return search_grid
-
-    @classmethod
-    def __get_airdrop_loc(cls, data, frame):
-        """
-        Deserializes the airdrop location to a ros message of type
-        PointStamped.
-
-        Args:
-            data: A dictionary with the air drop location.
-            frame: Frame for the point.
-
-        Returns:
-            A PointStamped message with x and y corresponding to the airdrop
-            location.
-        """
-        header = Header()
-        header.stamp = rospy.get_rostime()
-        header.frame_id = frame
-
-        air_drop = PointStamped()
-        air_drop.header = header
-
-        easting, northing, _, _ = utm.from_latlon(data["latitude"],
-                                                  data["longitude"])
-        air_drop.point.x = easting
-        air_drop.point.y = northing
-
-        return air_drop
-
     @classmethod
     def __get_point_msg(cls, data, frame):
         """
@@ -235,35 +196,13 @@ class MissionDeserializer(object):
         header.stamp = rospy.get_rostime()
         header.frame_id = frame
 
-        msg = PointStamped()
+        msg = GeoPointStamped()
         msg.header = header
 
-        easting, northing, _, _ = utm.from_latlon(data["latitude"],
-                                                  data["longitude"])
-
-        msg.point.x = easting
-        msg.point.y = northing
+        msg.position.latitude = data["latitude"]
+        msg.position.longitude = data["longitude"]
 
         return msg
-
-    @classmethod
-    def __utm_zone(cls, json):
-        """
-        Deserializes the home position and retrieves the UTM zone.
-
-        Args:
-            json: JSON dict containing the home position.
-
-        Returns:
-            A UTMZone message containing the UTM Zone.
-        """
-        ref_zone = UTMZone()
-        _, _, num, letter = utm.from_latlon(json["latitude"],
-                                            json["longitude"])
-        ref_zone.letter = letter
-        ref_zone.number = num
-
-        return ref_zone
 
     @classmethod
     def from_dict(cls, data, frame):
@@ -289,24 +228,15 @@ class MissionDeserializer(object):
         off_axis_targ = cls.__get_point_msg(data["off_axis_target_pos"], frame)
         emergent_obj = cls.__get_point_msg(data["emergent_last_known_pos"],
                                            frame)
-
         home_pos = cls.__get_point_msg(data["home_pos"], frame)
-        utm_zone = cls.__utm_zone(data["home_pos"])
 
         return (flyzones, search_grid, waypoints, air_drop_pos,
-                off_axis_targ, emergent_obj, home_pos, utm_zone)
+                off_axis_targ, emergent_obj, home_pos)
 
 
 class ObstaclesDeserializer(object):
 
     """Obstacles message deserializer."""
-
-    # McGill Robotics red, because we have big egos.
-    OBSTACLE_COLOR = ColorRGBA(
-        r=218 / 255.0,
-        g=41 / 255.0,
-        b=28 / 255.0,
-        a=1.0)
 
     @classmethod
     def from_dict(cls, data, frame, lifetime):
@@ -328,56 +258,40 @@ class ObstaclesDeserializer(object):
         header.frame_id = frame
 
         # Parse moving obstacles, and populate markers with spheres.
-        moving_obstacles = MarkerArray()
+        moving_obstacles = GeoSphereArrayStamped()
+        moving_obstacles.header = header
         if "moving_obstacles" in data:
             for obj in data["moving_obstacles"]:
                 # Moving obstacles are spheres.
-                marker = Marker()
-                marker.header = header
-                marker.type = Marker.SPHERE
-                marker.color = cls.OBSTACLE_COLOR
-                marker.ns = "moving_obstacles"
-                marker.lifetime = rospy.Duration(lifetime)
+                obstacle = GeoSphere()
 
                 # Set scale as radius.
-                radius = feet_to_meters(obj["sphere_radius"])
-                marker.scale.x = marker.scale.y = marker.scale.z = radius
+                obstacle.radius = feet_to_meters(obj["sphere_radius"])
 
-                # Convert latitude and longitude to UTM.
-                easting, northing, _, _ = utm.from_latlon(obj["latitude"],
-                                                          obj["longitude"])
-                marker.pose.position.x = easting
-                marker.pose.position.y = northing
-                marker.pose.position.z = feet_to_meters(obj["altitude_msl"])
+                obstacle.center.latitude = obj["latitude"]
+                obstacle.center.longitude = obj["longitude"]
+                obstacle.center.altitude = feet_to_meters(
+                                                        obj["altitude_msl"])
 
-                moving_obstacles.markers.append(marker)
+                moving_obstacles.spheres.append(obstacle)
 
         # Parse stationary obstacles, and populate markers with cylinders.
-        stationary_obstacles = MarkerArray()
+        stationary_obstacles = GeoCylinderArrayStamped()
+        stationary_obstacles.header = header
         if "stationary_obstacles" in data:
             for obj in data["stationary_obstacles"]:
                 # Stationary obstacles are cylinders.
-                marker = Marker()
-                marker.header = header
-                marker.type = Marker.CYLINDER
-                marker.color = cls.OBSTACLE_COLOR
-                marker.ns = "stationary_obstacles"
-                marker.lifetime = rospy.Duration(lifetime)
+                obstacle = GeoCylinder()
 
                 # Set scale to define size.
-                radius = feet_to_meters(obj["cylinder_radius"])
-                height = feet_to_meters(obj["cylinder_height"])
-                marker.scale.x = marker.scale.y = radius
-                marker.scale.z = height
+                obstacle.radius = feet_to_meters(obj["cylinder_radius"])
+                obstacle.height = feet_to_meters(obj["cylinder_height"])
 
                 # Convert latitude and longitude to UTM.
-                easting, northing, _, _ = utm.from_latlon(obj["latitude"],
-                                                          obj["longitude"])
-                marker.pose.position.x = easting
-                marker.pose.position.y = northing
-                marker.pose.position.z = height / 2
+                obstacle.center.latitude = obj["latitude"]
+                obstacle.center.longitude = obj["longitude"]
 
-                stationary_obstacles.markers.append(marker)
+                stationary_obstacles.cylinders.append(obstacle)
 
         return (moving_obstacles, stationary_obstacles)
 

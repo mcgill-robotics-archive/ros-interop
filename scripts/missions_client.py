@@ -12,7 +12,8 @@ from geometry_msgs.msg import PointStamped, PolygonStamped
 from visualization_msgs.msg import Marker
 from std_srvs.srv import Trigger
 from interop.srv import GetMissionByID
-from interop.msg import FlyZoneArray, UTMZone
+from interop.msg import FlyZoneArray, WayPoints, GeoPolygonStamped
+from geographic_msgs.msg import GeoPointStamped
 
 
 def publish_mission(timer):
@@ -25,7 +26,6 @@ def publish_mission(timer):
         off_axis_targ_pub.publish(msgs[4])
         emergent_targ_pub.publish(msgs[5])
         home_pos_pub.publish(msgs[6])
-        utm_zone_pub.publish(msgs[7])
 
 
 def get_active_mission(req):
@@ -104,22 +104,21 @@ if __name__ == "__main__":
     off_axis_targ_topic = rospy.get_param("~off_axis_targ_topic")
     emergent_targ_topic = rospy.get_param("~emergent_targ_topic")
     home_pos_topic = rospy.get_param("~home_pos_topic")
-    utm_zone_topic = rospy.get_param("~utm_zone_topic")
 
     # Setup publishers.
     flyzones_pub = rospy.Publisher(flyzones_topic, FlyZoneArray,
                                    queue_size=1)
-    search_grid_pub = rospy.Publisher(search_grid_topic, PolygonStamped,
+    search_grid_pub = rospy.Publisher(search_grid_topic, GeoPolygonStamped,
                                       queue_size=1)
-    waypoints_pub = rospy.Publisher(waypoints_topic, Marker, queue_size=1)
-    air_drop_pub = rospy.Publisher(air_drop_topic, PointStamped,
+    waypoints_pub = rospy.Publisher(waypoints_topic, WayPoints,
+                                    queue_size=1)
+    air_drop_pub = rospy.Publisher(air_drop_topic, GeoPointStamped,
                                    queue_size=1)
-    off_axis_targ_pub = rospy.Publisher(off_axis_targ_topic, PointStamped,
+    off_axis_targ_pub = rospy.Publisher(off_axis_targ_topic, GeoPointStamped,
                                         queue_size=1)
-    emergent_targ_pub = rospy.Publisher(emergent_targ_topic, PointStamped,
+    emergent_targ_pub = rospy.Publisher(emergent_targ_topic, GeoPointStamped,
                                         queue_size=1)
-    home_pos_pub = rospy.Publisher(home_pos_topic, PointStamped, queue_size=1)
-    utm_zone_pub = rospy.Publisher(utm_zone_topic, UTMZone, queue_size=1)
+    home_pos_pub = rospy.Publisher(home_pos_topic, GeoPointStamped, queue_size=1)
 
     # Get message parameters.
     frame = str(rospy.get_param("~frame"))

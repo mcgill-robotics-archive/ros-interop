@@ -7,6 +7,7 @@ import rospy
 from simplejson import JSONDecodeError
 from interop import InteroperabilityClient
 from visualization_msgs.msg import MarkerArray
+from interop.msg import GeoCylinderArrayStamped, GeoSphereArrayStamped
 from requests.exceptions import ConnectionError, HTTPError, Timeout
 
 
@@ -55,9 +56,10 @@ if __name__ == "__main__":
     stationary_topic = rospy.get_param("~stationary_topic")
 
     # Setup publishers.
-    moving_pub = rospy.Publisher(moving_topic, MarkerArray, queue_size=1)
+    moving_pub = rospy.Publisher(moving_topic,
+                                     GeoSphereArrayStamped, queue_size=1)
     stationary_pub = rospy.Publisher(stationary_topic,
-                                     MarkerArray, queue_size=1)
+                                     GeoCylinderArrayStamped, queue_size=1)
 
     # Get ROS parameter for publishing period and frame ID.
     period = float(rospy.get_param("~period"))

@@ -3,6 +3,7 @@ project(interop)
 
 find_package(catkin REQUIRED COMPONENTS
   genmsg
+  geographic_msgs
   message_generation
   rospy
   sensor_msgs
@@ -18,11 +19,17 @@ add_message_files(FILES
   Color.msg
   FlyZone.msg
   FlyZoneArray.msg
+  GeoCylinder.msg
+  GeoCylinderArrayStamped.msg
+  GeoPolygon.msg
+  GeoPolygonStamped.msg
+  GeoSphere.msg
+  GeoSphereArrayStamped.msg
   Orientation.msg
   Shape.msg
   Target.msg
   TargetType.msg
-  UTMZone.msg
+  WayPoints.msg
 )
 
 # Custom ROS services.
@@ -40,10 +47,11 @@ add_service_files(FILES
   UpdateTarget.srv
 )
 
-generate_messages(DEPENDENCIES sensor_msgs std_msgs)
+generate_messages(DEPENDENCIES geographic_msgs sensor_msgs std_msgs)
 
 catkin_package(
   CATKIN_DEPENDS
+  geographic_msgs
   message_generation
   message_runtime
   rospy

@@ -90,7 +90,6 @@ class TestSerializers(TestCase):
         off_axis_targ = mission[4]
         emergent_obj = mission[5]
         home_pos = mission[6]
-        utm_zone = mission[7]
 
         # Test flyzones.
         self.assertEqual(len(data["fly_zones"]), len(flyzones.flyzones))
@@ -106,77 +105,59 @@ class TestSerializers(TestCase):
 
             bound = zone["boundary_pts"]
             for k, pnt in enumerate(flyzone.zone.polygon.points):
-                self.assertEqual(k+1, bound[k]["order"])
+                self.assertEqual(k + 1, bound[k]["order"])
 
-                easting, northing, _, _ = utm.from_latlon(
-                    bound[k]["latitude"],
-                    bound[k]["longitude"])
-
-                self.assertEqual(pnt.x, easting)
-                self.assertEqual(pnt.y, northing)
+                self.assertEqual(pnt.latitude, bound[k]["latitude"])
+                self.assertEqual(pnt.longitude, bound[k]["longitude"])
 
         # Test search grid.
         grid = data["search_grid_points"]
         self.assertEqual(len(search_grid.polygon.points), len(grid))
         for i, pnt in enumerate(search_grid.polygon.points):
-            self.assertEqual(i+1, grid[i]["order"])
+            self.assertEqual(i + 1, grid[i]["order"])
 
             altitude = serializers.feet_to_meters(grid[i]["altitude_msl"])
-            easting, northing, _, _ = utm.from_latlon(
-                grid[i]["latitude"],
-                grid[i]["longitude"])
 
-            self.assertEqual(pnt.x, easting)
-            self.assertEqual(pnt.y, northing)
-            self.assertEqual(pnt.z, altitude)
+            self.assertEqual(pnt.latitude, grid[i]["latitude"])
+            self.assertEqual(pnt.longitude, grid[i]["longitude"])
+            self.assertEqual(pnt.altitude, altitude)
 
         # Test waypoints.
         points = data["mission_waypoints"]
-        self.assertEqual(len(waypoints.points), len(points))
+        self.assertEqual(len(waypoints.waypoints), len(points))
 
-        for i, pnt in enumerate(waypoints.points):
-            self.assertEqual(i+1, points[i]["order"])
+        for i, pnt in enumerate(waypoints.waypoints):
+            self.assertEqual(i + 1, points[i]["order"])
 
             altitude = serializers.feet_to_meters(points[i]["altitude_msl"])
-            easting, northing, _, _ = utm.from_latlon(
-                points[i]["latitude"],
-                points[i]["longitude"])
 
-            self.assertEqual(pnt.x, easting)
-            self.assertEqual(pnt.y, northing)
-            self.assertEqual(pnt.z, altitude)
+            self.assertEqual(pnt.latitude, points[i]["latitude"])
+            self.assertEqual(pnt.longitude, points[i]["longitude"])
+            self.assertEqual(pnt.altitude, altitude)
 
         # Test airdrop pos.
-        easting, northing, _, _ = utm.from_latlon(
-            data["air_drop_pos"]["latitude"],
-            data["air_drop_pos"]["longitude"])
-        self.assertEqual(air_drop_pos.point.x, easting)
-        self.assertEqual(air_drop_pos.point.y, northing)
+        self.assertEqual(air_drop_pos.position.latitude,
+                         data["air_drop_pos"]["latitude"])
+        self.assertEqual(air_drop_pos.position.longitude,
+                         data["air_drop_pos"]["longitude"])
 
         # Test off axis target.
-        easting, northing, _, _ = utm.from_latlon(
-            data["off_axis_target_pos"]["latitude"],
-            data["off_axis_target_pos"]["longitude"])
-        self.assertEqual(off_axis_targ.point.x, easting)
-        self.assertEqual(off_axis_targ.point.y, northing)
+        self.assertEqual(off_axis_targ.position.latitude,
+                         data["off_axis_target_pos"]["latitude"])
+        self.assertEqual(off_axis_targ.position.longitude,
+                         data["off_axis_target_pos"]["longitude"])
 
         # Test emergent object.
-        easting, northing, _, _ = utm.from_latlon(
-            data["emergent_last_known_pos"]["latitude"],
-            data["emergent_last_known_pos"]["longitude"])
-        self.assertEqual(emergent_obj.point.x, easting)
-        self.assertEqual(emergent_obj.point.y, northing)
+        self.assertEqual(emergent_obj.position.latitude,
+                         data["emergent_last_known_pos"]["latitude"])
+        self.assertEqual(emergent_obj.position.longitude,
+                         data["emergent_last_known_pos"]["longitude"])
 
         # Test home position.
-        easting, northing, zone_num, zone_letter = utm.from_latlon(
-            data["home_pos"]["latitude"],
-            data["home_pos"]["longitude"])
-        self.assertEqual(home_pos.point.x, easting)
-        self.assertEqual(home_pos.point.y, northing)
-
-        # Test UTM zone.
-        self.assertEqual(utm_zone.number, zone_num)
-        self.assertEqual(utm_zone.letter, zone_letter)
+        self.assertEqual(home_pos.position.latitude,
+                         data["home_pos"]["latitude"])
+        self.assertEqual(home_pos.position.longitude,
+                         data["home_pos"]["longitude"])
 
     def test_obstacles_deserializer(self):
         """Tests obstacles deserializer."""
@@ -217,45 +198,32 @@ class TestSerializers(TestCase):
         moving, stationary = serializers.ObstaclesDeserializer.from_dict(*args)
 
         # Compare number of markers.
-        self.assertEqual(len(data["moving_obstacles"]), len(moving.markers))
+        self.assertEqual(len(data["moving_obstacles"]), len(moving.spheres))
         self.assertEqual(len(data["stationary_obstacles"]),
-                         len(stationary.markers))
+                         len(stationary.cylinders))
 
         # Test moving obstacle properties.
-        for i, marker in enumerate(moving.markers):
-            self.assertEqual(marker.type, Marker.SPHERE)
-            self.assertEqual(marker.ns, "moving_obstacles")
-
+        for i, sphere in enumerate(moving.spheres):
             obs = data["moving_obstacles"][i]
+
             altitude = serializers.feet_to_meters(obs["altitude_msl"])
-            easting, northing, _, _ = utm.from_latlon(obs["latitude"],
-                                                      obs["longitude"])
-            self.assertEqual(marker.pose.position.x, easting)
-            self.assertEqual(marker.pose.position.y, northing)
-            self.assertEqual(marker.pose.position.z, altitude)
+            self.assertEqual(sphere.center.latitude, obs["latitude"])
+            self.assertEqual(sphere.center.longitude, obs["longitude"])
 
             radius = serializers.feet_to_meters(obs["sphere_radius"])
-            self.assertEqual(marker.scale.x, radius)
-            self.assertEqual(marker.scale.y, radius)
-            self.assertEqual(marker.scale.z, radius)
+            self.assertEqual(sphere.radius, radius)
 
         # Test stationary obstacle properties.
-        for i, marker in enumerate(stationary.markers):
-            self.assertEqual(marker.type, Marker.CYLINDER)
-            self.assertEqual(marker.ns, "stationary_obstacles")
-
+        for i, cylinder in enumerate(stationary.cylinders):
             obs = data["stationary_obstacles"][i]
             height = serializers.feet_to_meters(obs["cylinder_height"])
-            easting, northing, _, _ = utm.from_latlon(obs["latitude"],
-                                                      obs["longitude"])
-            self.assertEqual(marker.pose.position.x, easting)
-            self.assertEqual(marker.pose.position.y, northing)
-            self.assertEqual(marker.pose.position.z, height / 2)
+
+            self.assertEqual(cylinder.center.latitude, obs["latitude"])
+            self.assertEqual(cylinder.center.longitude, obs["longitude"])
 
             radius = serializers.feet_to_meters(obs["cylinder_radius"])
-            self.assertEqual(marker.scale.x, radius)
-            self.assertEqual(marker.scale.y, radius)
-            self.assertEqual(marker.scale.z, height)
+            self.assertEqual(cylinder.radius, radius)
+            self.assertEqual(cylinder.height, height)
 
     def test_telemetry_serializer(self):
         """Tests telemetry serializer."""

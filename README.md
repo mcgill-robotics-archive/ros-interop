@@ -72,42 +72,21 @@ This package has the following nodes available:
 This by default publishes both moving and stationary obstacles at 20 Hz to the
 following topics:
 
--   `~moving`: Moving obstacles, `visualization_msgs/MarkerArray`.
--   `~stationary`: Stationary obstacles, `visualization_msgs/MarkerArray`.
-
-#### Visualizing
-
-Stationary and moving obstacles can be visualized in `rviz` as `MarkerArray`s
-relative to the `odom` frame in UTM coordinates. Note that the marker's
-positions are in UTM coordinates, so you will likely not be able to see the
-obstacles in `rviz` (they will be *very* far away) without a static
-transformation to cancel this out. For example, you could have a static
-transformation `map -> odom` of your drone's starting position or your ground
-station's position in UTM coordinates, and then visualize the obstacles
-relative to the `map` frame.
-
-If set up properly, it should look like this:
-
-<img width="1680" alt="rviz"
- src="https://cloud.githubusercontent.com/assets/723610/15096449/d68b0ca2-14ac-11e6-82dc-8513809f7510.png">
-
-where the cylinder is a stationary obstacle, and the sphere is a moving
-obstacle.
-
+-   `~moving`: Moving obstacles, `GeoSphereArrayStamped`.
+-   `~stationary`: Stationary obstacles, `GeoCylinderArrayStamped`.
 
 ### `mission_info`
 
 This by default publishes mission information at 1 Hz to the following topics:
 
 -   `~flyzones`: Flight boundaries, `FlyZoneArray`.
--   `~search_grid`: Search grid area, `geometry_msgs/PolygonStamped`.
--   `~waypoints`: List of waypoints, `visualization_msgs/Marker`.
--   `~air_drop_pos`: Air drop position, `geometry_msgs/PointStamped`.
--   `~off_axis_targ`: Off axis target position, `geometry_msgs/PointStamped`.
+-   `~search_grid`: Search grid area, `GeoPolygonStamped`.
+-   `~waypoints`: List of waypoints, `WayPoints`.
+-   `~air_drop_pos`: Air drop position, `geographic_msgs/GeoPointStamped`.
+-   `~off_axis_targ`: Off axis target position, `geographic_msgs/GeoPointStamped`.
 -   `~emergent_targ_loc`: Emergent target last known location,
-                          `geometry_msgs/PointStamped`.
--   `~home`: Home position, `geometry_msgs/PointStamped`.
--   `~utm_zone`: UTM zone number and UTM zone letter, `UTMZone`.
+                          `geographic_msgs/GeoPointStamped`.
+-   `~home`: Home position, `geographic_msgs/GeoPointStamped`.
 
 This also provides the following services to change missions:
 
@@ -182,21 +161,19 @@ The following are the run-time ROS launch arguments available:
 
 -   `flyzones_topic`: `FlyZoneArray` flight boundaries,
     default: `~mission_info/flyzones`.
--   `search_grid_topic`: `geometry_msgs/PolygonStamped` search grid polygon,
+-   `search_grid_topic`: `GeoPolygonStamped` search grid polygon,
     default: `~mission_info/search_grid`.
--   `waypoints_topic`: `visualization_msgs/Marker` list of waypoints,
+-   `waypoints_topic`: `WayPoints` list of waypoints,
     default: `~mission_info/waypoints`.
--   `air_drop_topic`: `geometry_msgs/PointStamped` position of the air drop target,
+-   `air_drop_topic`: `geographic_msgs/GeoPointStamped` position of the air drop target,
     default: `~mission_info/air_drop_loc`.
--   `emergent_targ_topc`: `geometry_msgs/PointStamped` last known position of the emergent target,
+-   `emergent_targ_topic`: `geographic_msgs/GeoPointStamped` last known position of the emergent target,
     default: `~mission_info/emergent_targ_loc`.
--   `off_axis_targ_topic`: `geometry_msgs/PointStamped` position of the off axis target,
+-   `off_axis_targ_topic`: `geographic_msgs/GeoPointStamped` position of the off axis target,
     default: `~mission_info/off_axis_targ`.
--   `utm_zone_topic`: `UTMZone` UTM zone number and UTM zone letter,
-    default: `~mission_info/utm_zone`.
--   `moving_topic`: `visualization_msgs/MarkerArray` feed of the moving
+-   `moving_topic`: `GeoSphereArrayStamped` feed of the moving
     obstacles, default: `~obstacles/moving`.
--   `stationary_topic`: `visualization_msgs/MarkerArray` feed of the stationary
+-   `stationary_topic`: `GeoSphereArrayStamped` feed of the stationary
     obstacles, default: `~obstacles/stationary`.
 
 #### Publication periods
@@ -209,8 +186,8 @@ The following are the run-time ROS launch arguments available:
 #### Frame IDs
 
 -   `obstacles_frame`: Frame ID of the obstacles' `MarkerArray` messages,
-    default: `odom`.
--   `missions_frame`: Frame ID for the mission messages, default: `odom`.
+    default: `earth`.
+-   `missions_frame`: Frame ID for the mission messages, default: `earth`.
 
 #### Mission IDs
 
@@ -227,10 +204,6 @@ are synchronized in order to be properly paired. For more information, see
 -   `sync_queue_size`: Message synchronization queue size, default: `2`.
 -   `max_sync_delay`: Maximum message synchronization delay in seconds,
     default: `1`.
-
-## Known issues
-
-- Obstacles flicker in `rviz`.
 
 ## Contributing
 

@@ -30,15 +30,14 @@
   <arg name="emergent_targ_topic" default="~emergent_targ_loc"/>
   <arg name="off_axis_targ_topic" default="~off_axis_targ"/>
   <arg name="home_pos_topic" default="~home"/>
-  <arg name="utm_zone_topic" default="~utm_zone"/>
 
   <!-- Publication periods -->
   <arg name="obstacles_period" default="0.05"/>
   <arg name="mission_info_period" default="1.00"/>
 
   <!-- Frame IDs -->
-  <arg name="obstacles_frame" default="odom"/>
-  <arg name="missions_frame" default="odom"/>
+  <arg name="obstacles_frame" default="earth"/>
+  <arg name="missions_frame" default="earth"/>
 
   <!-- Mission ID -->
   <arg name="mission_id" default="-1"/>
@@ -87,7 +86,6 @@
       <param name="emergent_targ_topic" value="$(arg emergent_targ_topic)"/>
       <param name="off_axis_targ_topic" value="$(arg off_axis_targ_topic)"/>
       <param name="home_pos_topic" value="$(arg home_pos_topic)"/>
-      <param name="utm_zone_topic" value="$(arg utm_zone_topic)"/>
 
       <!-- Publication period -->
       <param name="period" value="$(arg mission_info_period)"/>
