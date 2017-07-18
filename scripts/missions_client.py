@@ -6,7 +6,6 @@ from threading import Lock
 
 import rospy
 from interop import InteroperabilityClient
-from simplejson import JSONDecodeError
 from requests.exceptions import Timeout, ConnectionError, HTTPError
 from geometry_msgs.msg import PointStamped, PolygonStamped
 from visualization_msgs.msg import Marker
@@ -44,7 +43,7 @@ def get_active_mission(req):
         except (ConnectionError, Timeout) as e:
             rospy.logwarn(e)
             return False, str(e)
-        except (JSONDecodeError, HTTPError) as e:
+        except (ValueError, HTTPError) as e:
             rospy.logerr(e)
             return False, str(e)
 
@@ -71,7 +70,7 @@ def get_mission_by_id(req):
         except (ConnectionError, Timeout) as e:
             rospy.logwarn(e)
             return False, str(e)
-        except (JSONDecodeError, HTTPError) as e:
+        except (ValueError, HTTPError) as e:
             rospy.logerr(e)
             return False, str(e)
         except Exception as e:

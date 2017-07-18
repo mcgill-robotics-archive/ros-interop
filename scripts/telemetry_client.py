@@ -8,7 +8,6 @@ import itertools
 import message_filters
 from std_msgs.msg import Float64
 from sensor_msgs.msg import NavSatFix
-from simplejson import JSONDecodeError
 from interop import InteroperabilityClient
 from requests.exceptions import ConnectionError, HTTPError, Timeout
 
@@ -25,7 +24,7 @@ def update_telemetry(navsat_msg, compass_msg):
     except (ConnectionError, Timeout) as e:
         rospy.logwarn(e)
         return
-    except (JSONDecodeError, HTTPError) as e:
+    except (ValueError, HTTPError) as e:
         rospy.logerr(e)
         return
     except Exception as e:

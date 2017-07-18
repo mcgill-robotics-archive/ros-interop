@@ -9,7 +9,6 @@ import datetime
 import threading
 import serializers
 from cv_bridge import CvBridgeError
-from simplejson import JSONDecodeError
 from requests.exceptions import ConnectionError, HTTPError, Timeout
 
 
@@ -317,7 +316,7 @@ class Target(object):
                         self.interop_id = self.client.post_target(target)
                     except (ConnectionError, Timeout) as e:
                         rospy.logwarn(e)
-                    except (JSONDecodeError, HTTPError) as e:
+                    except (ValueError, HTTPError) as e:
                         rospy.logerr(e)
                     else:
                         # No longer needs adding.
@@ -334,7 +333,7 @@ class Target(object):
                         self.client.put_target(self.interop_id, target)
                     except (ConnectionError, Timeout) as e:
                         rospy.logwarn(e)
-                    except (JSONDecodeError, HTTPError) as e:
+                    except (ValueError, HTTPError) as e:
                         rospy.logerr(e)
                     else:
                         self.needs_updating = False
@@ -344,7 +343,7 @@ class Target(object):
                     self.client.delete_target(self.interop_id)
                 except (ConnectionError, Timeout) as e:
                     rospy.logwarn(e)
-                except (JSONDecodeError, HTTPError) as e:
+                except (ValueError, HTTPError) as e:
                     rospy.logerr(e)
                 else:
                     self.interop_id = None

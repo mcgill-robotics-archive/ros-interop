@@ -197,7 +197,7 @@ class InteroperabilityClient(object):
             Timeout: On timeout.
             HTTPError: On request failure.
             ConnectionError: On connection failure.
-            JSONDecodeError: On JSON decoding failure.
+            ValueError: On JSON decoding failure.
         """
         response = self._get("/api/obstacles")
         return serializers.ObstaclesDeserializer.from_dict(response.json(),
@@ -246,7 +246,7 @@ class InteroperabilityClient(object):
             Timeout: On timeout.
             HTTPError: On request failure.
             ConnectionError: On connection failure.
-            JSONDecodeError: On JSON decoding failure.
+            ValueError: On JSON decoding failure.
         """
         response = self._get("/api/targets")
         targets = {t["id"]: t for t in response.json()}
@@ -265,7 +265,7 @@ class InteroperabilityClient(object):
             Timeout: On timeout.
             HTTPError: On request failure.
             ConnectionError: On connection failure.
-            JSONDecodeError: On JSON decoding failure.
+            ValueError: On JSON decoding failure.
         """
         response = self._get("/api/targets/{:d}".format(id))
         return response.json()
@@ -277,17 +277,17 @@ class InteroperabilityClient(object):
             frame: Frame ID.
 
         Returns
-            A tuple of (FlyZoneArray, GeoPolygonStamped, GeoObjectArray, 
+            A tuple of (FlyZoneArray, GeoPolygonStamped, GeoObjectArray,
             GeoPointStamped, GeoPointStamped, GeoPointStamped, GeoPointStamped)
             corresponding to the flyzones, search grid, waypoints,
-            air drop position, off axis target location, the emergent object 
+            air drop position, off axis target location, the emergent object
             location, the home position
 
         Raises:
             Timeout: On timeout.
             HTTPError: On request failure.
             ConnectionError: On connection failure.
-            JSONDecodeError: On JSON decoding failure.
+            ValueError: On JSON decoding failure.
             LookupError: On no active missions found.
         """
         response = self._get("/api/missions")
@@ -303,17 +303,17 @@ class InteroperabilityClient(object):
             frame: Frame ID.
 
         Returns:
-            A tuple of (FlyZoneArray, GeoPolygonStamped, GeoObjectArray, 
+            A tuple of (FlyZoneArray, GeoPolygonStamped, GeoObjectArray,
             GeoPointStamped, GeoPointStamped, GeoPointStamped, GeoPointStamped)
             corresponding to the flyzones, search grid, waypoints,
-            air drop position, off axis target location, the emergent object 
+            air drop position, off axis target location, the emergent object
             location, the home position.
 
         Raises:
             Timeout: On timeout.
             HTTPError: On request failure.
             ConnectionError: On connection failure.
-            JSONDecodeError: On JSON decoding failure.
+            ValueError: On JSON decoding failure.
         """
         response = self._get("/api/missions")
         missions = {
@@ -340,7 +340,7 @@ class InteroperabilityClient(object):
             Timeout: On Timeout.
             HTTPError: On request failure.
             ConnectionError: On connection failure.
-            JSONDecodeError: On JSON decoding failure.
+            ValueError: On JSON decoding failure.
         """
         response = self._get("/api/missions/{:d}".format(id))
         mission = serializers.MissionDeserializer.from_dict(response.json(),

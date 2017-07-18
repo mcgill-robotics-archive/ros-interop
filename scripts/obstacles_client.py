@@ -4,7 +4,6 @@
 """Interoperability Obstacles ROS Client."""
 
 import rospy
-from simplejson import JSONDecodeError
 from interop import InteroperabilityClient
 from visualization_msgs.msg import MarkerArray
 from interop.msg import GeoCylinderArrayStamped, GeoSphereArrayStamped
@@ -23,7 +22,7 @@ def publish_obstacles(timer_event):
     except (ConnectionError, Timeout) as e:
         rospy.logwarn(e)
         return
-    except (JSONDecodeError, HTTPError) as e:
+    except (ValueError, HTTPError) as e:
         rospy.logerr(e)
         return
     except Exception as e:
