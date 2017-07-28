@@ -3,7 +3,6 @@
 
 """Interoperability Serialization Tests."""
 
-import utm
 import rospy
 import rosunit
 import numpy as np

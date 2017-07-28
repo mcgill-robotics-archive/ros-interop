@@ -4,7 +4,6 @@
 Serializes from ROS messages to python dictionaries and vice versa."""
 
 import cv2
-import utm
 import rospy
 import numpy as np
 import dateutil.parser
@@ -15,7 +14,7 @@ from sensor_msgs.msg import CompressedImage, Image
 from geographic_msgs.msg import GeoPointStamped, GeoPoint
 from visualization_msgs.msg import Marker, MarkerArray
 from std_msgs.msg import ColorRGBA, Float64, Header, String, Time, Int16
-from interop.msg import (Color, FlyZone, FlyZoneArray, 
+from interop.msg import (Color, FlyZone, FlyZoneArray,
                          Orientation, Shape, Target, TargetType,
                          GeoSphere, GeoCylinder,
                          GeoPolygonStamped, GeoSphereArrayStamped,
@@ -215,11 +214,11 @@ class MissionDeserializer(object):
             frame: frame id for the messages.
 
         Returns:
-            A tuple of (FlyZoneArray, PolygonStamped, Marker, PointStamped,
-            PointStamped, PointStamped, PointStamped, UTMZone) corresponding to
-            the flyzones, search grid, waypoints, air drop position, off axis
-            target location, the emergent object location, the home position,
-            and the UTM Zone.
+            A tuple of (FlyZoneArray, GeoPolygonStamped, WayPoints,
+            GeoPointStamped, GeoPointStamped, GeoPointStamped, GeoPointStamped)
+            corresponding to the flyzones, search grid, waypoints, air drop
+            position, off axis target location, the emergent object location,
+            and the home position.
         """
         flyzones = cls.__get_flyzone(data["fly_zones"], frame)
         search_grid = cls.__get_search_grid(data["search_grid_points"], frame)
@@ -287,7 +286,6 @@ class ObstaclesDeserializer(object):
                 obstacle.radius = feet_to_meters(obj["cylinder_radius"])
                 obstacle.height = feet_to_meters(obj["cylinder_height"])
 
-                # Convert latitude and longitude to UTM.
                 obstacle.center.latitude = obj["latitude"]
                 obstacle.center.longitude = obj["longitude"]
 

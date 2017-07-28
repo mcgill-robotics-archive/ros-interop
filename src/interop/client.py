@@ -330,11 +330,11 @@ class InteroperabilityClient(object):
             frame: Frame ID.
 
         Returns:
-            A tuple of (FlyZoneArray, PolygonStamped, Marker, PointStamped,
-            PointStamped, PointStamped, PointStamped, UTMZone) corresponding to
-            the flyzones, search grid, waypoints, air drop position, off axis
-            target location, the emergent object location, the home position,
-            and the UTM Zone.
+            A tuple of (FlyZoneArray, GeoPolygonStamped, WayPoints,
+            GeoPointStamped, GeoPointStamped, GeoPointStamped, GeoPointStamped)
+            corresponding to the flyzones, search grid, waypoints, air drop
+            position, off axis target location, the emergent object location,
+            and the home position.
 
         Raises:
             Timeout: On Timeout.
