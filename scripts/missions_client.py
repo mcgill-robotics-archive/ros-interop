@@ -85,11 +85,13 @@ if __name__ == "__main__":
     rospy.init_node("mission_info")
 
     # Get server login information.
-    url = rospy.get_param("~base_url")
+    base_url = rospy.get_param("~base_url")
     username = rospy.get_param("~username")
     password = rospy.get_param("~password")
     timeout = rospy.get_param("~timeout")
-    client = InteroperabilityClient(url, username, password, timeout)
+    verify = rospy.get_param("~verify")
+    client = InteroperabilityClient(base_url, username, password, timeout,
+                                    verify)
 
     # Login.
     client.wait_for_server()

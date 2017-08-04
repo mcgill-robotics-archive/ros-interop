@@ -18,7 +18,7 @@ class InteroperabilityClient(object):
         timeout: Timeout in seconds for individual requests.
     """
 
-    def __init__(self, url, username, password, timeout):
+    def __init__(self, url, username, password, timeout, verify=True):
         """Initializes InteroperabilityClient.
 
         Note: the client must wait_for_server() and login() to the server
@@ -29,11 +29,13 @@ class InteroperabilityClient(object):
             username: Interoperability server username.
             password: Interoperability server password.
             timeout: Timeout in seconds for individual requests.
+            verify: Whether to verify SSL certificates or not, default: True.
 
         Raises:
             Timeout: On timeout.
             HTTPError: On request failure.
         """
+        self.verify = verify
         self.timeout = timeout
         self.url = url[:-1] if url.endswith('/') else url
         self.session = requests.Session()
@@ -65,6 +67,7 @@ class InteroperabilityClient(object):
                 method=method,
                 url=self.url + (uri if uri.startswith('/') else '/' + uri),
                 timeout=self.timeout,
+                verify=self.verify,
                 **kwargs)
 
             # Relogin if session expired, and try again.
@@ -160,7 +163,8 @@ class InteroperabilityClient(object):
         reachable = False
         while not reachable and not rospy.is_shutdown():
             try:
-                response = requests.get(self.url, timeout=self.timeout)
+                response = requests.get(self.url, timeout=self.timeout,
+                                        verify=self.verify)
                 response.raise_for_status()
                 reachable = response.ok
             except:
@@ -178,6 +182,7 @@ class InteroperabilityClient(object):
             method="POST",
             url=self.url + "/api/login",
             timeout=self.timeout,
+            verify=self.verify,
             data=self.__credentials)
         response.raise_for_status()
 

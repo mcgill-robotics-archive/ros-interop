@@ -42,9 +42,11 @@ if __name__ == "__main__":
     username = rospy.get_param("~username")
     password = rospy.get_param("~password")
     timeout = rospy.get_param("~timeout")
+    verify = rospy.get_param("~verify")
 
     # Initialize interoperability client.
-    client = InteroperabilityClient(base_url, username, password, timeout)
+    client = InteroperabilityClient(base_url, username, password, timeout,
+                                    verify)
 
     # Wait for server to be reachable, then login.
     client.wait_for_server()

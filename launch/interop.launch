@@ -4,6 +4,7 @@
   <arg name="username" default="$(optenv INTEROP_USERNAME testadmin)"/>
   <arg name="password" default="$(optenv INTEROP_PASSWORD testpass)"/>
   <arg name="timeout" default="1.0"/>
+  <arg name="verify" default="true"/>
 
   <!-- Targets directory settings -->
   <arg name="targets_root" default="~/object_files/"/>
@@ -54,6 +55,7 @@
       <param name="username" value="$(arg username)" type="str"/>
       <param name="password" value="$(arg password)" type="str"/>
       <param name="timeout" value="$(arg timeout)" type="double"/>
+      <param name="verify" value="$(arg verify)" type="bool"/>
 
       <!-- Published topics -->
       <param name="moving_topic" value="$(arg moving_topic)"/>
@@ -77,6 +79,7 @@
       <param name="username" value="$(arg username)" type="str"/>
       <param name="password" value="$(arg password)" type="str"/>
       <param name="timeout" value="$(arg timeout)" type="double"/>
+      <param name="verify" value="$(arg verify)" type="bool"/>
 
       <!-- Published topics -->
       <param name="flyzones_topic" value="$(arg flyzones_topic)"/>
@@ -108,6 +111,7 @@
       <param name="username" value="$(arg username)" type="str"/>
       <param name="password" value="$(arg password)" type="str"/>
       <param name="timeout" value="$(arg timeout)" type="double"/>
+      <param name="verify" value="$(arg verify)" type="bool"/>
 
       <!-- Synchronization settings -->
       <param name="sync_queue_size" value="$(arg sync_queue_size)"/>
@@ -129,6 +133,7 @@
       <param name="username" value="$(arg username)" type="str"/>
       <param name="password" value="$(arg password)" type="str"/>
       <param name="timeout" value="$(arg timeout)" type="double"/>
+      <param name="verify" value="$(arg verify)" type="bool"/>
 
       <!-- Targets directory settings -->
       <param name="targets_root" value="$(arg targets_root)"/>

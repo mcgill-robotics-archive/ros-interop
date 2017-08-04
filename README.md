@@ -1,7 +1,7 @@
 # AUVSI SUAS Interopability ROS Client
 
-[master]: http://dev.mcgillrobotics.com/buildStatus/icon?job=ros-interop_master
-[master url]: http://dev.mcgillrobotics.com/job/ros-interop_master
+[master]: https://dev.mcgillrobotics.com/buildStatus/icon?job=ros-interop_master
+[master url]: https://dev.mcgillrobotics.com/job/ros-interop_master
 [![master]][master url]
 
 This ROS package provides a client to communicate with the
@@ -141,6 +141,7 @@ The following are the run-time ROS launch arguments available:
 -   `username`: AUVSI SUAS interop server username, default: `$INTEROP_USERNAME` if set, or `testadmin`.
 -   `password`: AUVSI SUAS interop server password, default: `$INTEROP_PASSWORD` if set, or `testpass`.
 -   `timeout`: Timeout for each request in seconds, default: `1.0`.
+-   `verify`: Whether to verify SSL cerificates for HTTPS requests, default: `true`.
 
 #### Local object file directory
 
@@ -199,7 +200,7 @@ The following are the run-time ROS launch arguments available:
 
 _Advanced: shouldn't need to be modified._ This tweaks how incoming messages
 are synchronized in order to be properly paired. For more information, see
-[message filters](http://wiki.ros.org/message_filters/ApproximateTime).
+[message filters](https://wiki.ros.org/message_filters/ApproximateTime).
 
 -   `sync_queue_size`: Message synchronization queue size, default: `2`.
 -   `max_sync_delay`: Maximum message synchronization delay in seconds,
