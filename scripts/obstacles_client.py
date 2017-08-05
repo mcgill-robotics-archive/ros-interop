@@ -3,6 +3,7 @@
 
 """Interoperability Obstacles ROS Client."""
 
+import sys
 import rospy
 from interop import InteroperabilityClient
 from visualization_msgs.msg import MarkerArray
@@ -47,7 +48,11 @@ if __name__ == "__main__":
 
     # Wait for server to be reachable, then login.
     client.wait_for_server()
-    client.login()
+    try:
+        client.login()
+    except Exception as e:
+        rospy.logfatal(e)
+        sys.exit(1)
 
     # Get ROS parameters for published topic names.
     moving_topic = rospy.get_param("~moving_topic")

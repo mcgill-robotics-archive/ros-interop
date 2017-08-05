@@ -211,6 +211,18 @@ are synchronized in order to be properly paired. For more information, see
 -   `max_sync_delay`: Maximum message synchronization delay in seconds,
     default: `1`.
 
+## Debugging
+
+To debug any issues you may have, you can enable `debug` logging for the node
+in question to get more information about what is happening. You can do so with
+`rqt_logger_level`, by running the following:
+
+```bash
+rosrun rqt_logger_level rqt_logger_level
+```
+
+and selecting the desired log level for the node's `rosout` logger.
+
 ## Contributing
 
 Contributions are welcome. Simply open an issue or pull request on the matter,

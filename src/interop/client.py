@@ -102,13 +102,38 @@ class InteroperabilityClient(object):
                 self.login()
                 continue
 
+            message = self._get_response_log_message(method, uri, response)
+
             # Notify of other errors.
-            response.raise_for_status()
+            try:
+                response.raise_for_status()
+                rospy.logdebug(message)
+            except requests.HTTPError:
+                # For more human-readable error messages.
+                raise requests.HTTPError(message, response=response)
 
             # All is good.
             break
 
         return response
+
+    def _get_response_log_message(self, method, uri, response):
+        """Constructs a user-friendly log message.
+
+        Args:
+            method: Request method.
+            uri: Request URI.
+            response: Response received.
+
+        Returns:
+            Log message.
+        """
+        return "[{status_code}] {method} {uri}: {reason} {content}".format(
+            status_code=response.status_code,
+            method=method,
+            uri=uri,
+            reason=response.reason,
+            content=response.content)
 
     def _get(self, uri, **kwargs):
         """Sends GET request to Interoperability server at specified URI.
@@ -198,13 +223,22 @@ class InteroperabilityClient(object):
             HTTPError: On request failure.
             ConnectionError: On connection failure.
         """
+        method = "POST"
+        uri = "/api/login"
         response = self.session.request(
-            method="POST",
-            url=self.url + "/api/login",
+            method=method,
+            url=self.url + uri,
             timeout=self.timeout,
             verify=self.verify,
             data=self.__credentials)
-        response.raise_for_status()
+        message = self._get_response_log_message(method, uri, response)
+
+        try:
+            response.raise_for_status()
+            rospy.logdebug(message)
+        except requests.HTTPError:
+            # For more human-readable error messages.
+            raise requests.HTTPError(message, response=response)
 
     def get_obstacles(self, frame, lifetime):
         """Returns obstacles as Markers.

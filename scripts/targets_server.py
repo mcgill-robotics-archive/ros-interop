@@ -3,6 +3,7 @@
 
 """Interoperability Target ROS Server."""
 
+import sys
 import json
 import rospy
 import interop.srv
@@ -331,7 +332,11 @@ if __name__ == "__main__":
 
     # Wait for server to be reachable, then login.
     client.wait_for_server()
-    client.login()
+    try:
+        client.login()
+    except Exception as e:
+        rospy.logfatal(e)
+        sys.exit(1)
 
     # Initialize a directory for storing the targets.
     try:

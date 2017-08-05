@@ -2,9 +2,9 @@
 
 """Mission Information Client"""
 
-from threading import Lock
-
+import sys
 import rospy
+from threading import Lock
 from interop import InteroperabilityClient
 from requests.exceptions import Timeout, ConnectionError, HTTPError
 from geometry_msgs.msg import PointStamped, PolygonStamped
@@ -94,7 +94,11 @@ if __name__ == "__main__":
 
     # Login.
     client.wait_for_server()
-    client.login()
+    try:
+        client.login()
+    except Exception as e:
+        rospy.logfatal(e)
+        sys.exit(1)
 
     # Get topics to publish to.
     flyzones_topic = rospy.get_param("~flyzones_topic")

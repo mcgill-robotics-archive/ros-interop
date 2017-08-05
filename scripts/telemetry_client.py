@@ -3,6 +3,7 @@
 
 """Interoperability Telemetry ROS Client."""
 
+import sys
 import rospy
 import itertools
 import message_filters
@@ -90,7 +91,11 @@ if __name__ == "__main__":
 
     # Wait for server to be reachable, then login.
     client.wait_for_server()
-    client.login()
+    try:
+        client.login()
+    except Exception as e:
+        rospy.logfatal(e)
+        sys.exit(1)
 
     # Get ROS parameters for synchronization queue size and time delay.
     sync_queue = rospy.get_param("~sync_queue_size")
