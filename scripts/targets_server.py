@@ -320,8 +320,6 @@ if __name__ == "__main__":
 
     # Get ROS parameters for client.
     base_url = rospy.get_param("~base_url")
-    username = rospy.get_param("~username")
-    password = rospy.get_param("~password")
     timeout = rospy.get_param("~timeout")
     verify = rospy.get_param("~verify")
     targets_root = rospy.get_param("~targets_root")
@@ -329,8 +327,7 @@ if __name__ == "__main__":
     update_period = rospy.get_param("~interop_update_period")
 
     # Initialize interoperability client.
-    client = InteroperabilityClient(base_url, username, password, timeout,
-                                    verify)
+    client = InteroperabilityClient.from_env(base_url, timeout, verify)
 
     # Wait for server to be reachable, then login.
     client.wait_for_server()

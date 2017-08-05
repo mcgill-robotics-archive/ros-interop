@@ -1,8 +1,6 @@
 <launch>
   <!-- Login credentials and request parameters -->
-  <arg name="base_url" default="$(optenv INTEROP_HOST http://interop:80)"/>
-  <arg name="username" default="$(optenv INTEROP_USERNAME testadmin)"/>
-  <arg name="password" default="$(optenv INTEROP_PASSWORD testpass)"/>
+  <arg name="base_url" default="$(env INTEROP_HOST)"/>
   <arg name="timeout" default="1.0"/>
   <arg name="verify" default="true"/>
 
@@ -53,8 +51,6 @@
           respawn="true">
       <!-- Login credentials and request parameters -->
       <param name="base_url" value="$(arg base_url)" type="str"/>
-      <param name="username" value="$(arg username)" type="str"/>
-      <param name="password" value="$(arg password)" type="str"/>
       <param name="timeout" value="$(arg timeout)" type="double"/>
       <param name="verify" value="$(arg verify)" type="bool"/>
 
@@ -77,8 +73,6 @@
           respawn="true">
       <!-- Login credentials and request parameters -->
       <param name="base_url" value="$(arg base_url)" type="str"/>
-      <param name="username" value="$(arg username)" type="str"/>
-      <param name="password" value="$(arg password)" type="str"/>
       <param name="timeout" value="$(arg timeout)" type="double"/>
       <param name="verify" value="$(arg verify)" type="bool"/>
 
@@ -109,8 +103,6 @@
           respawn="true">
       <!-- Login credentials and request parameters -->
       <param name="base_url" value="$(arg base_url)" type="str"/>
-      <param name="username" value="$(arg username)" type="str"/>
-      <param name="password" value="$(arg password)" type="str"/>
       <param name="timeout" value="$(arg timeout)" type="double"/>
       <param name="verify" value="$(arg verify)" type="bool"/>
 
@@ -131,8 +123,6 @@
           respawn="true">
       <!-- Login credentials and request parameters -->
       <param name="base_url" value="$(arg base_url)" type="str"/>
-      <param name="username" value="$(arg username)" type="str"/>
-      <param name="password" value="$(arg password)" type="str"/>
       <param name="timeout" value="$(arg timeout)" type="double"/>
       <param name="verify" value="$(arg verify)" type="bool"/>
 

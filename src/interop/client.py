@@ -2,6 +2,7 @@
 
 """Interoperability HTTP Client."""
 
+import os
 import json
 import rospy
 import requests
@@ -18,7 +19,7 @@ class InteroperabilityClient(object):
         timeout: Timeout in seconds for individual requests.
     """
 
-    def __init__(self, url, username, password, timeout, verify=True):
+    def __init__(self, url, username, password, timeout=1.0, verify=True):
         """Initializes InteroperabilityClient.
 
         Note: the client must wait_for_server() and login() to the server
@@ -28,12 +29,8 @@ class InteroperabilityClient(object):
             url: Interoperability server base URL (e.g. http://127.0.0.1:8080).
             username: Interoperability server username.
             password: Interoperability server password.
-            timeout: Timeout in seconds for individual requests.
+            timeout: Timeout in seconds for individual requests, default: 1.0s.
             verify: Whether to verify SSL certificates or not, default: True.
-
-        Raises:
-            Timeout: On timeout.
-            HTTPError: On request failure.
         """
         self.verify = verify
         self.timeout = timeout
@@ -42,6 +39,29 @@ class InteroperabilityClient(object):
 
         # Set up credentials for login.
         self.__credentials = {"username": username, "password": password}
+
+    @classmethod
+    def from_env(cls, url, *args, **kwargs):
+        """Initializes an InteroperabilityClient with credentials loaded from
+        environment variables.
+
+        Args:
+            url: Interoperability server base URL (e.g. http://127.0.0.1:8080).
+
+        The username must be stored in $INTEROP_USERNAME.
+        The password must be stored in $INTEROP_PASSWORD.
+
+        Args:
+            *args: Additional positional arguments to pass to the constructor.
+            **kwargs: Additional key-word arguments to pass to the constructor.
+
+        Returns:
+            An InteroperabilityClient.
+        """
+        username = os.environ["INTEROP_USERNAME"]
+        password = os.environ["INTEROP_PASSWORD"]
+
+        return InteroperabilityClient(url, username, password, *args, **kwargs)
 
     def __request(self, method, uri, **kwargs):
         """Sends request to Interoperability server at specified URI.

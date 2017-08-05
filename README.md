@@ -51,10 +51,12 @@ catkin_make run_tests
 To run, simply launch the package with:
 
 ```bash
-roslaunch interop interop.launch base_url:=<base_url> username:=<username> password:=<password>
+export INTEROP_USERNAME=<username>
+export INTEROP PASSWORD=<password>
+roslaunch interop interop.launch base_url:=<base_url>
 ```
 
-or, if you prefer:
+or, if you prefer to avoid setting the `base_url` every time:
 
 ```bash
 export INTEROP_HOST=<base_url>
@@ -62,6 +64,11 @@ export INTEROP_USERNAME=<username>
 export INTEROP PASSWORD=<password>
 roslaunch interop interop.launch
 ```
+
+There are no arguments for credentials for security concerns as otherwise the
+credentials will be stored in plain text in the ROS parameter server. That can
+easily leak to other computers in the same network if your network security is
+misconfigured.
 
 ## Nodes
 
@@ -138,8 +145,6 @@ The following are the run-time ROS launch arguments available:
 #### Interop server, credentials, and request parameters
 
 -   `base_url`: AUVSI SUAS interop server url, default: `$INTEROP_HOST` if set, or `http://interop:80`.
--   `username`: AUVSI SUAS interop server username, default: `$INTEROP_USERNAME` if set, or `testadmin`.
--   `password`: AUVSI SUAS interop server password, default: `$INTEROP_PASSWORD` if set, or `testpass`.
 -   `timeout`: Timeout for each request in seconds, default: `1.0`.
 -   `verify`: Whether to verify SSL cerificates for HTTPS requests, default: `true`.
 
