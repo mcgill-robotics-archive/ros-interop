@@ -145,7 +145,7 @@ The following are the run-time ROS launch arguments available:
 
 #### Local object file directory
 
--   `targets_root`: The parent of all timestamped directories containing object files, default: `~/object_files/`.
+-   `targets_root`: The parent of all timestamped directories containing object files, default: `$INTEROP_OBJECTS_ROOT` if set, or `~/object_files/`.
 -   `interop_update_period`: Duration between attempts to sync the object files of the current run to the interop server, default: `10.0` (i.e. 10.0 s).
 -   `clear_targets`: Automatically clear all remote targets on start up (**use with caution**), default: `false`.
 

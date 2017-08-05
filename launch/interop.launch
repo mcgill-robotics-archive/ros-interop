@@ -7,7 +7,8 @@
   <arg name="verify" default="true"/>
 
   <!-- Targets directory settings -->
-  <arg name="targets_root" default="~/object_files/"/>
+  <arg name="targets_root"
+       default="$(optenv INTEROP_OBJECTS_ROOT ~/object_files/)"/>
   <arg name="interop_update_period" default="10.0"/>
 
   <!-- Whether to clear all targets on startup or not. -->
