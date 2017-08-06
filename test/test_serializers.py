@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
 """Interoperability Serialization Tests."""
 
 import rospy
@@ -21,6 +20,7 @@ class TestSerializers(TestCase):
 
     def test_mission_deserializer(self):
         """Tests the mission deserializer."""
+        # yapf: disable
         data = {
             "id": 1,
             "active": True,
@@ -28,41 +28,35 @@ class TestSerializers(TestCase):
                 "latitude": 38.141833,
                 "longitude": -76.425263
             },
-            "fly_zones": [
-                {
-                    "altitude_msl_max": 200.0,
-                    "altitude_msl_min": 100.0,
-                    "boundary_pts": [
-                        {
-                             "latitude": 38.142544,
-                             "longitude": -76.434088,
-                             "order": 1
-                        },
-                        {
-                             "latitude": 38.141833,
-                             "longitude": -76.425263,
-                             "order": 2
-                        },
-                        {
-                             "latitude": 38.144678,
-                             "longitude": -76.427995,
-                             "order": 3
-                        }
-                    ]
-                }
-            ],
+            "fly_zones": [{
+                "altitude_msl_max":
+                    200.0,
+                "altitude_msl_min":
+                    100.0,
+                "boundary_pts": [{
+                    "latitude": 38.142544,
+                    "longitude": -76.434088,
+                    "order": 1
+                }, {
+                    "latitude": 38.141833,
+                    "longitude": -76.425263,
+                    "order": 2
+                }, {
+                    "latitude": 38.144678,
+                    "longitude": -76.427995,
+                    "order": 3
+                }]
+            }],
             "home_pos": {
                 "latitude": 38.14792,
                 "longitude": -76.427995
             },
-            "mission_waypoints": [
-                {
-                    "altitude_msl": 200.0,
-                    "latitude": 38.142544,
-                    "longitude": -76.434088,
-                    "order": 1
-                }
-            ],
+            "mission_waypoints": [{
+                "altitude_msl": 200.0,
+                "latitude": 38.142544,
+                "longitude": -76.434088,
+                "order": 1
+            }],
             "off_axis_target_pos": {
                 "latitude": 38.142544,
                 "longitude": -76.434088
@@ -71,15 +65,14 @@ class TestSerializers(TestCase):
                 "latitude": 38.145823,
                 "longitude": -76.422396
             },
-            "search_grid_points": [
-                {
-                    "altitude_msl": 200.0,
-                    "latitude": 38.142544,
-                    "longitude": -76.434088,
-                    "order": 1
-                }
-            ]
+            "search_grid_points": [{
+                "altitude_msl": 200.0,
+                "latitude": 38.142544,
+                "longitude": -76.434088,
+                "order": 1
+            }]
         }
+        # yapf: enable
 
         mission = serializers.MissionDeserializer.from_dict(data, "map")
         flyzones = mission[0]
@@ -99,8 +92,8 @@ class TestSerializers(TestCase):
 
             self.assertEqual(flyzone.max_alt, max_alt)
             self.assertEqual(flyzone.min_alt, min_alt)
-            self.assertEqual(len(flyzone.zone.polygon.points),
-                             len(zone["boundary_pts"]))
+            self.assertEqual(
+                len(flyzone.zone.polygon.points), len(zone["boundary_pts"]))
 
             bound = zone["boundary_pts"]
             for k, pnt in enumerate(flyzone.zone.polygon.points):
@@ -162,34 +155,28 @@ class TestSerializers(TestCase):
         """Tests obstacles deserializer."""
         # Set up test data.
         data = {
-            "moving_obstacles": [
-                {
-                    "altitude_msl": 189.56748784643966,
-                    "latitude": 38.141826869853645,
-                    "longitude": -76.43199876559223,
-                    "sphere_radius": 150.0
-                },
-                {
-                    "altitude_msl": 250.0,
-                    "latitude": 38.14923628783763,
-                    "longitude": -76.43238529543882,
-                    "sphere_radius": 150.0
-                }
-            ],
-            "stationary_obstacles": [
-                {
-                    "cylinder_height": 750.0,
-                    "cylinder_radius": 300.0,
-                    "latitude": 38.140578,
-                    "longitude": -76.428997
-                },
-                {
-                    "cylinder_height": 400.0,
-                    "cylinder_radius": 100.0,
-                    "latitude": 38.149156,
-                    "longitude": -76.430622
-                }
-            ]
+            "moving_obstacles": [{
+                "altitude_msl": 189.56748784643966,
+                "latitude": 38.141826869853645,
+                "longitude": -76.43199876559223,
+                "sphere_radius": 150.0
+            }, {
+                "altitude_msl": 250.0,
+                "latitude": 38.14923628783763,
+                "longitude": -76.43238529543882,
+                "sphere_radius": 150.0
+            }],
+            "stationary_obstacles": [{
+                "cylinder_height": 750.0,
+                "cylinder_radius": 300.0,
+                "latitude": 38.140578,
+                "longitude": -76.428997
+            }, {
+                "cylinder_height": 400.0,
+                "cylinder_radius": 100.0,
+                "latitude": 38.149156,
+                "longitude": -76.430622
+            }]
         }
 
         # Deserialize obstacles.
@@ -198,8 +185,8 @@ class TestSerializers(TestCase):
 
         # Compare number of markers.
         self.assertEqual(len(data["moving_obstacles"]), len(moving.spheres))
-        self.assertEqual(len(data["stationary_obstacles"]),
-                         len(stationary.cylinders))
+        self.assertEqual(
+            len(data["stationary_obstacles"]), len(stationary.cylinders))
 
         # Test moving obstacle properties.
         for i, sphere in enumerate(moving.spheres):
@@ -266,8 +253,7 @@ class TestSerializers(TestCase):
         self.assertEqual(data["longitude"], target.longitude)
         self.assertEqual(data["orientation"], target.orientation.data)
         self.assertEqual(data["shape"], target.shape.data)
-        self.assertEqual(data["background_color"],
-                         target.background_color.data)
+        self.assertEqual(data["background_color"], target.background_color.data)
         self.assertEqual(data["alphanumeric_color"],
                          target.alphanumeric_color.data)
         self.assertEqual(data["alphanumeric"], target.alphanumeric)
@@ -301,8 +287,7 @@ class TestSerializers(TestCase):
         self.assertEqual(data["longitude"], target.longitude)
         self.assertEqual(data["orientation"], target.orientation.data)
         self.assertEqual(data["shape"], target.shape.data)
-        self.assertEqual(data["background_color"],
-                         target.background_color.data)
+        self.assertEqual(data["background_color"], target.background_color.data)
         self.assertEqual(data["alphanumeric_color"],
                          target.alphanumeric_color.data)
         self.assertEqual(data["alphanumeric"], target.alphanumeric)

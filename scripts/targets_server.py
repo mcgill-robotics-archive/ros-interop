@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
 """Interoperability Target ROS Server."""
 
 import os
@@ -29,7 +28,9 @@ def trigger_exception_handler(*expected_exception_types):
     Returns:
         Decorator that returns a TriggerResponse.
     """
+
     def decorator(f):
+
         def wrapper(*args, **kwargs):
             response = TriggerResponse()
 
@@ -114,7 +115,8 @@ class TargetsServer(object):
             response.success = False
         else:
             dict_target = json.loads(json_target)
-            response.target = serializers.TargetSerializer.from_dict(dict_target)
+            response.target = serializers.TargetSerializer.from_dict(
+                dict_target)
             response.success = True
 
         return response
@@ -262,8 +264,7 @@ class TargetsServer(object):
         else:
             try:
                 response.image = serializers.TargetImageSerializer.from_raw(
-                    png,
-                    compress)
+                    png, compress)
             except CvBridgeError as e:
                 rospy.logerr(e)
                 response.success = False
@@ -424,8 +425,8 @@ def symlink_targets_path_to_latest(targets_path):
     try:
         os.symlink(targets_path, path_to_symlink)
     except OSError as e:
-         # Replace the old symlink if an old symlink with the same
-         # name exists.
+        # Replace the old symlink if an old symlink with the same
+        # name exists.
         if e.errno == errno.EEXIST:
             os.remove(path_to_symlink)
             os.symlink(targets_path, path_to_symlink)

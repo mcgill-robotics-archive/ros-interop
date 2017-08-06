@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 """Interoperability API message serializer.
 Serializes from ROS messages to python dictionaries and vice versa."""
 
@@ -14,9 +13,8 @@ from sensor_msgs.msg import CompressedImage, Image
 from geographic_msgs.msg import GeoPointStamped, GeoPoint
 from visualization_msgs.msg import Marker, MarkerArray
 from std_msgs.msg import ColorRGBA, Float64, Header, String, Time, Int16
-from interop.msg import (Color, FlyZone, FlyZoneArray,
-                         Orientation, Shape, Target, TargetType,
-                         GeoSphere, GeoCylinder,
+from interop.msg import (Color, FlyZone, FlyZoneArray, Orientation, Shape,
+                         Target, TargetType, GeoSphere, GeoCylinder,
                          GeoPolygonStamped, GeoSphereArrayStamped,
                          GeoCylinderArrayStamped, WayPoints)
 
@@ -179,6 +177,7 @@ class MissionDeserializer(object):
             search_grid.polygon.points.append(boundary_pnt)
 
         return search_grid
+
     @classmethod
     def __get_point_msg(cls, data, frame):
         """
@@ -229,8 +228,8 @@ class MissionDeserializer(object):
                                            frame)
         home_pos = cls.__get_point_msg(data["home_pos"], frame)
 
-        return (flyzones, search_grid, waypoints, air_drop_pos,
-                off_axis_targ, emergent_obj, home_pos)
+        return (flyzones, search_grid, waypoints, air_drop_pos, off_axis_targ,
+                emergent_obj, home_pos)
 
 
 class ObstaclesDeserializer(object):
@@ -269,8 +268,7 @@ class ObstaclesDeserializer(object):
 
                 obstacle.center.latitude = obj["latitude"]
                 obstacle.center.longitude = obj["longitude"]
-                obstacle.center.altitude = feet_to_meters(
-                                                        obj["altitude_msl"])
+                obstacle.center.altitude = feet_to_meters(obj["altitude_msl"])
 
                 moving_obstacles.spheres.append(obstacle)
 
@@ -322,12 +320,7 @@ class TargetSerializer(object):
     """Target message serializer."""
 
     # Enumeration message types.
-    ENUMERATION_TYPES = {
-        Color,
-        Orientation,
-        Shape,
-        TargetType
-    }
+    ENUMERATION_TYPES = {Color, Orientation, Shape, TargetType}
 
     @classmethod
     def from_msg(cls, msg):

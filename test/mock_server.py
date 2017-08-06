@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 """Interoperability mock server for testing."""
 
 import json
@@ -85,11 +84,17 @@ class InteroperabilityMockServer(object):
                 successful.
         """
         code = 200 if success else 400
-        self.rsps.add(responses.POST, self.url + "/api/login", status=code,
-                      body="Login Successful." if success else "")
+        self.rsps.add(
+            responses.POST,
+            self.url + "/api/login",
+            status=code,
+            body="Login Successful." if success else "")
 
-    def set_get_server_info_response(self, message, message_timestamp,
-                                     server_time, code=200):
+    def set_get_server_info_response(self,
+                                     message,
+                                     message_timestamp,
+                                     server_time,
+                                     code=200):
         """Sets mock GET /api/server_info response.
 
         Args:
@@ -104,9 +109,12 @@ class InteroperabilityMockServer(object):
             "server_time": server_time
         })
 
-        self.rsps.add(responses.GET, self.url + "/api/server_info",
-                      status=code, body=content if code == 200 else "",
-                      content_type="application/json")
+        self.rsps.add(
+            responses.GET,
+            self.url + "/api/server_info",
+            status=code,
+            body=content if code == 200 else "",
+            content_type="application/json")
 
     def set_get_obstacles_response(self, obstacles, code=200):
         """Sets mock GET /api/obstacles response.
@@ -116,9 +124,12 @@ class InteroperabilityMockServer(object):
             code (int): Status code to respond with.
         """
         content = json.dumps(obstacles)
-        self.rsps.add(responses.GET, self.url + "/api/obstacles", status=code,
-                      body=content if code == 200 else "",
-                      content_type="application/json")
+        self.rsps.add(
+            responses.GET,
+            self.url + "/api/obstacles",
+            status=code,
+            body=content if code == 200 else "",
+            content_type="application/json")
 
     def set_telemetry_response(self, code=200):
         """Sets mock POST /api/telemetry response.
@@ -126,9 +137,11 @@ class InteroperabilityMockServer(object):
         Args:
             code (int): Status code to respond with.
         """
-        self.rsps.add(responses.POST, self.url + "/api/telemetry", status=code,
-                      body="UAS Telemetry Successfully Posted."
-                           if code == 200 else "")
+        self.rsps.add(
+            responses.POST,
+            self.url + "/api/telemetry",
+            status=code,
+            body="UAS Telemetry Successfully Posted." if code == 200 else "")
 
     def set_post_target_response(self, target, id, user=1, code=200):
         """Sets mock POST /api/targets response.
@@ -142,9 +155,12 @@ class InteroperabilityMockServer(object):
         target.update({"id": id, "user": user})
         content = json.dumps(target)
 
-        self.rsps.add(responses.POST, self.url + "/api/targets", status=code,
-                      body=content if code == 200 else "",
-                      content_type="application/json")
+        self.rsps.add(
+            responses.POST,
+            self.url + "/api/targets",
+            status=code,
+            body=content if code == 200 else "",
+            content_type="application/json")
 
     def set_get_targets_response(self, targets, code=200):
         """Sets mock GET /api/targets and GET /api/targets/<id> responses.
@@ -156,16 +172,20 @@ class InteroperabilityMockServer(object):
         content = json.dumps(targets)
 
         # Add all targets.
-        self.rsps.add(responses.GET, self.url + "/api/targets", status=code,
-                      body=content if code == 200 else "",
-                      content_type="application/json")
+        self.rsps.add(
+            responses.GET,
+            self.url + "/api/targets",
+            status=code,
+            body=content if code == 200 else "",
+            content_type="application/json")
 
         # Add individual targets.
         for t in targets:
-            self.rsps.add(responses.GET,
-                          "{}/api/targets/{:d}".format(self.url, t["id"]),
-                          body=json.dumps(t) if code == 200 else "",
-                          content_type="application/json")
+            self.rsps.add(
+                responses.GET,
+                "{}/api/targets/{:d}".format(self.url, t["id"]),
+                body=json.dumps(t) if code == 200 else "",
+                content_type="application/json")
 
     def set_put_target_response(self, id, target, user=1, code=200):
         """Sets mock PUT /api/targets/<id> response.
@@ -179,10 +199,12 @@ class InteroperabilityMockServer(object):
         target.update({"id": id, "user": user})
         content = json.dumps(target)
 
-        self.rsps.add(responses.PUT,
-                      "{}/api/targets/{:d}".format(self.url, id), status=code,
-                      body=content if code == 200 else "",
-                      content_type="application/json")
+        self.rsps.add(
+            responses.PUT,
+            "{}/api/targets/{:d}".format(self.url, id),
+            status=code,
+            body=content if code == 200 else "",
+            content_type="application/json")
 
     def set_delete_target_response(self, id, code=200):
         """Sets mock DELETE /api/targets/<id> response.
@@ -191,9 +213,11 @@ class InteroperabilityMockServer(object):
             id (int): Target ID.
             code (int): Status code to respond with.
         """
-        self.rsps.add(responses.DELETE,
-                      "{}/api/targets/{:d}".format(self.url, id), status=code,
-                      body="Target deleted." if code == 200 else "")
+        self.rsps.add(
+            responses.DELETE,
+            "{}/api/targets/{:d}".format(self.url, id),
+            status=code,
+            body="Target deleted." if code == 200 else "")
 
     def set_post_target_image_response(self, id, code=200):
         """Sets mock POST /api/targets/<id>/image response.
@@ -202,10 +226,11 @@ class InteroperabilityMockServer(object):
             id (int): Target ID.
             code (int): Status code to respond with.
         """
-        self.rsps.add(responses.POST,
-                      "{}/api/targets/{:d}/image".format(self.url, id),
-                      body="Image uploaded." if code == 200 else "",
-                      status=code)
+        self.rsps.add(
+            responses.POST,
+            "{}/api/targets/{:d}/image".format(self.url, id),
+            body="Image uploaded." if code == 200 else "",
+            status=code)
 
     def set_get_target_image_response(self, id, image, content_type, code=200):
         """Sets mock GET /api/targets/<id>/image response.
@@ -216,10 +241,12 @@ class InteroperabilityMockServer(object):
             content_type (str): Image type, either "image/jpeg" or "image/png".
             code (int): Status code to respond with.
         """
-        self.rsps.add(responses.GET,
-                      "{}/api/targets/{:d}/image".format(self.url, id),
-                      body=image if code == 200 else "",
-                      status=code, content_type=content_type)
+        self.rsps.add(
+            responses.GET,
+            "{}/api/targets/{:d}/image".format(self.url, id),
+            body=image if code == 200 else "",
+            status=code,
+            content_type=content_type)
 
     def set_delete_target_image_response(self, id, code=200):
         """Sets mock DELETE /api/targets/<id>/image response.
@@ -228,7 +255,8 @@ class InteroperabilityMockServer(object):
             id (int): Target ID.
             code (str): Status code to respond with.
         """
-        self.rsps.add(responses.DELETE,
-                      "{}/api/targets/{:d}/image".format(self.url, id),
-                      body="Image deleted." if code == 200 else "",
-                      status=code)
+        self.rsps.add(
+            responses.DELETE,
+            "{}/api/targets/{:d}/image".format(self.url, id),
+            body="Image deleted." if code == 200 else "",
+            status=code)

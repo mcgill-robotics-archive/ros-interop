@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
 """Interoperability Telemetry ROS Client."""
 
 import sys
@@ -67,7 +66,7 @@ class UnstampedTimeSynchronizer(message_filters.ApproximateTimeSynchronizer):
         for vv in itertools.product(*[list(q.keys()) for q in self.queues]):
             qt = zip(self.queues, vv)
             if (((max(vv) - min(vv)) < self.slop) and
-                    (len([1 for q, t in qt if t not in q]) == 0)):
+                (len([1 for q, t in qt if t not in q]) == 0)):
                 msgs = [q[t] for q, t in qt]
                 self.signalMessage(*msgs)
                 for q, t in qt:
@@ -110,10 +109,8 @@ if __name__ == "__main__":
         message_filters.Subscriber(navsat_topic, NavSatFix),
         message_filters.Subscriber(compass_topic, Float64)
     ]
-    synchronizer = UnstampedTimeSynchronizer(
-        subscribers,
-        sync_queue,
-        sync_delay)
+    synchronizer = UnstampedTimeSynchronizer(subscribers, sync_queue,
+                                             sync_delay)
     synchronizer.registerCallback(update_telemetry)
 
     # Spin forever.

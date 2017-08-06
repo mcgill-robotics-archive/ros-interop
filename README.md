@@ -247,8 +247,21 @@ much.
 As for style guides, we follow the ROS Python Style Guide for ROS-specifics and
 the Google Python Style Guide for everything else.
 
-Finally, we have a strict 80 character line limit and four spaces per
-indentation.
+### Linting
+
+We use [YAPF](https://github.com/google/yapf) for all Python formatting needs.
+You can auto-format your changes with the following command:
+
+```bash
+yapf --recursive --in-place --parallel .
+```
+
+We also use [catkin_lint](https://github.com/fkie/catkin_lint) for all `catkin`
+specifics. You can lint your changes as follows:
+
+```bash
+catkin lint --explain -W2 .
+```
 
 ## License
 

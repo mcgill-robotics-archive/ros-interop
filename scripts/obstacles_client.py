@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
 """Interoperability Obstacles ROS Client."""
 
 import sys
@@ -18,8 +17,8 @@ def publish_obstacles(timer_event):
         timer_event: ROS TimerEvent.
     """
     try:
-        moving_obstacles, stationary_obstacles = client.get_obstacles(frame,
-                                                                      lifetime)
+        moving_obstacles, stationary_obstacles = client.get_obstacles(
+            frame, lifetime)
     except (ConnectionError, Timeout) as e:
         rospy.logwarn(e)
         return
@@ -59,10 +58,10 @@ if __name__ == "__main__":
     stationary_topic = rospy.get_param("~stationary_topic")
 
     # Setup publishers.
-    moving_pub = rospy.Publisher(moving_topic,
-                                     GeoSphereArrayStamped, queue_size=1)
-    stationary_pub = rospy.Publisher(stationary_topic,
-                                     GeoCylinderArrayStamped, queue_size=1)
+    moving_pub = rospy.Publisher(
+        moving_topic, GeoSphereArrayStamped, queue_size=1)
+    stationary_pub = rospy.Publisher(
+        stationary_topic, GeoCylinderArrayStamped, queue_size=1)
 
     # Get ROS parameter for publishing period and frame ID.
     period = float(rospy.get_param("~period"))

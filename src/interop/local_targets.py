@@ -169,7 +169,8 @@ class Target(object):
         """
         with self.lock:
             if self.target_path is None:
-                raise IOError("Could not update target for file_id {}. "
+                raise IOError(
+                    "Could not update target for file_id {}. "
                     "Path to target file not known.".format(self.file_id))
             else:
                 try:
@@ -191,7 +192,8 @@ class Target(object):
         with self.lock:
             # Delete target.
             if self.target_path is None:
-                raise IOError("Could not delete target for file_id {}. "
+                raise IOError(
+                    "Could not delete target for file_id {}. "
                     "Path to target file not known.".format(self.file_id))
             else:
                 try:
@@ -225,7 +227,7 @@ class Target(object):
         with self.lock:
             if self.target_path is None:
                 raise IOError("Target file for file_id {} does not exist."
-                    .format(self.file_id))
+                              .format(self.file_id))
             else:
                 try:
                     with open(self.target_path, "r") as f:
@@ -268,7 +270,8 @@ class Target(object):
         """
         with self.lock:
             if self.image_path is None:
-                raise IOError("Could not delete image for file_id {}. "
+                raise IOError(
+                    "Could not delete image for file_id {}. "
                     "Path to image file not known.".format(self.file_id))
             else:
                 try:
@@ -288,8 +291,8 @@ class Target(object):
         with self.lock:
             if self.image_path is None:
                 raise IOError("Could not get image file. "
-                    "There is no image associated with file_id {}."
-                    .format(self.file_id))
+                              "There is no image associated with file_id {}."
+                              .format(self.file_id))
             else:
                 try:
                     # png_image is expected to be of type str.
@@ -366,8 +369,8 @@ class Target(object):
                         self.image_is_on_server = True
                         self.image_needs_setting = False
 
-            elif (self.image_needs_deleting and self.image_is_on_server
-                    and self.interop_id is not None):
+            elif (self.image_needs_deleting and self.image_is_on_server and
+                  self.interop_id is not None):
                 try:
                     self.client.delete_target_image(self.interop_id)
                 except (ConnectionError, Timeout) as e:
@@ -393,8 +396,9 @@ class Target(object):
                 return False
 
             # If there are still things to be done on the interop server.
-            if (self.needs_adding or self.needs_updating or self.needs_deleting
-                    or self.image_needs_setting or self.image_needs_deleting):
+            if (self.needs_adding or self.needs_updating or
+                    self.needs_deleting or self.image_needs_setting or
+                    self.image_needs_deleting):
                 return False
 
             # Otherwise, the target is useless and all references can be
@@ -457,8 +461,8 @@ class TargetsDirectory(object):
             try:
                 self.client.delete_target(target_id)
             except Exception as e:
-                rospy.logerr("Could not delete remote target %d: %r",
-                             target_id, e)
+                rospy.logerr("Could not delete remote target %d: %r", target_id,
+                             e)
 
     def add_target(self, data, interop_id=None):
         """Adds a target.
@@ -477,8 +481,7 @@ class TargetsDirectory(object):
             # New file_id.
             file_id = self.file_id + 1
 
-            target = Target(self.path, file_id, data,
-                            self.client, interop_id)
+            target = Target(self.path, file_id, data, self.client, interop_id)
 
             self.targets[file_id] = target
             # Record the largest file_id so far.

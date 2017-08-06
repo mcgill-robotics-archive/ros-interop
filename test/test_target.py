@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
 """Test local object file writing and syncing."""
 
 import unittest
@@ -60,8 +59,8 @@ class TestTarget(unittest.TestCase):
                 raise
 
         # Set up the client.
-        self.client = InteroperabilityClient("http://interop",  "testuser",
-            "testpass", 1.0)
+        self.client = InteroperabilityClient("http://interop", "testuser",
+                                             "testpass", 1.0)
 
         # Create a Target.
         self.target_data = {
@@ -110,7 +109,8 @@ class TestTarget(unittest.TestCase):
         self.target.delete()
 
         # Check that the file does not exist.
-        self.assertFalse(os.path.exists(os.path.join(self.targets_dir, "1.json")))
+        self.assertFalse(
+            os.path.exists(os.path.join(self.targets_dir, "1.json")))
 
         # Try to delete a previously deleted file.
         self.assertRaises(IOError, self.target.delete)
@@ -142,7 +142,8 @@ class TestTarget(unittest.TestCase):
         self.target.delete_image()  # Delete the image.
 
         # Check that the image does not exist after deleting.
-        self.assertFalse(os.path.exists(os.path.join(self.targets_dir, "1.png")))
+        self.assertFalse(
+            os.path.exists(os.path.join(self.targets_dir, "1.png")))
 
         # Try to delete a previously deleted image.
         self.assertRaises(OSError, self.target.delete_image)
@@ -157,7 +158,8 @@ class TestTarget(unittest.TestCase):
 
         self.assertIsNone(self.target.interop_id)
 
-    def test_state_variables_for_unnecessary_updates_and_deletes_before_sync(self):
+    def test_state_variables_for_unnecessary_updates_and_deletes_before_sync(
+            self):
         """Tests that the Target class recognizes that there is no need to update
         or delete on the interop server if the target has not yet been uploaded
         onto the server.

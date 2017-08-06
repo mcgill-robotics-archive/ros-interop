@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-
 """Mission Information Client"""
 
 import sys
@@ -110,19 +109,18 @@ if __name__ == "__main__":
     home_pos_topic = rospy.get_param("~home_pos_topic")
 
     # Setup publishers.
-    flyzones_pub = rospy.Publisher(flyzones_topic, FlyZoneArray,
-                                   queue_size=1)
-    search_grid_pub = rospy.Publisher(search_grid_topic, GeoPolygonStamped,
-                                      queue_size=1)
-    waypoints_pub = rospy.Publisher(waypoints_topic, WayPoints,
-                                    queue_size=1)
-    air_drop_pub = rospy.Publisher(air_drop_topic, GeoPointStamped,
-                                   queue_size=1)
-    off_axis_targ_pub = rospy.Publisher(off_axis_targ_topic, GeoPointStamped,
-                                        queue_size=1)
-    emergent_targ_pub = rospy.Publisher(emergent_targ_topic, GeoPointStamped,
-                                        queue_size=1)
-    home_pos_pub = rospy.Publisher(home_pos_topic, GeoPointStamped, queue_size=1)
+    flyzones_pub = rospy.Publisher(flyzones_topic, FlyZoneArray, queue_size=1)
+    search_grid_pub = rospy.Publisher(
+        search_grid_topic, GeoPolygonStamped, queue_size=1)
+    waypoints_pub = rospy.Publisher(waypoints_topic, WayPoints, queue_size=1)
+    air_drop_pub = rospy.Publisher(
+        air_drop_topic, GeoPointStamped, queue_size=1)
+    off_axis_targ_pub = rospy.Publisher(
+        off_axis_targ_topic, GeoPointStamped, queue_size=1)
+    emergent_targ_pub = rospy.Publisher(
+        emergent_targ_topic, GeoPointStamped, queue_size=1)
+    home_pos_pub = rospy.Publisher(
+        home_pos_topic, GeoPointStamped, queue_size=1)
 
     # Get message parameters.
     frame = str(rospy.get_param("~frame"))

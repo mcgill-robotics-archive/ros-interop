@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 """AUVSI SUAS Interoperability ROS client"""
 
 from client import InteroperabilityClient

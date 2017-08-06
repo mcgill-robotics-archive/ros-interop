@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
 """Interoperability serialization tests."""
 
 import rospy
@@ -25,34 +24,28 @@ class TestInteroperabilityClient(TestCase):
         url = "http://interop"
         client_args = (url, "testuser", "testpass", 1.0)
         json = {
-            "moving_obstacles": [
-                {
-                    "altitude_msl": 189.56748784643966,
-                    "latitude": 38.141826869853645,
-                    "longitude": -76.43199876559223,
-                    "sphere_radius": 150.0
-                },
-                {
-                    "altitude_msl": 250.0,
-                    "latitude": 38.14923628783763,
-                    "longitude": -76.43238529543882,
-                    "sphere_radius": 150.0
-                }
-            ],
-            "stationary_obstacles": [
-                {
-                    "cylinder_height": 750.0,
-                    "cylinder_radius": 300.0,
-                    "latitude": 38.140578,
-                    "longitude": -76.428997
-                },
-                {
-                    "cylinder_height": 400.0,
-                    "cylinder_radius": 100.0,
-                    "latitude": 38.149156,
-                    "longitude": -76.430622
-                }
-            ]
+            "moving_obstacles": [{
+                "altitude_msl": 189.56748784643966,
+                "latitude": 38.141826869853645,
+                "longitude": -76.43199876559223,
+                "sphere_radius": 150.0
+            }, {
+                "altitude_msl": 250.0,
+                "latitude": 38.14923628783763,
+                "longitude": -76.43238529543882,
+                "sphere_radius": 150.0
+            }],
+            "stationary_obstacles": [{
+                "cylinder_height": 750.0,
+                "cylinder_radius": 300.0,
+                "latitude": 38.140578,
+                "longitude": -76.428997
+            }, {
+                "cylinder_height": 400.0,
+                "cylinder_radius": 100.0,
+                "latitude": 38.149156,
+                "longitude": -76.430622
+            }]
         }
 
         with InteroperabilityMockServer(url) as server:
@@ -119,36 +112,33 @@ class TestInteroperabilityClient(TestCase):
         # Set up test data.
         url = "http://interop"
         client_args = (url, "testuser", "testpass", 1.0)
-        targets = [
-            {
-                "id": 1,
-                "user": 1,
-                "type": "standard",
-                "latitude": 38.1478,
-                "longitude": -76.4275,
-                "orientation": "n",
-                "shape": "star",
-                "background_color": "orange",
-                "alphanumeric": "C",
-                "alphanumeric_color": "black",
-                "description": None,
-                "autonomous": False
-            },
-            {
-                "id": 2,
-                "user": 1,
-                "type": "qrc",
-                "latitude": 38.1878,
-                "longitude": -76.4075,
-                "orientation": None,
-                "shape": None,
-                "background_color": None,
-                "alphanumeric": None,
-                "alphanumeric_color": None,
-                "description": "http://auvsi-seafarer.org",
-                "autonomous": False
-            }
-        ]
+        targets = [{
+            "id": 1,
+            "user": 1,
+            "type": "standard",
+            "latitude": 38.1478,
+            "longitude": -76.4275,
+            "orientation": "n",
+            "shape": "star",
+            "background_color": "orange",
+            "alphanumeric": "C",
+            "alphanumeric_color": "black",
+            "description": None,
+            "autonomous": False
+        }, {
+            "id": 2,
+            "user": 1,
+            "type": "qrc",
+            "latitude": 38.1878,
+            "longitude": -76.4075,
+            "orientation": None,
+            "shape": None,
+            "background_color": None,
+            "alphanumeric": None,
+            "alphanumeric_color": None,
+            "description": "http://auvsi-seafarer.org",
+            "autonomous": False
+        }]
 
         with InteroperabilityMockServer(url) as server:
             # Setup mock server.

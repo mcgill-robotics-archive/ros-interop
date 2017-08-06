@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 """Interoperability HTTP Client."""
 
 import os
@@ -208,8 +207,8 @@ class InteroperabilityClient(object):
         reachable = False
         while not reachable and not rospy.is_shutdown():
             try:
-                response = requests.get(self.url, timeout=self.timeout,
-                                        verify=self.verify)
+                response = requests.get(
+                    self.url, timeout=self.timeout, verify=self.verify)
                 response.raise_for_status()
                 reachable = response.ok
             except:
@@ -259,8 +258,8 @@ class InteroperabilityClient(object):
             ValueError: On JSON decoding failure.
         """
         response = self._get("/api/obstacles")
-        return serializers.ObstaclesDeserializer.from_dict(response.json(),
-                                                           frame, lifetime)
+        return serializers.ObstaclesDeserializer.from_dict(
+            response.json(), frame, lifetime)
 
     def post_telemetry(self, navsat_msg, compass_msg):
         """Uploads telemetry information to Interoperability server.
@@ -274,8 +273,8 @@ class InteroperabilityClient(object):
             HTTPError: On request failure.
             ConnectionError: On connection failure.
         """
-        dict_telem = serializers.TelemetrySerializer.from_msg(navsat_msg,
-                                                              compass_msg)
+        dict_telem = serializers.TelemetrySerializer.from_msg(
+            navsat_msg, compass_msg)
         self._post("/api/telemetry", data=dict_telem)
 
     def post_target(self, json_target):
@@ -402,8 +401,8 @@ class InteroperabilityClient(object):
             ValueError: On JSON decoding failure.
         """
         response = self._get("/api/missions/{:d}".format(id))
-        mission = serializers.MissionDeserializer.from_dict(response.json(),
-                                                            frame)
+        mission = serializers.MissionDeserializer.from_dict(
+            response.json(), frame)
         return mission
 
     def put_target(self, id, json_target):
