@@ -3,14 +3,49 @@
 
 """Interoperability Target ROS Server."""
 
+import os
 import sys
 import json
 import rospy
+import errno
+import datetime
 import interop.srv
 from cv_bridge import CvBridgeError
 from interop import InteroperabilityClient
 from interop import serializers, local_targets
 from std_srvs.srv import Trigger, TriggerResponse
+
+
+def trigger_exception_handler(*expected_exception_types):
+    """Helper decorator for std_srvs/Trigger ROS services.
+
+    Args:
+        *expected_exception_types: All exception types that are expected to
+            possibly occur. Any exception of one of these types will have
+            response.success = False and will be logged with an ERROR log level.
+            Other exceptions will not be caught, but will be automatically
+            logged and show a stacktrace. They will not crash the service.
+
+    Returns:
+        Decorator that returns a TriggerResponse.
+    """
+    def decorator(f):
+        def wrapper(*args, **kwargs):
+            response = TriggerResponse()
+
+            try:
+                f(*args, **kwargs)
+                response.success = True
+            except expected_exception_types as e:
+                rospy.logerr(e.message)
+                response.success = False
+                response.message = e.message
+
+            return response
+
+        return wrapper
+
+    return decorator
 
 
 class TargetsServer(object):
@@ -261,6 +296,48 @@ class TargetsServer(object):
 
         return response
 
+    @trigger_exception_handler(OSError)
+    def new_session(self, req):
+        """Creates a new object files session.
+
+        The old one still exists, but is no longer updated.
+
+        Args:
+            req: TriggerRequest message.
+
+        Returns:
+            TriggerResponse.
+        """
+        rospy.logwarn("Creating new session...")
+
+        # Get a new path.
+        targets_root = os.path.dirname(self.targets_dir.path)
+        targets_path = get_targets_path(targets_root)
+        create_targets_path(targets_path)
+
+        try:
+            symlink_targets_path_to_latest(targets_path)
+        except:
+            # Symlink the old targets directory back.
+            symlink_targets_path_to_latest(self.targets_dir.path)
+            raise
+
+        # Store current session's object file location for opportunity to
+        # recover the session in the event of a crash.
+        rospy.set_param(targets_path_param_key, targets_path)
+
+        rospy.loginfo("Storing object files in {}".format(targets_path))
+        targets_dir = local_targets.TargetsDirectory(targets_path, client)
+
+        rospy.loginfo("Loading all remote targets...")
+        targets_dir.load_all_remote_targets()
+
+        # Successful.
+        # Switch to new session.
+        self.targets_dir = targets_dir
+        rospy.loginfo("Switched to new session successfully")
+
+    @trigger_exception_handler()
     def reload_all_targets(self, req):
         """Reloads all remote targets.
 
@@ -270,18 +347,10 @@ class TargetsServer(object):
         Returns:
             TriggerResponse.
         """
-        response = TriggerResponse()
+        rospy.logwarn("Reloading all remote targets...")
+        self.targets_dir.load_all_remote_targets()
 
-        try:
-            rospy.logwarn("Reloading all remote targets...")
-            self.targets_dir.load_all_remote_targets()
-            response.success = True
-        except Exception as e:
-            response.success = False
-            response.message = e.message
-
-        return response
-
+    @trigger_exception_handler()
     def clear_all_targets(self, req):
         """Reloads all remote targets.
 
@@ -291,17 +360,9 @@ class TargetsServer(object):
         Returns:
             TriggerResponse.
         """
-        response = TriggerResponse()
-
-        try:
-            rospy.logwarn("Clearing all targets...")
-            self.targets_dir.clear_all_targets()
-            response.success = True
-        except Exception as e:
-            response.success = False
-            response.message = e.message
-
-        return response
+        rospy.logwarn("Clearing all targets...")
+        self.targets_dir.clear_all_targets()
+        rospy.loginfo("Cleared all targets successfully")
 
     def sync(self, rospy_timer_event):
         """Handles calls from rospy.Timer to sync the local targets and images
@@ -313,6 +374,64 @@ class TargetsServer(object):
                 rospy.Timer.
         """
         self.targets_dir.sync()
+
+
+def get_targets_path(targets_root):
+    """"Gets a new targets diretory.
+
+    Args:
+        targets_root: Parent directory of targets directory.
+
+    Returns:
+        Path to targets directory.
+    """
+    # Set folder name to timestamp (YYYY-mm-DD-hh-MM-ss)
+    dirname = "{:%Y-%m-%d-%H-%M-%S}".format(datetime.datetime.now())
+
+    # Set directory for targets: /<targets_root>/<dirname>/.
+    targets_root = os.path.expanduser(targets_root)
+    targets_path = os.path.join(targets_root, dirname)
+
+    return targets_path
+
+
+def create_targets_path(targets_path):
+    """Creates the targets directory.
+
+    Args:
+        targets_path: Path to targets directory.
+
+    Raises:
+        OSError: If the directory could not be created.
+    """
+    try:
+        os.makedirs(targets_path)
+    except OSError as e:
+        # Allow reusing the same directory.
+        if e.errno != errno.EEXIST:
+            raise
+
+
+def symlink_targets_path_to_latest(targets_path):
+    """Symlinks 'latest' to the given directory.
+
+    Args:
+        targets_path: Path to targets directory.
+    """
+    targets_root = os.path.dirname(targets_path)
+    path_to_symlink = os.path.join(targets_root, "latest")
+
+    try:
+        os.symlink(targets_path, path_to_symlink)
+    except OSError as e:
+         # Replace the old symlink if an old symlink with the same
+         # name exists.
+        if e.errno == errno.EEXIST:
+            os.remove(path_to_symlink)
+            os.symlink(targets_path, path_to_symlink)
+        else:
+            rospy.logerr(
+                "Could not create symlink to the latest targets directory")
 
 
 if __name__ == "__main__":
@@ -340,7 +459,25 @@ if __name__ == "__main__":
 
     # Initialize a directory for storing the targets.
     try:
-        targets_dir = local_targets.TargetsDirectory(targets_root, client)
+        targets_path_param_key = "~full_targets_path"
+        if rospy.has_param(targets_path_param_key):
+            # Get previous directory name if it was already set in the current
+            # session.
+            targets_path = rospy.get_param(targets_path_param_key)
+            rospy.loginfo("Recovering previous object files session...")
+        else:
+            # Get a new path otherwise.
+            targets_path = get_targets_path(targets_root)
+
+            # Store current session's object file location for opportunity to
+            # recover the same session in the event of a crash.
+            rospy.set_param(targets_path_param_key, targets_path)
+
+        # Set up directory.
+        rospy.loginfo("Storing object files in {}".format(targets_path))
+        create_targets_path(targets_path)
+        symlink_targets_path_to_latest(targets_path)
+        targets_dir = local_targets.TargetsDirectory(targets_path, client)
     except OSError as e:
         rospy.logfatal(e)
         raise
@@ -392,8 +529,9 @@ if __name__ == "__main__":
     rospy.Service("~image/compressed/get", interop.srv.GetTargetCompressedImage,
                   lambda r: targets_server.get_target_image(r, True))
 
-    # Initialize reload and clear targets ROS services.
+    # Initialize targets syncing ROS services.
     rospy.Service("~clear", Trigger, targets_server.clear_all_targets)
     rospy.Service("~reload", Trigger, targets_server.reload_all_targets)
+    rospy.Service("~new_session", Trigger, targets_server.new_session)
 
     rospy.spin()

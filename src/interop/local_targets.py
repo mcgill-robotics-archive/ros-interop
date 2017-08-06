@@ -2,10 +2,8 @@
 
 import os
 import json
-import errno
 import rospy
 import os.path
-import datetime
 import threading
 import serializers
 from cv_bridge import CvBridgeError
@@ -40,8 +38,9 @@ class Target(object):
         """
         # Reentrant lock needed for sync where there are attempts to
         # acquire the lock twice.
-        # Dual use: preventing simultaneous file IO, and preventing simultaneous
-        # changes to the state variables (_needs_adding, _needs_updating, etc.).
+        # Dual use: preventing simultaneous file IO, and preventing
+        # simultaneous changes to the state variables:
+        #   _needs_adding, _needs_updating, etc.
         self.lock = threading.RLock()
 
         self.client = client
@@ -398,7 +397,8 @@ class Target(object):
                     or self.image_needs_setting or self.image_needs_deleting):
                 return False
 
-            # Otherwise, the target is useless and all references can be deleted.
+            # Otherwise, the target is useless and all references can be
+            # deleted.
             return True
 
 
@@ -409,46 +409,16 @@ class TargetsDirectory(object):
     the interop server.
     """
 
-    def __init__(self, targets_root, client):
+    def __init__(self, path, client):
         """Creates a directory for storing targets and images.
 
         Args:
-            targets_root (str): Absolute path to the parent directory of
-                the directory to be created.
-            client (interop.InteroperabilityClient): Interoperability client that
-                will be used to handle syncs to the interop server.
-
-        Raises:
-            OSError: If the directory could not be created.
+            path (str): Absolute path to the directory of to be created.
+            client (interop.InteroperabilityClient): Interoperability client
+                that will be used to handle syncs to the interop server.
         """
         self.lock = threading.Lock()
-
-        # Create timestamp (YYYY-mm-DD-hh-MM-ss).
-        timestamp = "{:%Y-%m-%d-%H-%M-%S}".format(datetime.datetime.now())
-
-        # Perform shell expansion
-        targets_root = os.path.expanduser(targets_root)
-
-        # Create directory for targets (/<targets_root>/<timestamp>/).
-        self.targets_dir = os.path.join(targets_root, timestamp)
-        try:
-            os.makedirs(self.targets_dir)
-        except OSError as e:
-            raise
-
-        # Create symlink to directory.
-        path_to_symlink = os.path.join(targets_root, 'latest')
-        try:
-            os.symlink(self.targets_dir, path_to_symlink)
-        except OSError as e:
-             # Replace the old symlink if an old symlink with the same
-             # name exists.
-            if e.errno == errno.EEXIST:
-                os.remove(path_to_symlink)
-                os.symlink(self.targets_dir, path_to_symlink)
-            else:
-                rospy.logerr('Could not create symlink to the '
-                    + 'latest targets directory')
+        self.path = path
 
         # Client used to update the interop server.
         self.client = client
@@ -507,7 +477,7 @@ class TargetsDirectory(object):
             # New file_id.
             file_id = self.file_id + 1
 
-            target = Target(self.targets_dir, file_id, data,
+            target = Target(self.path, file_id, data,
                             self.client, interop_id)
 
             self.targets[file_id] = target
@@ -542,7 +512,8 @@ class TargetsDirectory(object):
         Raises:
             KeyError: If the file_id does not exist in the self.targets
                 dictionary.
-            OSError: If the target file or the target image could not be deleted.
+            OSError: If the target file or the target image could not be
+                deleted.
         """
         with self.lock:
             target = self.targets[file_id]
