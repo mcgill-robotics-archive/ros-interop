@@ -453,7 +453,7 @@ class TargetsDirectory(object):
         # Deal with locally stored targets first.
         for target_id, target in self.targets.iteritems():
             target.delete()
-            del self.targets[target_id]
+        self.targets.clear()
 
         # Need to load targets stored remotely.
         remote_targets = self.client.get_all_targets()
