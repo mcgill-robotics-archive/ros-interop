@@ -52,7 +52,7 @@ To run, simply launch the package with:
 
 ```bash
 export INTEROP_USERNAME=<username>
-export INTEROP PASSWORD=<password>
+export INTEROP_PASSWORD=<password>
 roslaunch interop interop.launch base_url:=<base_url>
 ```
 
@@ -61,7 +61,7 @@ or, if you prefer to avoid setting the `base_url` every time:
 ```bash
 export INTEROP_HOST=<base_url>
 export INTEROP_USERNAME=<username>
-export INTEROP PASSWORD=<password>
+export INTEROP_PASSWORD=<password>
 roslaunch interop interop.launch
 ```
 
