@@ -1,46 +1,66 @@
 <launch>
   <!-- Login credentials and request parameters -->
-  <arg name="base_url" default="$(env INTEROP_HOST)"/>
-  <arg name="timeout" default="1.0"/>
-  <arg name="verify" default="true"/>
+  <arg name="base_url" default="$(env INTEROP_HOST)"
+    doc="base URL of the interop server (e.g. http://interop:8080)"/>
+  <arg name="timeout" default="1.0" doc="timeout of each request in seconds"/>
+  <arg name="verify" default="true" doc="validate SSL certificates"/>
 
   <!-- Targets directory settings -->
   <arg name="targets_root"
-       default="$(optenv INTEROP_OBJECTS_ROOT ~/object_files/)"/>
-  <arg name="interop_update_period" default="10.0"/>
+       default="$(optenv INTEROP_OBJECTS_ROOT ~/object_files/)"
+       doc="path to save object files in"/>
+     <arg name="interop_update_period" default="10.0"
+       doc="period to update targets with the server in seconds"/>
 
   <!-- Whether to clear all targets on startup or not. -->
-  <arg name="clear_targets" default="false"/>
+  <arg name="clear_targets" default="false"
+    doc="clear all remote targets on startup"/>
 
   <!-- Synchronization settings -->
-  <arg name="sync_queue_size" default="2"/>
-  <arg name="max_sync_delay" default="1"/>
+  <arg name="sync_queue_size" default="2"
+    doc="message synchronization queue size"/>
+  <arg name="max_sync_delay" default="1"
+    doc="maximum message synchronization delay in seconds"/>
 
   <!-- Subscribed topics -->
-  <arg name="navsat_topic" default="/mavros/global_position/global"/>
-  <arg name="compass_topic" default="/mavros/global_position/compass_hdg"/>
+  <arg name="navsat_topic" default="/mavros/global_position/global"
+    doc="topic for vehicle's GPS position to use for telemetry"/>
+  <arg name="compass_topic" default="/mavros/global_position/compass_hdg"
+    doc="topic for vehicle's compass heading in degrees"/>
 
   <!-- Published topics -->
-  <arg name="moving_topic" default="~moving"/>
-  <arg name="stationary_topic" default="~stationary"/>
-  <arg name="flyzones_topic" default="~flyzones" />
-  <arg name="search_grid_topic" default="~search_grid"/>
-  <arg name="waypoints_topic" default="~waypoints"/>
-  <arg name="air_drop_topic" default="~air_drop_loc"/>
-  <arg name="emergent_targ_topic" default="~emergent_targ_loc"/>
-  <arg name="off_axis_targ_topic" default="~off_axis_targ"/>
-  <arg name="home_pos_topic" default="~home"/>
+  <arg name="moving_topic" default="~moving"
+    doc="topic for publishing moving obstacles"/>
+  <arg name="stationary_topic" default="~stationary"
+    doc="topic for publishing stationary obstacles"/>
+  <arg name="flyzones_topic" default="~flyzones"
+    doc="topic for publishing flyzones"/>
+  <arg name="search_grid_topic" default="~search_grid"
+    doc="topic for publishing search grid"/>
+  <arg name="waypoints_topic" default="~waypoints"
+    doc="topic for publishing waypoints"/>
+  <arg name="air_drop_topic" default="~air_drop_loc"
+    doc="topic for publishing air drop location"/>
+  <arg name="emergent_targ_topic" default="~emergent_targ_loc"
+    doc="topic for publishing emergent target location"/>
+  <arg name="off_axis_targ_topic" default="~off_axis_targ"
+    doc="topic for publishing off axis target location"/>
+  <arg name="home_pos_topic" default="~home"
+    doc="topic for publishing home location"/>
 
   <!-- Publication periods -->
-  <arg name="obstacles_period" default="0.05"/>
-  <arg name="mission_info_period" default="1.00"/>
+  <arg name="obstacles_period" default="0.05"
+    doc="period to fetch obstacles in seconds"/>
+  <arg name="mission_info_period" default="1.00"
+    doc="period to fetch mission information in seconds"/>
 
   <!-- Frame IDs -->
-  <arg name="obstacles_frame" default="earth"/>
-  <arg name="missions_frame" default="earth"/>
+  <arg name="obstacles_frame" default="earth" doc="obstalces frame ID"/>
+  <arg name="missions_frame" default="earth"
+    doc="mission information frame ID"/>
 
   <!-- Mission ID -->
-  <arg name="mission_id" default="-1"/>
+  <arg name="mission_id" default="-1" doc="mission ID (-1 means active)"/>
 
   <group ns="interop">
     <!-- Obstacles client -->
