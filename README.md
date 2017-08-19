@@ -156,9 +156,9 @@ new session, use the `~new_session` ROS service.
 
 The following are the run-time ROS launch arguments available:
 
-#### Interop server, credentials, and request parameters
+#### Interop server and request parameters
 
--   `base_url`: AUVSI SUAS interop server url, default: `$INTEROP_HOST` if set, or `http://interop:80`.
+-   `base_url`: AUVSI SUAS interop server url, default: `$INTEROP_HOST` if set.
 -   `timeout`: Timeout for each request in seconds, default: `1.0`.
 -   `verify`: Whether to verify SSL cerificates for HTTPS requests, default: `true`.
 
