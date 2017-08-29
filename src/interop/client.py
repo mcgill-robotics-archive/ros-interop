@@ -291,7 +291,7 @@ class InteroperabilityClient(object):
             HTTPError: On request failure.
             ConnectionError: On connection failure.
         """
-        response = self._post("/api/targets", data=json_target)
+        response = self._post("/api/odlcs", data=json_target)
         return response.json()["id"]
 
     def get_all_targets(self):
@@ -306,7 +306,7 @@ class InteroperabilityClient(object):
             ConnectionError: On connection failure.
             ValueError: On JSON decoding failure.
         """
-        response = self._get("/api/targets")
+        response = self._get("/api/odlcs")
         targets = {t["id"]: t for t in response.json()}
         return targets
 
@@ -325,7 +325,7 @@ class InteroperabilityClient(object):
             ConnectionError: On connection failure.
             ValueError: On JSON decoding failure.
         """
-        response = self._get("/api/targets/{:d}".format(id))
+        response = self._get("/api/odlcs/{:d}".format(id))
         return response.json()
 
     def get_active_mission(self, frame):
@@ -417,7 +417,7 @@ class InteroperabilityClient(object):
             HTTPError: On request failure.
             ConnectionError: On connection failure.
         """
-        self._put("/api/targets/{:d}".format(id), data=json_target)
+        self._put("/api/odlcs/{:d}".format(id), data=json_target)
 
     def delete_target(self, id):
         """Deletes target with matching ID.
@@ -430,7 +430,7 @@ class InteroperabilityClient(object):
             HTTPError: On request failure.
             ConnectionError: On connection failure.
         """
-        self._delete("/api/targets/{:d}".format(id))
+        self._delete("/api/odlcs/{:d}".format(id))
 
     def post_target_image(self, id, png):
         """Adds or updates target image thumbnail as a compressed PNG.
@@ -445,7 +445,7 @@ class InteroperabilityClient(object):
             ConnectionError: On connection failure.
             CvBridgeError: On image conversion failure.
         """
-        self._post("/api/targets/{:d}/image".format(id), data=png)
+        self._post("/api/odlcs/{:d}/image".format(id), data=png)
 
     def get_target_image(self, id):
         """Retrieves target image thumbnail.
@@ -462,7 +462,7 @@ class InteroperabilityClient(object):
             ConnectionError: On connection failure.
             CvBridgeError: On image conversion failure.
         """
-        response = self._get("/api/targets/{:d}/image".format(id))
+        response = self._get("/api/odlcs/{:d}/image".format(id))
         img = serializers.TargetImageSerializer.from_raw(response.content)
         return img
 
@@ -477,4 +477,4 @@ class InteroperabilityClient(object):
             HTTPError: On request failure.
             ConnectionError: On connection failure.
         """
-        self._delete("/api/targets/{:d}/image".format(id))
+        self._delete("/api/odlcs/{:d}/image".format(id))
