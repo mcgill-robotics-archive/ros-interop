@@ -57,7 +57,7 @@ class TestSerializers(TestCase):
                 "longitude": -76.434088,
                 "order": 1
             }],
-            "off_axis_target_pos": {
+            "off_axis_odlc_pos": {
                 "latitude": 38.142544,
                 "longitude": -76.434088
             },
@@ -135,9 +135,9 @@ class TestSerializers(TestCase):
 
         # Test off axis target.
         self.assertEqual(off_axis_targ.position.latitude,
-                         data["off_axis_target_pos"]["latitude"])
+                         data["off_axis_odlc_pos"]["latitude"])
         self.assertEqual(off_axis_targ.position.longitude,
-                         data["off_axis_target_pos"]["longitude"])
+                         data["off_axis_odlc_pos"]["longitude"])
 
         # Test emergent object.
         self.assertEqual(emergent_obj.position.latitude,

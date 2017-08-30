@@ -223,7 +223,7 @@ class MissionDeserializer(object):
         search_grid = cls.__get_search_grid(data["search_grid_points"], frame)
         waypoints = cls.__get_waypoints(data["mission_waypoints"], frame)
         air_drop_pos = cls.__get_point_msg(data["air_drop_pos"], frame)
-        off_axis_targ = cls.__get_point_msg(data["off_axis_target_pos"], frame)
+        off_axis_targ = cls.__get_point_msg(data["off_axis_odlc_pos"], frame)
         emergent_obj = cls.__get_point_msg(data["emergent_last_known_pos"],
                                            frame)
         home_pos = cls.__get_point_msg(data["home_pos"], frame)
