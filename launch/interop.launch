@@ -7,14 +7,10 @@
 
   <!-- Targets directory settings -->
   <arg name="targets_root"
-       default="$(optenv INTEROP_OBJECTS_ROOT ~/object_files/)"
-       doc="path to save object files in"/>
-     <arg name="interop_update_period" default="10.0"
-       doc="period to update targets with the server in seconds"/>
-
-  <!-- Whether to clear all targets on startup or not. -->
-  <arg name="clear_targets" default="false"
-    doc="clear all remote targets on startup"/>
+    default="$(optenv INTEROP_OBJECTS_ROOT ~/object_files/)"
+    doc="path to save object files in"/>
+  <arg name="interop_update_period" default="10.0"
+    doc="period to update targets with the server in seconds"/>
 
   <!-- Synchronization settings -->
   <arg name="sync_queue_size" default="2"
@@ -149,7 +145,6 @@
       <!-- Targets directory settings -->
       <param name="targets_root" value="$(arg targets_root)"/>
       <param name="interop_update_period" value="$(arg interop_update_period)"/>
-      <param name="clear_targets" value="$(arg clear_targets)"/>
     </node>
   </group>
 </launch>

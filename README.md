@@ -126,10 +126,6 @@ this argument with the `$INTEROP_OBJECTS_ROOT` environment variable as follows:
 export INTEROP_OBJECTS_ROOT=/path/to/object_files
 ```
 
-**Note**: The same timestamped directory will be used for the lifespan of the
-running ROS Master, no matter how many times this node is spawned. To force a
-new session, use the `~new_session` ROS service.
-
 #### Targets
 
 -   `~add`: Adds new target, `AddTarget`.
@@ -150,7 +146,6 @@ new session, use the `~new_session` ROS service.
 
 -   `~clear`: Clears all local and remote targets, `Trigger`.
 -   `~reload`: Reloads all remote targets, `Trigger`.
--   `~new_session`: Creates and switches to a new object files session with a new directory, `Trigger`.
 
 ## Arguments
 
@@ -166,8 +161,6 @@ The following are the run-time ROS launch arguments available:
 
 -   `targets_root`: The parent of all timestamped directories containing object files, default: `$INTEROP_OBJECTS_ROOT` if set, or `~/object_files/`.
 -   `interop_update_period`: Duration between attempts to sync the object files of the current run to the interop server, default: `10.0` (i.e. 10.0 s).
--   `clear_targets`: Automatically clear all remote targets on start up (**use with caution**), default: `false`.
--   `full_targets_path`: The complete path to the object files directory, no default. Used for recovering sessions in case of failures. Do not set manually.
 
 #### Subscribed topics
 

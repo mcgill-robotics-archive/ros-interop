@@ -297,47 +297,6 @@ class TargetsServer(object):
 
         return response
 
-    @trigger_exception_handler(OSError)
-    def new_session(self, req):
-        """Creates a new object files session.
-
-        The old one still exists, but is no longer updated.
-
-        Args:
-            req: TriggerRequest message.
-
-        Returns:
-            TriggerResponse.
-        """
-        rospy.logwarn("Creating new session...")
-
-        # Get a new path.
-        targets_root = os.path.dirname(self.targets_dir.path)
-        targets_path = get_targets_path(targets_root)
-        create_targets_path(targets_path)
-
-        try:
-            symlink_targets_path_to_latest(targets_path)
-        except:
-            # Symlink the old targets directory back.
-            symlink_targets_path_to_latest(self.targets_dir.path)
-            raise
-
-        # Store current session's object file location for opportunity to
-        # recover the session in the event of a crash.
-        rospy.set_param(targets_path_param_key, targets_path)
-
-        rospy.loginfo("Storing object files in {}".format(targets_path))
-        targets_dir = local_targets.TargetsDirectory(targets_path, client)
-
-        rospy.loginfo("Loading all remote targets...")
-        targets_dir.load_all_remote_targets()
-
-        # Successful.
-        # Switch to new session.
-        self.targets_dir = targets_dir
-        rospy.loginfo("Switched to new session successfully")
-
     @trigger_exception_handler()
     def reload_all_targets(self, req):
         """Reloads all remote targets.
@@ -444,7 +403,6 @@ if __name__ == "__main__":
     timeout = rospy.get_param("~timeout")
     verify = rospy.get_param("~verify")
     targets_root = rospy.get_param("~targets_root")
-    clear_targets = rospy.get_param("~clear_targets")
     update_period = rospy.get_param("~interop_update_period")
 
     # Initialize interoperability client.
@@ -460,21 +418,8 @@ if __name__ == "__main__":
 
     # Initialize a directory for storing the targets.
     try:
-        targets_path_param_key = "~full_targets_path"
-        if rospy.has_param(targets_path_param_key):
-            # Get previous directory name if it was already set in the current
-            # session.
-            targets_path = rospy.get_param(targets_path_param_key)
-            rospy.loginfo("Recovering previous object files session...")
-        else:
-            # Get a new path otherwise.
-            targets_path = get_targets_path(targets_root)
-
-            # Store current session's object file location for opportunity to
-            # recover the same session in the event of a crash.
-            rospy.set_param(targets_path_param_key, targets_path)
-
         # Set up directory.
+        targets_path = get_targets_path(targets_root)
         rospy.loginfo("Storing object files in {}".format(targets_path))
         create_targets_path(targets_path)
         symlink_targets_path_to_latest(targets_path)
@@ -484,17 +429,9 @@ if __name__ == "__main__":
         raise
 
     try:
-        if clear_targets:
-            rospy.logwarn("Clearing all remote targets...")
-            targets_dir.clear_all_targets()
-
-            # Unset this parameter to avoid redoing it after a crash.
-            rospy.logwarn("Unsetting clear targets parameter...")
-            rospy.set_param("~clear_targets", False)
-        else:
-            # Sync up the targets directory.
-            rospy.loginfo("Loading all remote targets...")
-            targets_dir.load_all_remote_targets()
+        # Sync up the targets directory.
+        rospy.loginfo("Loading all remote targets...")
+        targets_dir.load_all_remote_targets()
     except Exception as e:
         rospy.logfatal(e)
         raise
@@ -533,6 +470,5 @@ if __name__ == "__main__":
     # Initialize targets syncing ROS services.
     rospy.Service("~clear", Trigger, targets_server.clear_all_targets)
     rospy.Service("~reload", Trigger, targets_server.reload_all_targets)
-    rospy.Service("~new_session", Trigger, targets_server.new_session)
 
     rospy.spin()
