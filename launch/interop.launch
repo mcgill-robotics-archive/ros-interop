@@ -1,7 +1,7 @@
 <launch>
   <!-- Login credentials and request parameters -->
-  <arg name="base_url" default="$(env INTEROP_HOST)"
-    doc="base URL of the interop server (e.g. http://interop:8080)"/>
+  <arg name="base_url" default="$(optenv INTEROP_HOST)"
+    doc="base URL of the interop server (e.g. http://localhost:8080)"/>
   <arg name="timeout" default="1.0" doc="timeout of each request in seconds"/>
   <arg name="verify" default="true" doc="validate SSL certificates"/>
 

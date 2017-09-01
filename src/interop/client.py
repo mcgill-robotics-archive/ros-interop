@@ -31,6 +31,9 @@ class InteroperabilityClient(object):
             timeout: Timeout in seconds for individual requests, default: 1.0s.
             verify: Whether to verify SSL certificates or not, default: True.
         """
+        if not url.strip():
+            raise ValueError("Base URL cannot be empty")
+
         self.verify = verify
         self.timeout = timeout
         self.url = url[:-1] if url.endswith('/') else url
