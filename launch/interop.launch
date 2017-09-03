@@ -1,4 +1,7 @@
 <launch>
+  <!-- Node namespace -->
+  <arg name="ns" default="interop" doc="namespace for all nodes"/>
+
   <!-- Login credentials and request parameters -->
   <arg name="base_url" default="$(optenv INTEROP_HOST)"
     doc="base URL of the interop server (e.g. http://localhost:8080)"/>
@@ -58,7 +61,7 @@
   <!-- Mission ID -->
   <arg name="mission_id" default="-1" doc="mission ID (-1 means active)"/>
 
-  <group ns="interop">
+  <group ns="$(arg ns)">
     <!-- Obstacles client -->
     <node name="obstacles"
           pkg="interop"

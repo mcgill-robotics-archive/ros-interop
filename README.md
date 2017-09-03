@@ -206,8 +206,7 @@ The following are the run-time ROS launch arguments available:
 #### Mission IDs
 
 -   `mission_id`: ID for the first mission to access. Negative numbers
-                  will retrieve active mission instead
-                  , default: `-1`.
+                  will retrieve active mission instead, default: `-1`.
 
 #### Synchronization settings
 
@@ -218,6 +217,11 @@ are synchronized in order to be properly paired. For more information, see
 -   `sync_queue_size`: Message synchronization queue size, default: `2`.
 -   `max_sync_delay`: Maximum message synchronization delay in seconds,
     default: `1`.
+
+#### Miscellaneous
+
+-   `ns`: Namespace for all `interop` nodes. Can be used to launch several
+    `interop` instances if wanted, default: `interop`.
 
 ## Debugging
 
