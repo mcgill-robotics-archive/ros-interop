@@ -208,14 +208,23 @@ class InteroperabilityClient(object):
     def wait_for_server(self):
         """Waits until interoperability server is reachable."""
         reachable = False
+        rate = rospy.Rate(1)
         while not reachable and not rospy.is_shutdown():
             try:
                 response = requests.get(
                     self.url, timeout=self.timeout, verify=self.verify)
                 response.raise_for_status()
                 reachable = response.ok
-            except:
-                continue
+            except requests.ConnectionError:
+                rospy.logwarn_throttle(
+                    5.0, "Waiting for server: {}".format(self.url))
+            except Exception as e:
+                rospy.logerr_throttle(
+                    5.0, "Unexpected error waiting for server: {}, {}".format(
+                        self.url, e))
+
+            if not reachable:
+                rate.sleep()
 
     def login(self):
         """Authenticates with the server.
