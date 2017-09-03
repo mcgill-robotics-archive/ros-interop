@@ -289,28 +289,28 @@ class InteroperabilityClient(object):
             navsat_msg, compass_msg)
         self._post("/api/telemetry", data=dict_telem)
 
-    def post_target(self, json_target):
-        """Uploads new target for submission.
+    def post_object(self, json_object):
+        """Uploads new object for submission.
 
         Args:
-            json_target: Target as a JSON string.
+            json_object: Object as a JSON string.
 
         Returns:
-            Target ID.
+            Object ID.
 
         Raises:
             Timeout: On timeout.
             HTTPError: On request failure.
             ConnectionError: On connection failure.
         """
-        response = self._post("/api/odlcs", data=json_target)
+        response = self._post("/api/odlcs", data=json_object)
         return response.json()["id"]
 
-    def get_all_targets(self):
-        """Returns first 100 submitted targets.
+    def get_all_objects(self):
+        """Returns first 100 submitted objects.
 
         Returns:
-            dict: Target IDs to target data (dict).
+            dict: Object IDs to object data (dict).
 
         Raises:
             Timeout: On timeout.
@@ -319,17 +319,17 @@ class InteroperabilityClient(object):
             ValueError: On JSON decoding failure.
         """
         response = self._get("/api/odlcs")
-        targets = {t["id"]: t for t in response.json()}
-        return targets
+        objects = {t["id"]: t for t in response.json()}
+        return objects
 
-    def get_target(self, id):
-        """Returns target with matching ID.
+    def get_object(self, id):
+        """Returns object with matching ID.
 
         Args:
-            id: Target ID.
+            id: Object ID.
 
         Returns:
-            dict: The target data.
+            dict: The object data.
 
         Raises:
             Timeout: On timeout.
@@ -350,7 +350,7 @@ class InteroperabilityClient(object):
             A tuple of (FlyZoneArray, GeoPolygonStamped, GeoObjectArray,
             GeoPointStamped, GeoPointStamped, GeoPointStamped, GeoPointStamped)
             corresponding to the flyzones, search grid, waypoints,
-            air drop position, off axis target location, the emergent object
+            air drop position, off axis object location, the emergent object
             location, the home position
 
         Raises:
@@ -376,7 +376,7 @@ class InteroperabilityClient(object):
             A tuple of (FlyZoneArray, GeoPolygonStamped, GeoObjectArray,
             GeoPointStamped, GeoPointStamped, GeoPointStamped, GeoPointStamped)
             corresponding to the flyzones, search grid, waypoints,
-            air drop position, off axis target location, the emergent object
+            air drop position, off axis object location, the emergent object
             location, the home position.
 
         Raises:
@@ -403,7 +403,7 @@ class InteroperabilityClient(object):
             A tuple of (FlyZoneArray, GeoPolygonStamped, WayPoints,
             GeoPointStamped, GeoPointStamped, GeoPointStamped, GeoPointStamped)
             corresponding to the flyzones, search grid, waypoints, air drop
-            position, off axis target location, the emergent object location,
+            position, off axis object location, the emergent object location,
             and the home position.
 
         Raises:
@@ -417,25 +417,25 @@ class InteroperabilityClient(object):
             response.json(), frame)
         return mission
 
-    def put_target(self, id, json_target):
-        """Updates target information.
+    def put_object(self, id, json_object):
+        """Updates object information.
 
         Args:
-            id: Target ID.
-            json_target: Target as a JSON string.
+            id: Object ID.
+            json_object: Object as a JSON string.
 
         Raises:
             Timeout: On timeout.
             HTTPError: On request failure.
             ConnectionError: On connection failure.
         """
-        self._put("/api/odlcs/{:d}".format(id), data=json_target)
+        self._put("/api/odlcs/{:d}".format(id), data=json_object)
 
-    def delete_target(self, id):
-        """Deletes target with matching ID.
+    def delete_object(self, id):
+        """Deletes object with matching ID.
 
         Args:
-            id: Target ID.
+            id: Object ID.
 
         Raises:
             Timeout: On timeout.
@@ -444,12 +444,12 @@ class InteroperabilityClient(object):
         """
         self._delete("/api/odlcs/{:d}".format(id))
 
-    def post_target_image(self, id, png):
-        """Adds or updates target image thumbnail as a compressed PNG.
+    def post_object_image(self, id, png):
+        """Adds or updates object image thumbnail as a compressed PNG.
 
         Args:
-            id: Target ID.
-            png: Target PNG image from a file.
+            id: Object ID.
+            png: Object PNG image from a file.
 
         Raises:
             Timeout: On timeout.
@@ -459,11 +459,11 @@ class InteroperabilityClient(object):
         """
         self._post("/api/odlcs/{:d}/image".format(id), data=png)
 
-    def get_target_image(self, id):
-        """Retrieves target image thumbnail.
+    def get_object_image(self, id):
+        """Retrieves object image thumbnail.
 
         Args:
-            id: Target ID.
+            id: Object ID.
 
         Returns:
             A ROS Image message.
@@ -475,14 +475,14 @@ class InteroperabilityClient(object):
             CvBridgeError: On image conversion failure.
         """
         response = self._get("/api/odlcs/{:d}/image".format(id))
-        img = serializers.TargetImageSerializer.from_raw(response.content)
+        img = serializers.ObjectImageSerializer.from_raw(response.content)
         return img
 
-    def delete_target_image(self, id):
-        """Deletes target image thumbnail.
+    def delete_object_image(self, id):
+        """Deletes object image thumbnail.
 
         Args:
-            id: Target ID.
+            id: Object ID.
 
         Raises:
             Timeout: On timeout.

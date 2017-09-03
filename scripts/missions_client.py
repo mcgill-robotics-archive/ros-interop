@@ -21,8 +21,8 @@ def publish_mission(timer):
         search_grid_pub.publish(msgs[1])
         waypoints_pub.publish(msgs[2])
         air_drop_pub.publish(msgs[3])
-        off_axis_targ_pub.publish(msgs[4])
-        emergent_targ_pub.publish(msgs[5])
+        off_axis_obj_pub.publish(msgs[4])
+        emergent_obj_pub.publish(msgs[5])
         home_pos_pub.publish(msgs[6])
 
 
@@ -104,8 +104,8 @@ if __name__ == "__main__":
     search_grid_topic = rospy.get_param("~search_grid_topic")
     waypoints_topic = rospy.get_param("~waypoints_topic")
     air_drop_topic = rospy.get_param("~air_drop_loc_topic")
-    off_axis_targ_topic = rospy.get_param("~off_axis_targ_topic")
-    emergent_targ_topic = rospy.get_param("~emergent_targ_topic")
+    off_axis_obj_topic = rospy.get_param("~off_axis_obj_topic")
+    emergent_obj_topic = rospy.get_param("~emergent_obj_topic")
     home_pos_topic = rospy.get_param("~home_pos_topic")
 
     # Setup publishers.
@@ -115,10 +115,10 @@ if __name__ == "__main__":
     waypoints_pub = rospy.Publisher(waypoints_topic, WayPoints, queue_size=1)
     air_drop_pub = rospy.Publisher(
         air_drop_topic, GeoPointStamped, queue_size=1)
-    off_axis_targ_pub = rospy.Publisher(
-        off_axis_targ_topic, GeoPointStamped, queue_size=1)
-    emergent_targ_pub = rospy.Publisher(
-        emergent_targ_topic, GeoPointStamped, queue_size=1)
+    off_axis_obj_pub = rospy.Publisher(
+        off_axis_obj_topic, GeoPointStamped, queue_size=1)
+    emergent_obj_pub = rospy.Publisher(
+        emergent_obj_topic, GeoPointStamped, queue_size=1)
     home_pos_pub = rospy.Publisher(
         home_pos_topic, GeoPointStamped, queue_size=1)
 

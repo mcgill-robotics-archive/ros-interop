@@ -9,11 +9,11 @@
   <arg name="verify" default="true" doc="validate SSL certificates"/>
 
   <!-- Targets directory settings -->
-  <arg name="targets_root"
+  <arg name="objects_root"
     default="$(optenv INTEROP_OBJECTS_ROOT ~/object_files/)"
     doc="path to save object files in"/>
   <arg name="interop_update_period" default="10.0"
-    doc="period to update targets with the server in seconds"/>
+    doc="period to update objects with the server in seconds"/>
 
   <!-- Synchronization settings -->
   <arg name="sync_queue_size" default="2"
@@ -40,10 +40,10 @@
     doc="topic for publishing waypoints"/>
   <arg name="air_drop_topic" default="~air_drop_loc"
     doc="topic for publishing air drop location"/>
-  <arg name="emergent_targ_topic" default="~emergent_targ_loc"
-    doc="topic for publishing emergent target location"/>
-  <arg name="off_axis_targ_topic" default="~off_axis_targ"
-    doc="topic for publishing off axis target location"/>
+  <arg name="emergent_obj_topic" default="~emergent_obj_loc"
+    doc="topic for publishing emergent object location"/>
+  <arg name="off_axis_obj_topic" default="~off_axis_obj"
+    doc="topic for publishing off axis object location"/>
   <arg name="home_pos_topic" default="~home"
     doc="topic for publishing home location"/>
 
@@ -100,8 +100,8 @@
       <param name="search_grid_topic" value="$(arg search_grid_topic)"/>
       <param name="waypoints_topic" value="$(arg waypoints_topic)"/>
       <param name="air_drop_loc_topic" value="$(arg air_drop_topic)"/>
-      <param name="emergent_targ_topic" value="$(arg emergent_targ_topic)"/>
-      <param name="off_axis_targ_topic" value="$(arg off_axis_targ_topic)"/>
+      <param name="emergent_obj_topic" value="$(arg emergent_obj_topic)"/>
+      <param name="off_axis_obj_topic" value="$(arg off_axis_obj_topic)"/>
       <param name="home_pos_topic" value="$(arg home_pos_topic)"/>
 
       <!-- Publication period -->
@@ -135,9 +135,9 @@
     </node>
 
     <!-- Target client -->
-    <node name="targets"
+    <node name="objects"
           pkg="interop"
-          type="targets_server.py"
+          type="objects_server.py"
           output="screen"
           respawn="true">
       <!-- Login credentials and request parameters -->
@@ -146,7 +146,7 @@
       <param name="verify" value="$(arg verify)" type="bool"/>
 
       <!-- Targets directory settings -->
-      <param name="targets_root" value="$(arg targets_root)"/>
+      <param name="objects_root" value="$(arg objects_root)"/>
       <param name="interop_update_period" value="$(arg interop_update_period)"/>
     </node>
   </group>

@@ -10,31 +10,31 @@ from cv_bridge import CvBridgeError
 from requests.exceptions import ConnectionError, HTTPError, Timeout
 
 
-class Target(object):
+class Object(object):
 
-    """Represents a target and its image that is stored inside a local
-    targets directory.
-    Contains a sync function that syncs the target and its image to the
+    """Represents an object and its image that is stored inside a local
+    objects directory.
+    Contains a sync function that syncs the object and its image to the
     interop server.
     """
 
-    def __init__(self, targets_dir, file_id, data, client, interop_id=None):
-        """Creates the target file with the specified data, inside the
+    def __init__(self, objects_dir, file_id, data, client, interop_id=None):
+        """Creates the object file with the specified data, inside the
         specified directory.
 
         Args:
-            targets_dir (str): Absolute path to the parent directory
-                of the target file.
-            file_id (int): ID associated with this target.
-            data (str): The target data that will be written into the target
+            objects_dir (str): Absolute path to the parent directory
+                of the object file.
+            file_id (int): ID associated with this object.
+            data (str): The object data that will be written into the object
                 file.
             client (interop.InteroperabilityClient): Interoperability client
-                that will be used to sync the target and its image to the
+                that will be used to sync the object and its image to the
                 server.
-            interop_id (int): Remote ID associated with this target, optional.
+            interop_id (int): Remote ID associated with this object, optional.
 
         Raises:
-            IOError: If the target file could not be written.
+            IOError: If the object file could not be written.
         """
         # Reentrant lock needed for sync where there are attempts to
         # acquire the lock twice.
@@ -44,7 +44,7 @@ class Target(object):
         self.lock = threading.RLock()
 
         self.client = client
-        self.targets_dir = targets_dir
+        self.objects_dir = objects_dir
 
         self.file_id = file_id
         # Also used to indicate presence on the server.
@@ -60,14 +60,14 @@ class Target(object):
         self._image_needs_deleting = False
 
         filename = str(self.file_id) + ".json"
-        # self.target_path may become None when target is deleted locally.
-        self.target_path = os.path.join(self.targets_dir, filename)
+        # self.object_path may become None when object is deleted locally.
+        self.object_path = os.path.join(self.objects_dir, filename)
         self.image_path = None
 
-        # Create the target file.
+        # Create the object file.
         with self.lock:
             try:
-                with open(self.target_path, "w", 0) as f:
+                with open(self.object_path, "w", 0) as f:
                     f.write(data)
             except IOError as e:
                 raise
@@ -89,10 +89,10 @@ class Target(object):
     @needs_updating.setter
     def needs_updating(self, value):
         if value:
-            # No need to update target if it has not been added.
+            # No need to update object if it has not been added.
             if self._needs_adding:
                 self._needs_updating = False
-            # No need to update target if it is to be deleted.
+            # No need to update object if it is to be deleted.
             elif self._needs_deleting:
                 self._needs_updating = False
             else:
@@ -107,13 +107,13 @@ class Target(object):
     @needs_deleting.setter
     def needs_deleting(self, value):
         if value:
-            # If the target is not on the the server,
+            # If the object is not on the the server,
             # there is no need to do anything.
             if self.interop_id is None:
                 self._needs_adding = False
                 self._needs_updating = False
                 self._needs_deleting = False
-            # If the target is on the server, there is no need to
+            # If the object is on the server, there is no need to
             # do anything other than deleting from the server.
             else:
                 self._needs_adding = False
@@ -121,7 +121,7 @@ class Target(object):
                 self._needs_deleting = True
 
             # No need to do anything with the image as it will be
-            # deleted together with the target anyway.
+            # deleted together with the object anyway.
             self.image_needs_setting = False
             self.image_needs_deleting = False
         else:
@@ -158,23 +158,23 @@ class Target(object):
             self._image_needs_deleting = False
 
     def update(self, data):
-        """Update this target.
+        """Update this object.
 
         Args:
-            data (str): The updated string to write into this target.
+            data (str): The updated string to write into this object.
 
         Raises:
-            IOError: If the path to the target file is not known,
-                or if the target file could not be written.
+            IOError: If the path to the object file is not known,
+                or if the object file could not be written.
         """
         with self.lock:
-            if self.target_path is None:
+            if self.object_path is None:
                 raise IOError(
-                    "Could not update target for file_id {}. "
-                    "Path to target file not known.".format(self.file_id))
+                    "Could not update object for file_id {}. "
+                    "Path to object file not known.".format(self.file_id))
             else:
                 try:
-                    with open(self.target_path, "w", 0) as f:
+                    with open(self.object_path, "w", 0) as f:
                         f.write(data)
                 except IOError as e:
                     raise
@@ -182,26 +182,26 @@ class Target(object):
                 self.needs_updating = True
 
     def delete(self):
-        """Delete this target and its associated image.
+        """Delete this object and its associated image.
         Will silently fail if there is nothing to delete.
 
         Raises:
-            OSError: If the path to the target file is not known,
-                or if the target file or image could not be deleted.
+            OSError: If the path to the object file is not known,
+                or if the object file or image could not be deleted.
         """
         with self.lock:
-            # Delete target.
-            if self.target_path is None:
+            # Delete object.
+            if self.object_path is None:
                 raise IOError(
-                    "Could not delete target for file_id {}. "
-                    "Path to target file not known.".format(self.file_id))
+                    "Could not delete object for file_id {}. "
+                    "Path to object file not known.".format(self.file_id))
             else:
                 try:
-                    os.remove(self.target_path)
+                    os.remove(self.object_path)
                 except OSError as e:
                     raise
 
-                self.target_path = None
+                self.object_path = None
 
             # Delete associated image.
             if self.image_path is not None:
@@ -215,22 +215,22 @@ class Target(object):
             self.needs_deleting = True
 
     def get(self):
-        """Returns the content of the target file.
+        """Returns the content of the object file.
 
         Returns:
-            str: The contents of the target file.
+            str: The contents of the object file.
 
         Raises:
-            IOError: If the path to the target file is not known, or if the
+            IOError: If the path to the object file is not known, or if the
                 file could not be read.
         """
         with self.lock:
-            if self.target_path is None:
-                raise IOError("Target file for file_id {} does not exist."
+            if self.object_path is None:
+                raise IOError("Object file for file_id {} does not exist."
                               .format(self.file_id))
             else:
                 try:
-                    with open(self.target_path, "r") as f:
+                    with open(self.object_path, "r") as f:
                         data = f.read()
                 except IOError as e:
                     raise
@@ -238,7 +238,7 @@ class Target(object):
                 return data
 
     def set_image(self, png_image, needs_adding=True):
-        """Associate an image with this target, or update the existing image.
+        """Associate an image with this object, or update the existing image.
 
         Args:
             png_image (str): The PNG image to be written.
@@ -250,7 +250,7 @@ class Target(object):
         """
         with self.lock:
             filename = str(self.file_id) + ".png"
-            self.image_path = os.path.join(self.targets_dir, filename)
+            self.image_path = os.path.join(self.objects_dir, filename)
 
             try:
                 with open(self.image_path, "wb", 0) as f:
@@ -261,12 +261,12 @@ class Target(object):
             self.image_needs_setting = needs_adding
 
     def delete_image(self):
-        """Delete the image associated with this target.
+        """Delete the image associated with this object.
         Will silently fail if there is nothing to delete.
 
         Raises:
-            OSError: If the path to the target image is not known,
-                or if the target image could not be deleted.
+            OSError: If the path to the object image is not known,
+                or if the object image could not be deleted.
         """
         with self.lock:
             if self.image_path is None:
@@ -282,7 +282,7 @@ class Target(object):
             self.image_needs_deleting = True
 
     def get_image(self):
-        """Delete this target and its associated image.
+        """Delete this object and its associated image.
 
         Raises:
             IOError: If the path to the image file is not known, or if the
@@ -304,18 +304,18 @@ class Target(object):
                 return png_image
 
     def sync(self):
-        """Syncs this target and its image to the interop server."""
+        """Syncs this object and its image to the interop server."""
         with self.lock:
             # TARGET FILE
             if self.needs_adding:
                 try:
-                    target = self.get()
+                    object = self.get()
                 except IOError as e:
                     rospy.logerr(e)
                 else:
                     try:
-                        # Post target and record the interop_id.
-                        self.interop_id = self.client.post_target(target)
+                        # Post object and record the interop_id.
+                        self.interop_id = self.client.post_object(object)
                     except (ConnectionError, Timeout) as e:
                         rospy.logwarn(e)
                     except (ValueError, HTTPError) as e:
@@ -327,12 +327,12 @@ class Target(object):
             # An interop id is needed to update.
             elif self.needs_updating and self.interop_id is not None:
                 try:
-                    target = self.get()
+                    object = self.get()
                 except IOError as e:
                     rospy.logerr(e)
                 else:
                     try:
-                        self.client.put_target(self.interop_id, target)
+                        self.client.put_object(self.interop_id, object)
                     except (ConnectionError, Timeout) as e:
                         rospy.logwarn(e)
                     except (ValueError, HTTPError) as e:
@@ -342,7 +342,7 @@ class Target(object):
 
             elif self.needs_deleting and self.interop_id is not None:
                 try:
-                    self.client.delete_target(self.interop_id)
+                    self.client.delete_object(self.interop_id)
                 except (ConnectionError, Timeout) as e:
                     rospy.logwarn(e)
                 except (ValueError, HTTPError) as e:
@@ -360,7 +360,7 @@ class Target(object):
                     rospy.logerr(e)
                 else:
                     try:
-                        self.client.post_target_image(self.interop_id, image)
+                        self.client.post_object_image(self.interop_id, image)
                     except (ConnectionError, Timeout) as e:
                         rospy.logwarn(e)
                     except (CvBridgeError, HTTPError) as e:
@@ -372,7 +372,7 @@ class Target(object):
             elif (self.image_needs_deleting and self.image_is_on_server and
                   self.interop_id is not None):
                 try:
-                    self.client.delete_target_image(self.interop_id)
+                    self.client.delete_object_image(self.interop_id)
                 except (ConnectionError, Timeout) as e:
                     rospy.logwarn(e)
                 except (CvBridgeError, HTTPError) as e:
@@ -382,17 +382,17 @@ class Target(object):
                     self.image_needs_deleting = False
 
     def can_be_forgotten(self):
-        """When a target is removed locally and on the interop server, it
-        no longer has any use. References to a target may still exist elsewhere
+        """When an object is removed locally and on the interop server, it
+        no longer has any use. References to an object may still exist elsewhere
         in program. This method helps to determine if those references can be
         deleted.
 
         Returns:
-            True if the target object can be forgotten, False otherwise.
+            True if the object object can be forgotten, False otherwise.
         """
         with self.lock:
-            # If the target and/or its image is still stored locally.
-            if self.target_path or self.image_path:
+            # If the object and/or its image is still stored locally.
+            if self.object_path or self.image_path:
                 return False
 
             # If there are still things to be done on the interop server.
@@ -401,20 +401,20 @@ class Target(object):
                     self.image_needs_deleting):
                 return False
 
-            # Otherwise, the target is useless and all references can be
+            # Otherwise, the object is useless and all references can be
             # deleted.
             return True
 
 
-class TargetsDirectory(object):
+class ObjectsDirectory(object):
 
-    """Represents the directory containing target files and images.
+    """Represents the directory containing object files and images.
     Contains a sync function that syncs the contents of the directory to
     the interop server.
     """
 
     def __init__(self, path, client):
-        """Creates a directory for storing targets and images.
+        """Creates a directory for storing objects and images.
 
         Args:
             path (str): Absolute path to the directory of to be created.
@@ -430,203 +430,203 @@ class TargetsDirectory(object):
         # Highest file id so far.
         self.file_id = 0
 
-        # Dictionary for storing Targets.
-        # {file_id (int): target (Target)}
-        self.targets = {}
+        # Dictionary for storing Objects.
+        # {file_id (int): object (Object)}
+        self.objects = {}
 
-    def load_all_remote_targets(self):
-        """Loads all targets stored remotely to sync up state on startup."""
-        remote_targets = self.client.get_all_targets()
-        rospy.loginfo("Found %d remote targets", len(remote_targets))
-        for target_id, target in remote_targets.iteritems():
-            json_target = json.dumps(target)
-            file_id = self.add_target(json_target, target_id)
+    def load_all_remote_objects(self):
+        """Loads all objects stored remotely to sync up state on startup."""
+        remote_objects = self.client.get_all_objects()
+        rospy.loginfo("Found %d remote objects", len(remote_objects))
+        for object_id, object in remote_objects.iteritems():
+            json_object = json.dumps(object)
+            file_id = self.add_object(json_object, object_id)
             try:
-                img = self.client.get_target_image(target_id)
-                png = serializers.TargetImageSerializer.from_msg(img)
-                self.set_target_image(file_id, png, False)
+                img = self.client.get_object_image(object_id)
+                png = serializers.ObjectImageSerializer.from_msg(img)
+                self.set_object_image(file_id, png, False)
             except Exception as e:
-                rospy.logerr("Could not get target %d image: %r", target_id, e)
+                rospy.logerr("Could not get object %d image: %r", object_id, e)
 
-    def clear_all_targets(self):
-        """Clears all targets both remotely and locally."""
-        # Deal with locally stored targets first.
-        for target_id, target in self.targets.iteritems():
-            target.delete()
-        self.targets.clear()
+    def clear_all_objects(self):
+        """Clears all objects both remotely and locally."""
+        # Deal with locally stored objects first.
+        for object_id, object in self.objects.iteritems():
+            object.delete()
+        self.objects.clear()
 
-        # Need to load targets stored remotely.
-        remote_targets = self.client.get_all_targets()
-        for target_id, target in remote_targets.iteritems():
+        # Need to load objects stored remotely.
+        remote_objects = self.client.get_all_objects()
+        for object_id, object in remote_objects.iteritems():
             try:
-                self.client.delete_target(target_id)
+                self.client.delete_object(object_id)
             except Exception as e:
-                rospy.logerr("Could not delete remote target %d: %r", target_id,
+                rospy.logerr("Could not delete remote object %d: %r", object_id,
                              e)
 
-    def add_target(self, data, interop_id=None):
-        """Adds a target.
+    def add_object(self, data, interop_id=None):
+        """Adds an object.
 
         Args:
-            data (str): The target data.
+            data (str): The object data.
             interop_id (int): The associated ID on the server, optional.
 
         Returns:
-            The file_id (int) of the added target.
+            The file_id (int) of the added object.
 
         Raises:
-            IOError: If the target could not be added.
+            IOError: If the object could not be added.
         """
         with self.lock:
             # New file_id.
             file_id = self.file_id + 1
 
-            target = Target(self.path, file_id, data, self.client, interop_id)
+            object = Object(self.path, file_id, data, self.client, interop_id)
 
-            self.targets[file_id] = target
+            self.objects[file_id] = object
             # Record the largest file_id so far.
             self.file_id = file_id
 
         return file_id
 
-    def update_target(self, file_id, data):
-        """Updates an existing target.
+    def update_object(self, file_id, data):
+        """Updates an existing object.
 
         Args:
-            file_id (int): The file id of the target file to update.
-            data (str): The target data.
+            file_id (int): The file id of the object file to update.
+            data (str): The object data.
 
         Raises:
-            KeyError: If the file_id does not exist in the self.targets
+            KeyError: If the file_id does not exist in the self.objects
                 dictionary.
-            IOError: If the target could not be written.
+            IOError: If the object could not be written.
         """
         with self.lock:
-            target = self.targets[file_id]
+            object = self.objects[file_id]
 
-        target.update(data)
+        object.update(data)
 
-    def delete_target(self, file_id):
-        """Deletes an existing target.
+    def delete_object(self, file_id):
+        """Deletes an existing object.
 
         Args:
-            file_id (int): The file id of the target to delete.
+            file_id (int): The file id of the object to delete.
 
         Raises:
-            KeyError: If the file_id does not exist in the self.targets
+            KeyError: If the file_id does not exist in the self.objects
                 dictionary.
-            OSError: If the target file or the target image could not be
+            OSError: If the object file or the object image could not be
                 deleted.
         """
         with self.lock:
-            target = self.targets[file_id]
+            object = self.objects[file_id]
 
-        target.delete()
+        object.delete()
 
-    def get_target(self, file_id):
-        """Returns a target as a str.
+    def get_object(self, file_id):
+        """Returns an object as a str.
 
         Args:
-            file_id (int): The file id of the target file to get.
+            file_id (int): The file id of the object file to get.
 
         Returns:
-            str: The contents of the target file
+            str: The contents of the object file
 
         Raises:
-            KeyError: If the file_id does not exist in the self.targets
+            KeyError: If the file_id does not exist in the self.objects
                 dictionary.
-            IOError: If the path to the target file is not known, or if the
+            IOError: If the path to the object file is not known, or if the
                 file could not be read.
         """
         with self.lock:
-            target = self.targets[file_id]
+            object = self.objects[file_id]
 
-        return target.get()
+        return object.get()
 
-    def get_all_targets(self):
-        """Returns all the targets as a dict.
+    def get_all_objects(self):
+        """Returns all the objects as a dict.
 
         Returns:
-            dict: The targets. {file_id (int): target (Target)}
+            dict: The objects. {file_id (int): object (Object)}
 
         Raises:
-            IOError: If the path to the one of the target files is not known,
+            IOError: If the path to the one of the object files is not known,
                 or if one of the files could not be read.
         """
-        targets = {}
+        objects = {}
 
         with self.lock:
-            for file_id, target in self.targets.iteritems():
-                targets[file_id] = target.get()
+            for file_id, object in self.objects.iteritems():
+                objects[file_id] = object.get()
 
-        return targets
+        return objects
 
-    def set_target_image(self, file_id, png_image, needs_adding=True):
-        """Associates an image with a target or updates an existing target
+    def set_object_image(self, file_id, png_image, needs_adding=True):
+        """Associates an image with an object or updates an existing object
         image.
 
         Args:
-            file_id (int): The file id of the target to associate the image
+            file_id (int): The file id of the object to associate the image
                 with.
             png_image (str): The image to add or update.
             needs_adding (bool): Whether we need to add the image to the
                 server.
 
         Raises:
-            KeyError: If the file_id does not exist in the self.targets
+            KeyError: If the file_id does not exist in the self.objects
                 dictionary.
             IOError: If the image could not be written.
         """
         with self.lock:
-            target = self.targets[file_id]
+            object = self.objects[file_id]
 
-        target.set_image(png_image, needs_adding)
+        object.set_image(png_image, needs_adding)
 
-    def delete_target_image(self, file_id):
-        """Deletes an existing target image.
+    def delete_object_image(self, file_id):
+        """Deletes an existing object image.
 
         Args:
-            file_id (int): The file id of the target associated with the image.
+            file_id (int): The file id of the object associated with the image.
 
         Raises:
-            KeyError: If the file_id does not exist in the self.targets
+            KeyError: If the file_id does not exist in the self.objects
                 dictionary.
-            OSError: If the target image could not be deleted.
+            OSError: If the object image could not be deleted.
         """
         with self.lock:
-            target = self.targets[file_id]
+            object = self.objects[file_id]
 
-        target.delete_image()
+        object.delete_image()
 
-    def get_target_image(self, file_id):
-        """Returns a target image as a str.
+    def get_object_image(self, file_id):
+        """Returns an object image as a str.
 
         Args:
-            file_id (int): The file id of the target associated with the image.
+            file_id (int): The file id of the object associated with the image.
 
         Returns:
-            str: The target image.
+            str: The object image.
 
         Raises:
-            KeyError: If the file_id does not exist in the self.targets
+            KeyError: If the file_id does not exist in the self.objects
                 dictionary.
             IOError: If the path to the image file is not known, or if the
                 file could not be read.
         """
         with self.lock:
-            target = self.targets[file_id]
+            object = self.objects[file_id]
 
-        return target.get_image()
+        return object.get_image()
 
     def sync(self):
-        """Syncs all the targets and their images to the interop server."""
+        """Syncs all the objects and their images to the interop server."""
         with self.lock:
-            # Sync all targets.
-            for target_id, target in self.targets.iteritems():
-                target.sync()
+            # Sync all objects.
+            for object_id, object in self.objects.iteritems():
+                object.sync()
 
-            # Delete unused targets from the targets dictionary.
-            for file_id in list(self.targets):
-                target = self.targets[file_id]
-                if target.can_be_forgotten():
-                    del self.targets[file_id]
+            # Delete unused objects from the objects dictionary.
+            for file_id in list(self.objects):
+                object = self.objects[file_id]
+                if object.can_be_forgotten():
+                    del self.objects[file_id]

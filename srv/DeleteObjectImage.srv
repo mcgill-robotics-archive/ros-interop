@@ -1,7 +1,7 @@
 # This service is used to delete an existing image thumbnail from an existing
-# target on the interoperability server.
+# object on the interoperability server.
 
-# Target ID.
+# Object ID.
 uint64 id
 
 ---

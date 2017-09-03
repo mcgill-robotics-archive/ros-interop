@@ -27,24 +27,24 @@ add_message_files(FILES
   GeoSphereArrayStamped.msg
   Orientation.msg
   Shape.msg
-  Target.msg
-  TargetType.msg
+  Object.msg
+  ObjectType.msg
   WayPoints.msg
 )
 
 # Custom ROS services.
 add_service_files(FILES
-  AddTarget.srv
-  DeleteTarget.srv
-  DeleteTargetImage.srv
-  GetAllTargets.srv
+  AddObject.srv
+  DeleteObject.srv
+  DeleteObjectImage.srv
+  GetAllObjects.srv
   GetMissionByID.srv
-  GetTarget.srv
-  GetTargetCompressedImage.srv
-  GetTargetImage.srv
-  SetTargetCompressedImage.srv
-  SetTargetImage.srv
-  UpdateTarget.srv
+  GetObject.srv
+  GetObjectCompressedImage.srv
+  GetObjectImage.srv
+  SetObjectCompressedImage.srv
+  SetObjectImage.srv
+  UpdateObject.srv
 )
 
 generate_messages(DEPENDENCIES geographic_msgs sensor_msgs std_msgs)
@@ -64,7 +64,7 @@ install(
   PROGRAMS
   scripts/missions_client.py
   scripts/obstacles_client.py
-  scripts/targets_server.py
+  scripts/objects_server.py
   scripts/telemetry_client.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
@@ -72,5 +72,5 @@ if(CATKIN_ENABLE_TESTING)
   find_package(rostest REQUIRED)
   add_rostest(test/serializers.test)
   add_rostest(test/client.test)
-  add_rostest(test/local_targets.test)
+  add_rostest(test/local_objects.test)
 endif()

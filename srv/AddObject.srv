@@ -1,0 +1,12 @@
+# This service is used to upload a new object to the interoperability server.
+
+# Object to add.
+Object object
+
+---
+
+# Whether the request was successful.
+bool success
+
+# The new object ID.
+uint64 id

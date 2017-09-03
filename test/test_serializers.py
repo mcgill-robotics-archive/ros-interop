@@ -11,7 +11,7 @@ from interop import serializers
 from std_msgs.msg import Float64
 from sensor_msgs.msg import NavSatFix
 from visualization_msgs.msg import Marker
-from interop.msg import Color, Orientation, Shape, Target, TargetType
+from interop.msg import Color, Orientation, Shape, Object, ObjectType
 
 
 class TestSerializers(TestCase):
@@ -79,7 +79,7 @@ class TestSerializers(TestCase):
         search_grid = mission[1]
         waypoints = mission[2]
         air_drop_pos = mission[3]
-        off_axis_targ = mission[4]
+        off_axis_obj = mission[4]
         emergent_obj = mission[5]
         home_pos = mission[6]
 
@@ -133,10 +133,10 @@ class TestSerializers(TestCase):
         self.assertEqual(air_drop_pos.position.longitude,
                          data["air_drop_pos"]["longitude"])
 
-        # Test off axis target.
-        self.assertEqual(off_axis_targ.position.latitude,
+        # Test off axis object.
+        self.assertEqual(off_axis_obj.position.latitude,
                          data["off_axis_odlc_pos"]["latitude"])
-        self.assertEqual(off_axis_targ.position.longitude,
+        self.assertEqual(off_axis_obj.position.longitude,
                          data["off_axis_odlc_pos"]["longitude"])
 
         # Test emergent object.
@@ -229,39 +229,39 @@ class TestSerializers(TestCase):
         self.assertEqual(data["altitude_msl"], altitude_msl)
         self.assertEqual(data["uas_heading"], compass.data)
 
-    def test_target_serializer(self):
-        """Tests target serializer."""
+    def test_object_serializer(self):
+        """Tests object serializer."""
         # Set up test data.
-        target = Target()
-        target.type.data = TargetType.STANDARD
-        target.latitude = 38.1478
-        target.longitude = -76.4275
-        target.orientation.data = Orientation.NORTH
-        target.shape.data = Shape.STAR
-        target.background_color.data = Color.ORANGE
-        target.alphanumeric_color.data = Color.ORANGE
-        target.alphanumeric = "C"
-        target.description = ""
-        target.autonomous = False
+        object = Object()
+        object.type.data = ObjectType.STANDARD
+        object.latitude = 38.1478
+        object.longitude = -76.4275
+        object.orientation.data = Orientation.NORTH
+        object.shape.data = Shape.STAR
+        object.background_color.data = Color.ORANGE
+        object.alphanumeric_color.data = Color.ORANGE
+        object.alphanumeric = "C"
+        object.description = ""
+        object.autonomous = False
 
-        # Serialize target message.
-        data = serializers.TargetSerializer.from_msg(target)
+        # Serialize object message.
+        data = serializers.ObjectSerializer.from_msg(object)
 
         # Compare.
-        self.assertEqual(data["type"], target.type.data)
-        self.assertEqual(data["latitude"], target.latitude)
-        self.assertEqual(data["longitude"], target.longitude)
-        self.assertEqual(data["orientation"], target.orientation.data)
-        self.assertEqual(data["shape"], target.shape.data)
-        self.assertEqual(data["background_color"], target.background_color.data)
+        self.assertEqual(data["type"], object.type.data)
+        self.assertEqual(data["latitude"], object.latitude)
+        self.assertEqual(data["longitude"], object.longitude)
+        self.assertEqual(data["orientation"], object.orientation.data)
+        self.assertEqual(data["shape"], object.shape.data)
+        self.assertEqual(data["background_color"], object.background_color.data)
         self.assertEqual(data["alphanumeric_color"],
-                         target.alphanumeric_color.data)
-        self.assertEqual(data["alphanumeric"], target.alphanumeric)
-        self.assertEqual(data["description"], target.description)
-        self.assertEqual(data["autonomous"], target.autonomous)
+                         object.alphanumeric_color.data)
+        self.assertEqual(data["alphanumeric"], object.alphanumeric)
+        self.assertEqual(data["description"], object.description)
+        self.assertEqual(data["autonomous"], object.autonomous)
 
-    def test_target_deserializer(self):
-        """Tests target deserializer."""
+    def test_object_deserializer(self):
+        """Tests object deserializer."""
         # Set up test data.
         data = {
             "id": 1,
@@ -278,24 +278,24 @@ class TestSerializers(TestCase):
             "autonomous": False
         }
 
-        # Deserialize target data.
-        target = serializers.TargetSerializer.from_dict(data)
+        # Deserialize object data.
+        object = serializers.ObjectSerializer.from_dict(data)
 
         # Compare.
-        self.assertEqual(data["type"], target.type.data)
-        self.assertEqual(data["latitude"], target.latitude)
-        self.assertEqual(data["longitude"], target.longitude)
-        self.assertEqual(data["orientation"], target.orientation.data)
-        self.assertEqual(data["shape"], target.shape.data)
-        self.assertEqual(data["background_color"], target.background_color.data)
+        self.assertEqual(data["type"], object.type.data)
+        self.assertEqual(data["latitude"], object.latitude)
+        self.assertEqual(data["longitude"], object.longitude)
+        self.assertEqual(data["orientation"], object.orientation.data)
+        self.assertEqual(data["shape"], object.shape.data)
+        self.assertEqual(data["background_color"], object.background_color.data)
         self.assertEqual(data["alphanumeric_color"],
-                         target.alphanumeric_color.data)
-        self.assertEqual(data["alphanumeric"], target.alphanumeric)
-        self.assertEqual(data["description"], target.description)
-        self.assertEqual(data["autonomous"], target.autonomous)
+                         object.alphanumeric_color.data)
+        self.assertEqual(data["alphanumeric"], object.alphanumeric)
+        self.assertEqual(data["description"], object.description)
+        self.assertEqual(data["autonomous"], object.autonomous)
 
-    def test_target_image_serializer(self):
-        """Tests target image serializer can be deserialized."""
+    def test_object_image_serializer(self):
+        """Tests object image serializer can be deserialized."""
         # Create random 40 x 30 RGB image.
         width = 40
         height = 30
@@ -306,10 +306,10 @@ class TestSerializers(TestCase):
         msg = bridge.cv2_to_imgmsg(nparr)
 
         # Serialize.
-        png = serializers.TargetImageSerializer.from_msg(msg)
+        png = serializers.ObjectImageSerializer.from_msg(msg)
 
         # Deserialize.
-        converted_msg = serializers.TargetImageSerializer.from_raw(png)
+        converted_msg = serializers.ObjectImageSerializer.from_raw(png)
 
         # Convert to array.
         converted_img = bridge.imgmsg_to_cv2(converted_msg)

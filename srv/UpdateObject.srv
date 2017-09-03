@@ -1,0 +1,13 @@
+# This service is used to update an existing object on the interoperability
+# server.
+
+# Object ID to update.
+uint64 id
+
+# Object with updated characteristics.
+Object object
+
+---
+
+# Whether the request was successful.
+bool success

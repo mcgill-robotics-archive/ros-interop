@@ -1,0 +1,10 @@
+# This service is used to delete an existing object from the interoperability
+# server.
+
+# Object ID to delete.
+uint64 id
+
+---
+
+# Whether the request was successful.
+bool success

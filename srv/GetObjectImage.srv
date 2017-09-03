@@ -1,7 +1,7 @@
 # This service is used to retrieve an existing image thumbnail from an existing
-# target on the interoperability server in a compressed format.
+# object on the interoperability server.
 
-# Target ID.
+# Object ID.
 uint64 id
 
 ---
@@ -10,4 +10,4 @@ uint64 id
 bool success
 
 # Image thumbnail.
-sensor_msgs/CompressedImage image
+sensor_msgs/Image image

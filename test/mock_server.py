@@ -143,17 +143,17 @@ class InteroperabilityMockServer(object):
             status=code,
             body="UAS Telemetry Successfully Posted." if code == 200 else "")
 
-    def set_post_target_response(self, target, id, user=1, code=200):
+    def set_post_object_response(self, object_, id, user=1, code=200):
         """Sets mock POST /api/odlcs response.
 
         Args:
-            target (dict): Target to post.
+            object_ (dict): Target to post.
             id (int): Target ID to return.
             user (int): User number to respond with.
             code (int): Status code to respond with.
         """
-        target.update({"id": id, "user": user})
-        content = json.dumps(target)
+        object_.update({"id": id, "user": user})
+        content = json.dumps(object_)
 
         self.rsps.add(
             responses.POST,
@@ -162,16 +162,16 @@ class InteroperabilityMockServer(object):
             body=content if code == 200 else "",
             content_type="application/json")
 
-    def set_get_targets_response(self, targets, code=200):
+    def set_get_objects_response(self, objects, code=200):
         """Sets mock GET /api/odlcs and GET /api/odlcs/<id> responses.
 
         Args:
-            targets (list): List of targets.
+            objects (list): List of objects.
             code (int): Status code to respond with.
         """
-        content = json.dumps(targets)
+        content = json.dumps(objects)
 
-        # Add all targets.
+        # Add all objects.
         self.rsps.add(
             responses.GET,
             self.url + "/api/odlcs",
@@ -179,25 +179,25 @@ class InteroperabilityMockServer(object):
             body=content if code == 200 else "",
             content_type="application/json")
 
-        # Add individual targets.
-        for t in targets:
+        # Add individual objects.
+        for t in objects:
             self.rsps.add(
                 responses.GET,
                 "{}/api/odlcs/{:d}".format(self.url, t["id"]),
                 body=json.dumps(t) if code == 200 else "",
                 content_type="application/json")
 
-    def set_put_target_response(self, id, target, user=1, code=200):
+    def set_put_object_response(self, id, object_, user=1, code=200):
         """Sets mock PUT /api/odlcs/<id> response.
 
         Args:
             id (int): Target ID.
-            target (dict): Target data to update with.
+            object_ (dict): Target data to update with.
             user (int): User number to respond with.
             code (int): Status code to respond with.
         """
-        target.update({"id": id, "user": user})
-        content = json.dumps(target)
+        object_.update({"id": id, "user": user})
+        content = json.dumps(object_)
 
         self.rsps.add(
             responses.PUT,
@@ -206,7 +206,7 @@ class InteroperabilityMockServer(object):
             body=content if code == 200 else "",
             content_type="application/json")
 
-    def set_delete_target_response(self, id, code=200):
+    def set_delete_object_response(self, id, code=200):
         """Sets mock DELETE /api/odlcs/<id> response.
 
         Args:
@@ -219,7 +219,7 @@ class InteroperabilityMockServer(object):
             status=code,
             body="Target deleted." if code == 200 else "")
 
-    def set_post_target_image_response(self, id, code=200):
+    def set_post_object_image_response(self, id, code=200):
         """Sets mock POST /api/odlcs/<id>/image response.
 
         Args:
@@ -232,7 +232,7 @@ class InteroperabilityMockServer(object):
             body="Image uploaded." if code == 200 else "",
             status=code)
 
-    def set_get_target_image_response(self, id, image, content_type, code=200):
+    def set_get_object_image_response(self, id, image, content_type, code=200):
         """Sets mock GET /api/odlcs/<id>/image response.
 
         Args:
@@ -248,7 +248,7 @@ class InteroperabilityMockServer(object):
             status=code,
             content_type=content_type)
 
-    def set_delete_target_image_response(self, id, code=200):
+    def set_delete_object_image_response(self, id, code=200):
         """Sets mock DELETE /api/odlcs/<id>/image response.
 
         Args:

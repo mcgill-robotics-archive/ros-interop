@@ -14,7 +14,7 @@ from geographic_msgs.msg import GeoPointStamped, GeoPoint
 from visualization_msgs.msg import Marker, MarkerArray
 from std_msgs.msg import ColorRGBA, Float64, Header, String, Time, Int16
 from interop.msg import (Color, FlyZone, FlyZoneArray, Orientation, Shape,
-                         Target, TargetType, GeoSphere, GeoCylinder,
+                         Object, ObjectType, GeoSphere, GeoCylinder,
                          GeoPolygonStamped, GeoSphereArrayStamped,
                          GeoCylinderArrayStamped, WayPoints)
 
@@ -216,19 +216,19 @@ class MissionDeserializer(object):
             A tuple of (FlyZoneArray, GeoPolygonStamped, WayPoints,
             GeoPointStamped, GeoPointStamped, GeoPointStamped, GeoPointStamped)
             corresponding to the flyzones, search grid, waypoints, air drop
-            position, off axis target location, the emergent object location,
+            position, off axis object location, the emergent object location,
             and the home position.
         """
         flyzones = cls.__get_flyzone(data["fly_zones"], frame)
         search_grid = cls.__get_search_grid(data["search_grid_points"], frame)
         waypoints = cls.__get_waypoints(data["mission_waypoints"], frame)
         air_drop_pos = cls.__get_point_msg(data["air_drop_pos"], frame)
-        off_axis_targ = cls.__get_point_msg(data["off_axis_odlc_pos"], frame)
+        off_axis_obj = cls.__get_point_msg(data["off_axis_odlc_pos"], frame)
         emergent_obj = cls.__get_point_msg(data["emergent_last_known_pos"],
                                            frame)
         home_pos = cls.__get_point_msg(data["home_pos"], frame)
 
-        return (flyzones, search_grid, waypoints, air_drop_pos, off_axis_targ,
+        return (flyzones, search_grid, waypoints, air_drop_pos, off_axis_obj,
                 emergent_obj, home_pos)
 
 
@@ -315,19 +315,19 @@ class TelemetrySerializer(object):
         }
 
 
-class TargetSerializer(object):
+class ObjectSerializer(object):
 
-    """Target message serializer."""
+    """Object message serializer."""
 
     # Enumeration message types.
-    ENUMERATION_TYPES = {Color, Orientation, Shape, TargetType}
+    ENUMERATION_TYPES = {Color, Orientation, Shape, ObjectType}
 
     @classmethod
     def from_msg(cls, msg):
-        """Serializes target data into a dictionary.
+        """Serializes object data into a dictionary.
 
         Args:
-            msg: Target ROS message.
+            msg: Object ROS message.
 
         Returns:
             A dictionary.
@@ -346,16 +346,16 @@ class TargetSerializer(object):
 
     @classmethod
     def from_dict(cls, data):
-        """Deserializes target data into Target ROS message.
+        """Deserializes object data into Object ROS message.
 
         Args:
             data: A dictionary.
 
         Returns:
-            A Target ROS message.
+            A Object ROS message.
         """
         # Determine ROS message type.
-        msg = Target()
+        msg = Object()
 
         for attribute in msg.__slots__:
             if attribute in data:
@@ -370,9 +370,9 @@ class TargetSerializer(object):
         return msg
 
 
-class TargetImageSerializer(object):
+class ObjectImageSerializer(object):
 
-    """Target image message serializer."""
+    """Object image message serializer."""
 
     @classmethod
     def from_msg(cls, msg):

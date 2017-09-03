@@ -90,8 +90,8 @@ This by default publishes mission information at 1 Hz to the following topics:
 -   `~search_grid`: Search grid area, `GeoPolygonStamped`.
 -   `~waypoints`: List of waypoints, `WayPoints`.
 -   `~air_drop_pos`: Air drop position, `geographic_msgs/GeoPointStamped`.
--   `~off_axis_targ`: Off axis target position, `geographic_msgs/GeoPointStamped`.
--   `~emergent_targ_loc`: Emergent target last known location,
+-   `~off_axis_obj`: Off axis object position, `geographic_msgs/GeoPointStamped`.
+-   `~emergent_obj_loc`: Emergent object last known location,
                           `geographic_msgs/GeoPointStamped`.
 -   `~home`: Home position, `geographic_msgs/GeoPointStamped`.
 
@@ -112,40 +112,40 @@ uploads them to the interoperability server:
 -   `/mavros/global_position/compass_hdg`: Current heading in degrees relative
     to true north, `std_msgs/Float64`.
 
-### `targets`
+### `objects`
 
 This by default serves ROS services to interact with the interoperability
-targets API. It also generates all the necessary object files in the Object
-File Format described in the competition rules.
+odlc API. It also generates all the necessary object files in the Object File
+Format described in the competition rules.
 
 The object files are stored in a timestamped directory within the
-directory defined by the `targets_root` ROS launch argument. You may also set
+directory defined by the `objects_root` ROS launch argument. You may also set
 this argument with the `$INTEROP_OBJECTS_ROOT` environment variable as follows:
 
 ```bash
 export INTEROP_OBJECTS_ROOT=/path/to/object_files
 ```
 
-#### Targets
+#### Objects
 
--   `~add`: Adds new target, `AddTarget`.
--   `~get`: Retrieves specific target, `GetTarget`.
--   `~update`: Updates specific target with new characteristics `UpdateTarget`.
--   `~delete`: Deletes specific target, `DeleteTarget`.
--   `~all`: Gets all submitted targets, `GetAllTargets`.
+-   `~add`: Adds new object, `AddObject`.
+-   `~get`: Retrieves specific object, `GetObject`.
+-   `~update`: Updates specific object with new characteristics `UpdateObject`.
+-   `~delete`: Deletes specific object, `DeleteObject`.
+-   `~all`: Gets all submitted objects, `GetAllObjects`.
 
 #### Thumbnails
 
--   `~image/set`: Sets or updates target image thumbnail, `SetTargetImage`.
--   `~image/get`: Retrieves target image thumbnail, `GetTargetImage`.
--   `~image/delete`: Deletes target image thumbnail, `DeleteTargetImage`.
--   `~image/compressed/set`: Sets or updates target image thumbnail with a `CompressedImage`, `SetTargetCompressedImage`.
--   `~image/compressed/get`: Retrieves target image thumbnail as a `CompressedImage`, `GetTargetCompressedImage`.
+-   `~image/set`: Sets or updates object image thumbnail, `SetObjectImage`.
+-   `~image/get`: Retrieves object image thumbnail, `GetObjectImage`.
+-   `~image/delete`: Deletes object image thumbnail, `DeleteObjectImage`.
+-   `~image/compressed/set`: Sets or updates object image thumbnail with a `CompressedImage`, `SetObjectCompressedImage`.
+-   `~image/compressed/get`: Retrieves object image thumbnail as a `CompressedImage`, `GetObjectCompressedImage`.
 
 #### Syncing
 
--   `~clear`: Clears all local and remote targets, `Trigger`.
--   `~reload`: Reloads all remote targets, `Trigger`.
+-   `~clear`: Clears all local and remote objects, `Trigger`.
+-   `~reload`: Reloads all remote objects, `Trigger`.
 
 ## Arguments
 
@@ -159,7 +159,7 @@ The following are the run-time ROS launch arguments available:
 
 #### Local object file directory
 
--   `targets_root`: The parent of all timestamped directories containing object files, default: `$INTEROP_OBJECTS_ROOT` if set, or `~/object_files/`.
+-   `objects_root`: The parent of all timestamped directories containing object files, default: `$INTEROP_OBJECTS_ROOT` if set, or `~/object_files/`.
 -   `interop_update_period`: Duration between attempts to sync the object files of the current run to the interop server, default: `10.0` (i.e. 10.0 s).
 
 #### Subscribed topics
@@ -179,12 +179,12 @@ The following are the run-time ROS launch arguments available:
     default: `~mission_info/search_grid`.
 -   `waypoints_topic`: `WayPoints` list of waypoints,
     default: `~mission_info/waypoints`.
--   `air_drop_topic`: `geographic_msgs/GeoPointStamped` position of the air drop target,
+-   `air_drop_topic`: `geographic_msgs/GeoPointStamped` position of the air drop object,
     default: `~mission_info/air_drop_loc`.
--   `emergent_targ_topic`: `geographic_msgs/GeoPointStamped` last known position of the emergent target,
-    default: `~mission_info/emergent_targ_loc`.
--   `off_axis_targ_topic`: `geographic_msgs/GeoPointStamped` position of the off axis target,
-    default: `~mission_info/off_axis_targ`.
+-   `emergent_obj_topic`: `geographic_msgs/GeoPointStamped` last known position of the emergent object,
+    default: `~mission_info/emergent_obj_loc`.
+-   `off_axis_obj_topic`: `geographic_msgs/GeoPointStamped` position of the off axis object,
+    default: `~mission_info/off_axis_obj`.
 -   `moving_topic`: `GeoSphereArrayStamped` feed of the moving
     obstacles, default: `~obstacles/moving`.
 -   `stationary_topic`: `GeoSphereArrayStamped` feed of the stationary

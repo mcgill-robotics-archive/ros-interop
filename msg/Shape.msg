@@ -1,4 +1,4 @@
-# These are the valid shapes that may be specified for a target.
+# These are the valid shapes that may be specified for an object.
 string CIRCLE="circle"
 string SEMICIRCLE="semicircle"
 string QUARTER_CIRCLE="quarter_circle"
@@ -13,6 +13,6 @@ string OCTAGON="octagon"
 string STAR="star"
 string CROSS="cross"
 
-# Target shape.
+# Object shape.
 # Must be one of the constants defined above.
 string data

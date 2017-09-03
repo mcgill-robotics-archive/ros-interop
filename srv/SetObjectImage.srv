@@ -1,11 +1,11 @@
 # This service is used to upload or update an image thumbnail to an existing
-# target on the interoperability server in a compressed format.
+# object on the interoperability server.
 
-# Target ID.
+# Object ID.
 uint64 id
 
 # Image thumbnail.
-sensor_msgs/CompressedImage image
+sensor_msgs/Image image
 
 ---
 

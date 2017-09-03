@@ -1,9 +1,9 @@
-# These are the valid target types that may be specified for a target.
+# These are the valid object types that may be specified for an object.
 string STANDARD="standard"
 string QRC="qrc"
 string OFFAXIS="off_axis"
 string EMERGENT="emergent"
 
-# Target type.
+# Object type.
 # Must be one of the constants defined above.
 string data

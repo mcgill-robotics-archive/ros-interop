@@ -11,7 +11,7 @@ from std_msgs.msg import Float64
 from sensor_msgs.msg import NavSatFix
 from interop.client import InteroperabilityClient
 from mock_server import InteroperabilityMockServer
-from interop.serializers import TargetSerializer, TargetImageSerializer
+from interop.serializers import ObjectSerializer, ObjectImageSerializer
 
 
 class TestInteroperabilityClient(TestCase):
@@ -78,8 +78,8 @@ class TestInteroperabilityClient(TestCase):
             client.login()
             client.post_telemetry(NavSatFix(), Float64())
 
-    def test_post_target(self):
-        """Tests posting target data through client."""
+    def test_post_object(self):
+        """Tests posting object data through client."""
         # Set up test data.
         url = "http://interop"
         client_args = (url, "testuser", "testpass", 1.0)
@@ -98,21 +98,21 @@ class TestInteroperabilityClient(TestCase):
             # Setup mock server.
             server.set_root_response()
             server.set_login_response()
-            server.set_post_target_response(data, id=1)
+            server.set_post_object_response(data, id=1)
 
             # Connect client.
             client = InteroperabilityClient(*client_args)
             client.wait_for_server()
             client.login()
-            client.post_target(data)
+            client.post_object(data)
 
-    def test_targets(self):
-        """Tests posting, updating, retrieving and deleting target data
+    def test_objects(self):
+        """Tests posting, updating, retrieving and deleting object data
         through client."""
         # Set up test data.
         url = "http://interop"
         client_args = (url, "testuser", "testpass", 1.0)
-        targets = [{
+        objects = [{
             "id": 1,
             "user": 1,
             "type": "standard",
@@ -144,36 +144,36 @@ class TestInteroperabilityClient(TestCase):
             # Setup mock server.
             server.set_root_response()
             server.set_login_response()
-            server.set_get_targets_response(targets)
+            server.set_get_objects_response(objects)
 
             # Connect client.
             client = InteroperabilityClient(*client_args)
             client.wait_for_server()
             client.login()
-            all_targets = client.get_all_targets()
+            all_objects = client.get_all_objects()
 
-            # Compare all targets.
-            for t in targets:
+            # Compare all objects.
+            for t in objects:
                 # Verify ID is correct.
-                self.assertTrue(t["id"] in all_targets)
+                self.assertTrue(t["id"] in all_objects)
 
-                # Get target individually.
-                curr_target = client.get_target(t["id"])
+                # Get object individually.
+                curr_object = client.get_object(t["id"])
 
-                # Try to update the targets.
-                server.set_put_target_response(t["id"], curr_target)
-                client.put_target(t["id"], curr_target)
+                # Try to update the objects.
+                server.set_put_object_response(t["id"], curr_object)
+                client.put_object(t["id"], curr_object)
 
-                # Try to delete target.
-                server.set_delete_target_response(t["id"])
-                client.delete_target(t["id"])
+                # Try to delete object.
+                server.set_delete_object_response(t["id"])
+                client.delete_object(t["id"])
 
-    def test_target_image(self):
+    def test_object_image(self):
         """Tests posting telemetry data through client."""
         # Set up test data.
         url = "http://interop"
         client_args = (url, "testuser", "testpass", 1.0)
-        target_id = 1
+        object_id = 1
 
         width = 40
         height = 30
@@ -182,23 +182,23 @@ class TestInteroperabilityClient(TestCase):
         bridge = CvBridge()
         ros_img = bridge.cv2_to_imgmsg(nparr)
 
-        img = TargetImageSerializer.from_msg(ros_img)
+        img = ObjectImageSerializer.from_msg(ros_img)
 
         with InteroperabilityMockServer(url) as server:
             # Setup mock server.
             server.set_root_response()
             server.set_login_response()
-            server.set_post_target_image_response(target_id)
-            server.set_get_target_image_response(target_id, img, "image/png")
-            server.set_delete_target_image_response(target_id)
+            server.set_post_object_image_response(object_id)
+            server.set_get_object_image_response(object_id, img, "image/png")
+            server.set_delete_object_image_response(object_id)
 
             # Connect client.
             client = InteroperabilityClient(*client_args)
             client.wait_for_server()
             client.login()
-            client.post_target_image(target_id, ros_img)
-            client.get_target_image(target_id)
-            client.delete_target_image(target_id)
+            client.post_object_image(object_id, ros_img)
+            client.get_object_image(object_id)
+            client.delete_object_image(object_id)
 
 
 if __name__ == "__main__":

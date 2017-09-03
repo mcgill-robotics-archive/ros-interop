@@ -1,4 +1,4 @@
-# This service is used to retrieve all existing targets from the
+# This service is used to retrieve all existing objects from the
 # interoperability server.
 
 # No inputs necessary.
@@ -8,12 +8,12 @@
 # Whether the request was successful.
 bool success
 
-# The target IDs.
-# The ith element of this array corresponds to the ith element of the targets
+# The object IDs.
+# The ith element of this array corresponds to the ith element of the objects
 # array.
 uint64[] ids
 
-# The targets.
+# The objects.
 # The ith element of this array corresponds to the ith element of the ids
 # array.
-Target[] targets
+Object[] objects
