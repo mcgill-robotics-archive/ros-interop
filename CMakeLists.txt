@@ -25,10 +25,10 @@ add_message_files(FILES
   GeoPolygonStamped.msg
   GeoSphere.msg
   GeoSphereArrayStamped.msg
-  Orientation.msg
-  Shape.msg
   Object.msg
   ObjectType.msg
+  Orientation.msg
+  Shape.msg
   WayPoints.msg
 )
 
@@ -63,8 +63,8 @@ catkin_package(
 install(
   PROGRAMS
   scripts/missions_client.py
-  scripts/obstacles_client.py
   scripts/objects_server.py
+  scripts/obstacles_client.py
   scripts/telemetry_client.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 

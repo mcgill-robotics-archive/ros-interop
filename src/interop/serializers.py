@@ -222,14 +222,14 @@ class MissionDeserializer(object):
         flyzones = cls.__get_flyzone(data["fly_zones"], frame)
         search_grid = cls.__get_search_grid(data["search_grid_points"], frame)
         waypoints = cls.__get_waypoints(data["mission_waypoints"], frame)
-        air_drop_pos = cls.__get_point_msg(data["air_drop_pos"], frame)
+        air_drop = cls.__get_point_msg(data["air_drop_pos"], frame)
         off_axis_obj = cls.__get_point_msg(data["off_axis_odlc_pos"], frame)
         emergent_obj = cls.__get_point_msg(data["emergent_last_known_pos"],
                                            frame)
-        home_pos = cls.__get_point_msg(data["home_pos"], frame)
+        home = cls.__get_point_msg(data["home_pos"], frame)
 
-        return (flyzones, search_grid, waypoints, air_drop_pos, off_axis_obj,
-                emergent_obj, home_pos)
+        return (flyzones, search_grid, waypoints, air_drop, off_axis_obj,
+                emergent_obj, home)
 
 
 class ObstaclesDeserializer(object):

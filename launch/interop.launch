@@ -38,14 +38,14 @@
     doc="topic for publishing search grid"/>
   <arg name="waypoints_topic" default="~waypoints"
     doc="topic for publishing waypoints"/>
-  <arg name="air_drop_topic" default="~air_drop_loc"
-    doc="topic for publishing air drop location"/>
-  <arg name="emergent_obj_topic" default="~emergent_obj_loc"
-    doc="topic for publishing emergent object location"/>
+  <arg name="air_drop_topic" default="~air_drop"
+    doc="topic for publishing air drop position"/>
+  <arg name="emergent_obj_topic" default="~emergent_obj"
+    doc="topic for publishing emergent object position"/>
   <arg name="off_axis_obj_topic" default="~off_axis_obj"
-    doc="topic for publishing off axis object location"/>
-  <arg name="home_pos_topic" default="~home"
-    doc="topic for publishing home location"/>
+    doc="topic for publishing off axis object position"/>
+  <arg name="home_topic" default="~home"
+    doc="topic for publishing home position"/>
 
   <!-- Publication periods -->
   <arg name="obstacles_period" default="0.05"
@@ -99,10 +99,10 @@
       <param name="flyzones_topic" value="$(arg flyzones_topic)"/>
       <param name="search_grid_topic" value="$(arg search_grid_topic)"/>
       <param name="waypoints_topic" value="$(arg waypoints_topic)"/>
-      <param name="air_drop_loc_topic" value="$(arg air_drop_topic)"/>
+      <param name="air_drop_topic" value="$(arg air_drop_topic)"/>
       <param name="emergent_obj_topic" value="$(arg emergent_obj_topic)"/>
       <param name="off_axis_obj_topic" value="$(arg off_axis_obj_topic)"/>
-      <param name="home_pos_topic" value="$(arg home_pos_topic)"/>
+      <param name="home_topic" value="$(arg home_topic)"/>
 
       <!-- Publication period -->
       <param name="period" value="$(arg mission_info_period)"/>

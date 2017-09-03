@@ -89,9 +89,9 @@ This by default publishes mission information at 1 Hz to the following topics:
 -   `~flyzones`: Flight boundaries, `FlyZoneArray`.
 -   `~search_grid`: Search grid area, `GeoPolygonStamped`.
 -   `~waypoints`: List of waypoints, `WayPoints`.
--   `~air_drop_pos`: Air drop position, `geographic_msgs/GeoPointStamped`.
+-   `~air_drop`: Air drop position, `geographic_msgs/GeoPointStamped`.
 -   `~off_axis_obj`: Off axis object position, `geographic_msgs/GeoPointStamped`.
--   `~emergent_obj_loc`: Emergent object last known location,
+-   `~emergent_obj`: Emergent object last known position,
                           `geographic_msgs/GeoPointStamped`.
 -   `~home`: Home position, `geographic_msgs/GeoPointStamped`.
 
@@ -180,9 +180,9 @@ The following are the run-time ROS launch arguments available:
 -   `waypoints_topic`: `WayPoints` list of waypoints,
     default: `~mission_info/waypoints`.
 -   `air_drop_topic`: `geographic_msgs/GeoPointStamped` position of the air drop object,
-    default: `~mission_info/air_drop_loc`.
+    default: `~mission_info/air_drop`.
 -   `emergent_obj_topic`: `geographic_msgs/GeoPointStamped` last known position of the emergent object,
-    default: `~mission_info/emergent_obj_loc`.
+    default: `~mission_info/emergent_obj`.
 -   `off_axis_obj_topic`: `geographic_msgs/GeoPointStamped` position of the off axis object,
     default: `~mission_info/off_axis_obj`.
 -   `moving_topic`: `GeoSphereArrayStamped` feed of the moving

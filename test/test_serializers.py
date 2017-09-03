@@ -78,10 +78,10 @@ class TestSerializers(TestCase):
         flyzones = mission[0]
         search_grid = mission[1]
         waypoints = mission[2]
-        air_drop_pos = mission[3]
+        air_drop = mission[3]
         off_axis_obj = mission[4]
         emergent_obj = mission[5]
-        home_pos = mission[6]
+        home = mission[6]
 
         # Test flyzones.
         self.assertEqual(len(data["fly_zones"]), len(flyzones.flyzones))
@@ -128,9 +128,9 @@ class TestSerializers(TestCase):
             self.assertEqual(pnt.altitude, altitude)
 
         # Test airdrop pos.
-        self.assertEqual(air_drop_pos.position.latitude,
+        self.assertEqual(air_drop.position.latitude,
                          data["air_drop_pos"]["latitude"])
-        self.assertEqual(air_drop_pos.position.longitude,
+        self.assertEqual(air_drop.position.longitude,
                          data["air_drop_pos"]["longitude"])
 
         # Test off axis object.
@@ -146,10 +146,8 @@ class TestSerializers(TestCase):
                          data["emergent_last_known_pos"]["longitude"])
 
         # Test home position.
-        self.assertEqual(home_pos.position.latitude,
-                         data["home_pos"]["latitude"])
-        self.assertEqual(home_pos.position.longitude,
-                         data["home_pos"]["longitude"])
+        self.assertEqual(home.position.latitude, data["home_pos"]["latitude"])
+        self.assertEqual(home.position.longitude, data["home_pos"]["longitude"])
 
     def test_obstacles_deserializer(self):
         """Tests obstacles deserializer."""

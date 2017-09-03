@@ -23,7 +23,7 @@ def publish_mission(timer):
         air_drop_pub.publish(msgs[3])
         off_axis_obj_pub.publish(msgs[4])
         emergent_obj_pub.publish(msgs[5])
-        home_pos_pub.publish(msgs[6])
+        home_pub.publish(msgs[6])
 
 
 def get_active_mission(req):
@@ -103,10 +103,10 @@ if __name__ == "__main__":
     flyzones_topic = rospy.get_param("~flyzones_topic")
     search_grid_topic = rospy.get_param("~search_grid_topic")
     waypoints_topic = rospy.get_param("~waypoints_topic")
-    air_drop_topic = rospy.get_param("~air_drop_loc_topic")
+    air_drop_topic = rospy.get_param("~air_drop_topic")
     off_axis_obj_topic = rospy.get_param("~off_axis_obj_topic")
     emergent_obj_topic = rospy.get_param("~emergent_obj_topic")
-    home_pos_topic = rospy.get_param("~home_pos_topic")
+    home_topic = rospy.get_param("~home_topic")
 
     # Setup publishers.
     flyzones_pub = rospy.Publisher(flyzones_topic, FlyZoneArray, queue_size=1)
@@ -119,8 +119,7 @@ if __name__ == "__main__":
         off_axis_obj_topic, GeoPointStamped, queue_size=1)
     emergent_obj_pub = rospy.Publisher(
         emergent_obj_topic, GeoPointStamped, queue_size=1)
-    home_pos_pub = rospy.Publisher(
-        home_pos_topic, GeoPointStamped, queue_size=1)
+    home_pub = rospy.Publisher(home_topic, GeoPointStamped, queue_size=1)
 
     # Get message parameters.
     frame = str(rospy.get_param("~frame"))
