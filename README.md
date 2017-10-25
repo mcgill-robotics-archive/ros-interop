@@ -1,11 +1,11 @@
-# AUVSI SUAS Interopability ROS Client
+# AUVSI SUAS Interoperability ROS Client
 
 [master]: https://dev.mcgillrobotics.com/buildStatus/icon?job=ros-interop_master
 [master url]: https://dev.mcgillrobotics.com/job/ros-interop_master
 [![master]][master url]
 
 This ROS package provides a client to communicate with the
-[AUVSI SUAS Interopability server](https://github.com/auvsi-suas/interop).
+[AUVSI SUAS Interoperability server](https://github.com/auvsi-suas/interop).
 
 *This package has been tested on ROS Kinetic Kame on Ubuntu 16.04.*
 
@@ -155,7 +155,7 @@ The following are the run-time ROS launch arguments available:
 
 -   `base_url`: AUVSI SUAS interop server url, default: `$INTEROP_HOST` if set.
 -   `timeout`: Timeout for each request in seconds, default: `1.0`.
--   `verify`: Whether to verify SSL cerificates for HTTPS requests, default: `true`.
+-   `verify`: Whether to verify SSL certificates for HTTPS requests, default: `true`.
 
 #### Local object file directory
 
