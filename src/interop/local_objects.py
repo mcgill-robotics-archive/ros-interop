@@ -169,9 +169,9 @@ class Object(object):
         """
         with self.lock:
             if self.object_path is None:
-                raise IOError(
-                    "Could not update object for file_id {}. "
-                    "Path to object file not known.".format(self.file_id))
+                raise IOError("Could not update object for file_id {}. "
+                              "Path to object file not known.".format(
+                                  self.file_id))
             else:
                 try:
                     with open(self.object_path, "w", 0) as f:
@@ -192,9 +192,9 @@ class Object(object):
         with self.lock:
             # Delete object.
             if self.object_path is None:
-                raise IOError(
-                    "Could not delete object for file_id {}. "
-                    "Path to object file not known.".format(self.file_id))
+                raise IOError("Could not delete object for file_id {}. "
+                              "Path to object file not known.".format(
+                                  self.file_id))
             else:
                 try:
                     os.remove(self.object_path)
@@ -270,9 +270,9 @@ class Object(object):
         """
         with self.lock:
             if self.image_path is None:
-                raise IOError(
-                    "Could not delete image for file_id {}. "
-                    "Path to image file not known.".format(self.file_id))
+                raise IOError("Could not delete image for file_id {}. "
+                              "Path to image file not known.".format(
+                                  self.file_id))
             else:
                 try:
                     os.remove(self.image_path)
@@ -309,13 +309,13 @@ class Object(object):
             # TARGET FILE
             if self.needs_adding:
                 try:
-                    object = self.get()
+                    object_ = self.get()
                 except IOError as e:
                     rospy.logerr(e)
                 else:
                     try:
                         # Post object and record the interop_id.
-                        self.interop_id = self.client.post_object(object)
+                        self.interop_id = self.client.post_object(object_)
                     except (ConnectionError, Timeout) as e:
                         rospy.logwarn(e)
                     except (ValueError, HTTPError) as e:
@@ -327,12 +327,12 @@ class Object(object):
             # An interop id is needed to update.
             elif self.needs_updating and self.interop_id is not None:
                 try:
-                    object = self.get()
+                    object_ = self.get()
                 except IOError as e:
                     rospy.logerr(e)
                 else:
                     try:
-                        self.client.put_object(self.interop_id, object)
+                        self.client.put_object(self.interop_id, object_)
                     except (ConnectionError, Timeout) as e:
                         rospy.logwarn(e)
                     except (ValueError, HTTPError) as e:
@@ -438,8 +438,8 @@ class ObjectsDirectory(object):
         """Loads all objects stored remotely to sync up state on startup."""
         remote_objects = self.client.get_all_objects()
         rospy.loginfo("Found %d remote objects", len(remote_objects))
-        for object_id, object in remote_objects.iteritems():
-            json_object = json.dumps(object)
+        for object_id, object_ in remote_objects.iteritems():
+            json_object = json.dumps(object_)
             file_id = self.add_object(json_object, object_id)
             try:
                 img = self.client.get_object_image(object_id)
@@ -451,13 +451,13 @@ class ObjectsDirectory(object):
     def clear_all_objects(self):
         """Clears all objects both remotely and locally."""
         # Deal with locally stored objects first.
-        for object_id, object in self.objects.iteritems():
-            object.delete()
+        for object_id, object_ in self.objects.iteritems():
+            object_.delete()
         self.objects.clear()
 
         # Need to load objects stored remotely.
         remote_objects = self.client.get_all_objects()
-        for object_id, object in remote_objects.iteritems():
+        for object_id, object_ in remote_objects.iteritems():
             try:
                 self.client.delete_object(object_id)
             except Exception as e:
@@ -481,9 +481,9 @@ class ObjectsDirectory(object):
             # New file_id.
             file_id = self.file_id + 1
 
-            object = Object(self.path, file_id, data, self.client, interop_id)
+            object_ = Object(self.path, file_id, data, self.client, interop_id)
 
-            self.objects[file_id] = object
+            self.objects[file_id] = object_
             # Record the largest file_id so far.
             self.file_id = file_id
 
@@ -502,9 +502,9 @@ class ObjectsDirectory(object):
             IOError: If the object could not be written.
         """
         with self.lock:
-            object = self.objects[file_id]
+            object_ = self.objects[file_id]
 
-        object.update(data)
+        object_.update(data)
 
     def delete_object(self, file_id):
         """Deletes an existing object.
@@ -519,9 +519,9 @@ class ObjectsDirectory(object):
                 deleted.
         """
         with self.lock:
-            object = self.objects[file_id]
+            object_ = self.objects[file_id]
 
-        object.delete()
+        object_.delete()
 
     def get_object(self, file_id):
         """Returns an object as a str.
@@ -539,9 +539,9 @@ class ObjectsDirectory(object):
                 file could not be read.
         """
         with self.lock:
-            object = self.objects[file_id]
+            object_ = self.objects[file_id]
 
-        return object.get()
+        return object_.get()
 
     def get_all_objects(self):
         """Returns all the objects as a dict.
@@ -556,8 +556,8 @@ class ObjectsDirectory(object):
         objects = {}
 
         with self.lock:
-            for file_id, object in self.objects.iteritems():
-                objects[file_id] = object.get()
+            for file_id, object_ in self.objects.iteritems():
+                objects[file_id] = object_.get()
 
         return objects
 
@@ -578,9 +578,9 @@ class ObjectsDirectory(object):
             IOError: If the image could not be written.
         """
         with self.lock:
-            object = self.objects[file_id]
+            object_ = self.objects[file_id]
 
-        object.set_image(png_image, needs_adding)
+        object_.set_image(png_image, needs_adding)
 
     def delete_object_image(self, file_id):
         """Deletes an existing object image.
@@ -594,9 +594,9 @@ class ObjectsDirectory(object):
             OSError: If the object image could not be deleted.
         """
         with self.lock:
-            object = self.objects[file_id]
+            object_ = self.objects[file_id]
 
-        object.delete_image()
+        object_.delete_image()
 
     def get_object_image(self, file_id):
         """Returns an object image as a str.
@@ -614,19 +614,19 @@ class ObjectsDirectory(object):
                 file could not be read.
         """
         with self.lock:
-            object = self.objects[file_id]
+            object_ = self.objects[file_id]
 
-        return object.get_image()
+        return object_.get_image()
 
     def sync(self):
         """Syncs all the objects and their images to the interop server."""
         with self.lock:
             # Sync all objects.
-            for object_id, object in self.objects.iteritems():
-                object.sync()
+            for object_id, object_ in self.objects.iteritems():
+                object_.sync()
 
             # Delete unused objects from the objects dictionary.
             for file_id in list(self.objects):
-                object = self.objects[file_id]
-                if object.can_be_forgotten():
+                object_ = self.objects[file_id]
+                if object_.can_be_forgotten():
                     del self.objects[file_id]

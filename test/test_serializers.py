@@ -229,33 +229,34 @@ class TestSerializers(TestCase):
     def test_object_serializer(self):
         """Tests object serializer."""
         # Set up test data.
-        object = Object()
-        object.type.data = ObjectType.STANDARD
-        object.latitude = 38.1478
-        object.longitude = -76.4275
-        object.orientation.data = Orientation.NORTH
-        object.shape.data = Shape.STAR
-        object.background_color.data = Color.ORANGE
-        object.alphanumeric_color.data = Color.ORANGE
-        object.alphanumeric = "C"
-        object.description = ""
-        object.autonomous = False
+        object_ = Object()
+        object_.type.data = ObjectType.STANDARD
+        object_.latitude = 38.1478
+        object_.longitude = -76.4275
+        object_.orientation.data = Orientation.NORTH
+        object_.shape.data = Shape.STAR
+        object_.background_color.data = Color.ORANGE
+        object_.alphanumeric_color.data = Color.ORANGE
+        object_.alphanumeric = "C"
+        object_.description = ""
+        object_.autonomous = False
 
         # Serialize object message.
-        data = serializers.ObjectSerializer.from_msg(object)
+        data = serializers.ObjectSerializer.from_msg(object_)
 
         # Compare.
-        self.assertEqual(data["type"], object.type.data)
-        self.assertEqual(data["latitude"], object.latitude)
-        self.assertEqual(data["longitude"], object.longitude)
-        self.assertEqual(data["orientation"], object.orientation.data)
-        self.assertEqual(data["shape"], object.shape.data)
-        self.assertEqual(data["background_color"], object.background_color.data)
+        self.assertEqual(data["type"], object_.type.data)
+        self.assertEqual(data["latitude"], object_.latitude)
+        self.assertEqual(data["longitude"], object_.longitude)
+        self.assertEqual(data["orientation"], object_.orientation.data)
+        self.assertEqual(data["shape"], object_.shape.data)
+        self.assertEqual(data["background_color"],
+                         object_.background_color.data)
         self.assertEqual(data["alphanumeric_color"],
-                         object.alphanumeric_color.data)
-        self.assertEqual(data["alphanumeric"], object.alphanumeric)
-        self.assertEqual(data["description"], object.description)
-        self.assertEqual(data["autonomous"], object.autonomous)
+                         object_.alphanumeric_color.data)
+        self.assertEqual(data["alphanumeric"], object_.alphanumeric)
+        self.assertEqual(data["description"], object_.description)
+        self.assertEqual(data["autonomous"], object_.autonomous)
 
     def test_object_deserializer(self):
         """Tests object deserializer."""
@@ -276,20 +277,21 @@ class TestSerializers(TestCase):
         }
 
         # Deserialize object data.
-        object = serializers.ObjectSerializer.from_dict(data)
+        object_ = serializers.ObjectSerializer.from_dict(data)
 
         # Compare.
-        self.assertEqual(data["type"], object.type.data)
-        self.assertEqual(data["latitude"], object.latitude)
-        self.assertEqual(data["longitude"], object.longitude)
-        self.assertEqual(data["orientation"], object.orientation.data)
-        self.assertEqual(data["shape"], object.shape.data)
-        self.assertEqual(data["background_color"], object.background_color.data)
+        self.assertEqual(data["type"], object_.type.data)
+        self.assertEqual(data["latitude"], object_.latitude)
+        self.assertEqual(data["longitude"], object_.longitude)
+        self.assertEqual(data["orientation"], object_.orientation.data)
+        self.assertEqual(data["shape"], object_.shape.data)
+        self.assertEqual(data["background_color"],
+                         object_.background_color.data)
         self.assertEqual(data["alphanumeric_color"],
-                         object.alphanumeric_color.data)
-        self.assertEqual(data["alphanumeric"], object.alphanumeric)
-        self.assertEqual(data["description"], object.description)
-        self.assertEqual(data["autonomous"], object.autonomous)
+                         object_.alphanumeric_color.data)
+        self.assertEqual(data["alphanumeric"], object_.alphanumeric)
+        self.assertEqual(data["description"], object_.description)
+        self.assertEqual(data["autonomous"], object_.autonomous)
 
     def test_object_image_serializer(self):
         """Tests object image serializer can be deserialized."""

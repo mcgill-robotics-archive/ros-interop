@@ -215,8 +215,8 @@ class InteroperabilityClient(object):
                 response.raise_for_status()
                 reachable = response.ok
             except requests.ConnectionError:
-                rospy.logwarn_throttle(
-                    5.0, "Waiting for server: {}".format(self.url))
+                rospy.logwarn_throttle(5.0, "Waiting for server: {}".format(
+                    self.url))
             except Exception as e:
                 rospy.logerr_throttle(
                     5.0, "Unexpected error waiting for server: {}, {}".format(
