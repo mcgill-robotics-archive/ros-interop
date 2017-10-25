@@ -9,10 +9,9 @@ import dateutil.parser
 from dateutil.tz import tzutc
 from datetime import datetime
 from cv_bridge import CvBridge
-from sensor_msgs.msg import CompressedImage, Image
+from sensor_msgs.msg import CompressedImage
 from geographic_msgs.msg import GeoPointStamped, GeoPoint
-from visualization_msgs.msg import Marker, MarkerArray
-from std_msgs.msg import ColorRGBA, Float64, Header, String, Time, Int16
+from std_msgs.msg import Header, Time
 from interop.msg import (Color, FlyZone, FlyZoneArray, Orientation, Shape,
                          Object, ObjectType, GeoSphere, GeoCylinder,
                          GeoPolygonStamped, GeoSphereArrayStamped,

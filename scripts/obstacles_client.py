@@ -5,7 +5,6 @@
 import sys
 import rospy
 from interop import InteroperabilityClient
-from visualization_msgs.msg import MarkerArray
 from interop.msg import GeoCylinderArrayStamped, GeoSphereArrayStamped
 from requests.exceptions import ConnectionError, HTTPError, Timeout
 

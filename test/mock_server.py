@@ -3,7 +3,6 @@
 
 import json
 import responses
-from interop import serializers
 
 
 class InteroperabilityMockServer(object):

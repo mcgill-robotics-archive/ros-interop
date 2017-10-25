@@ -6,8 +6,6 @@ import rospy
 from threading import Lock
 from interop import InteroperabilityClient
 from requests.exceptions import Timeout, ConnectionError, HTTPError
-from geometry_msgs.msg import PointStamped, PolygonStamped
-from visualization_msgs.msg import Marker
 from std_srvs.srv import Trigger
 from interop.srv import GetMissionByID
 from interop.msg import FlyZoneArray, WayPoints, GeoPolygonStamped

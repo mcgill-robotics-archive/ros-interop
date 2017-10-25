@@ -10,7 +10,6 @@ from cv_bridge import CvBridge
 from interop import serializers
 from std_msgs.msg import Float64
 from sensor_msgs.msg import NavSatFix
-from visualization_msgs.msg import Marker
 from interop.msg import Color, Orientation, Shape, Object, ObjectType
 
 

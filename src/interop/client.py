@@ -2,7 +2,6 @@
 """Interoperability HTTP Client."""
 
 import os
-import json
 import rospy
 import requests
 import serializers
