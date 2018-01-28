@@ -1,0 +1,2 @@
+- setup-file:
+    local-name: /home/alexsmith/mr/drone/catkin_ws/src/interop/devel/setup.sh

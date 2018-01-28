@@ -11,7 +11,7 @@ float64 longitude
 
 # Object postion in Gazebo coordinates (optional)
 # Temporary for getting doing auto-tagging for drone_cv
-Point position
+geometry_msgs/Point position
 
 # Object orientation (optional).
 # Need only be set for standard and off-axis objects.

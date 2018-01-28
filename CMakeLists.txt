@@ -8,6 +8,7 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   sensor_msgs
   std_msgs
+  geometry_msgs
 )
 
 # Python src libraries setup.
@@ -46,7 +47,7 @@ add_service_files(FILES
   UpdateObject.srv
 )
 
-generate_messages(DEPENDENCIES geographic_msgs sensor_msgs std_msgs)
+generate_messages(DEPENDENCIES geographic_msgs sensor_msgs std_msgs geometry_msgs)
 
 catkin_package(
   CATKIN_DEPENDS
@@ -56,6 +57,7 @@ catkin_package(
   rospy
   sensor_msgs
   std_msgs
+  geometry_msgs
 )
 
 install(
