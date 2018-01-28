@@ -9,6 +9,10 @@ ObjectType type
 float64 latitude
 float64 longitude
 
+# Object postion in Gazebo coordinates (optional)
+# Temporary for getting doing auto-tagging for drone_cv
+Point position
+
 # Object orientation (optional).
 # Need only be set for standard and off-axis objects.
 Orientation orientation
