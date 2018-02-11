@@ -1,6 +1,0 @@
-set(interop_SETUP_PY_VERSION "0.15.0")
-set(interop_SETUP_PY_SCRIPTS "")
-set(interop_SETUP_PY_PACKAGES "interop")
-set(interop_SETUP_PY_PACKAGE_DIRS "src/interop")
-set(interop_SETUP_PY_MODULES "")
-set(interop_SETUP_PY_MODULE_DIRS "")

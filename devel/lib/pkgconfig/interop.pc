@@ -1,8 +1,0 @@
-prefix=/home/alexsmith/mr/drone/catkin_ws/src/interop/devel
-
-Name: interop
-Description: Description of interop
-Version: 0.15.0
-Cflags: -I/home/alexsmith/mr/drone/catkin_ws/src/interop/devel/include
-Libs: -L/home/alexsmith/mr/drone/catkin_ws/src/interop/devel/lib 
-Requires: geographic_msgs message_generation message_runtime rospy sensor_msgs std_msgs geometry_msgs
