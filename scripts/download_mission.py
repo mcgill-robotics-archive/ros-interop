@@ -10,7 +10,10 @@ if __name__ == "__main__":
     rospy.init_node("mission_downloader")
 
     # Get target download path.
-    path = rospy.get_param("~base_path")
+    if "INTEROP_PATH" in os.environ:
+        base_path = rospy.get_param("~base_path", os.environ["INTEROP_PATH"])
+    else:
+        base_path = rospy.get_param("~base_path")
 
     # Get server login information.
     timeout = rospy.get_param("~timeout", 1.0)
@@ -32,7 +35,7 @@ if __name__ == "__main__":
         sys.exit(1)
 
     # Download.
-    if not os.path.isdir(path):
-        os.makedirs(path)
-    client.download_mission_info(path)
-    rospy.loginfo("Mission downloaded successfully to {}".format(path))
+    if not os.path.isdir(base_path):
+        os.makedirs(base_path)
+    client.download_mission_info(base_path)
+    rospy.loginfo("Mission downloaded successfully to {}".format(base_path))
