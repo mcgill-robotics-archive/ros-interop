@@ -4,12 +4,12 @@
 import sys
 import rospy
 from threading import Lock
-from interop import InteroperabilityClient
 from requests.exceptions import Timeout, ConnectionError, HTTPError
 from std_srvs.srv import Trigger
 from interop.srv import GetMissionByID
 from interop.msg import FlyZoneArray, WayPoints, GeoPolygonStamped
 from geographic_msgs.msg import GeoPointStamped
+from interop import InteroperabilityClient, OfflineInteroperabilityClient
 
 
 def publish_mission(timer):
@@ -81,13 +81,17 @@ def get_mission_by_id(req):
 if __name__ == "__main__":
     rospy.init_node("mission_info")
 
-    # Get server login information.
-    base_url = rospy.get_param("~base_url")
-    timeout = rospy.get_param("~timeout")
-    verify = rospy.get_param("~verify")
-
-    # Initialize interoperability client.
-    client = InteroperabilityClient.from_env(base_url, timeout, verify)
+    # Get server connection information.
+    offline = rospy.get_param("~offline")
+    if offline:
+        base_path = rospy.get_param("~base_path")
+        client = OfflineInteroperabilityClient(base_path)
+        rospy.logwarn("Running in OFFLINE mode")
+    else:
+        base_url = rospy.get_param("~base_url")
+        timeout = rospy.get_param("~timeout")
+        verify = rospy.get_param("~verify")
+        client = InteroperabilityClient.from_env(base_url, timeout, verify)
 
     # Login.
     client.wait_for_server()

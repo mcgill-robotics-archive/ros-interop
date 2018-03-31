@@ -10,9 +10,9 @@ import errno
 import datetime
 import interop.srv
 from cv_bridge import CvBridgeError
-from interop import InteroperabilityClient
 from interop import serializers, local_objects
 from std_srvs.srv import Trigger, TriggerResponse
+from interop import InteroperabilityClient, OfflineInteroperabilityClient
 
 
 def trigger_exception_handler(*expected_exception_types):
@@ -398,15 +398,21 @@ if __name__ == "__main__":
     # Initialize node.
     rospy.init_node("objects")
 
-    # Get ROS parameters for client.
-    base_url = rospy.get_param("~base_url")
-    timeout = rospy.get_param("~timeout")
-    verify = rospy.get_param("~verify")
+    # Get server connection information.
+    offline = rospy.get_param("~offline")
+    if offline:
+        base_path = rospy.get_param("~base_path")
+        client = OfflineInteroperabilityClient(base_path)
+        rospy.logwarn("Running in OFFLINE mode")
+    else:
+        base_url = rospy.get_param("~base_url")
+        timeout = rospy.get_param("~timeout")
+        verify = rospy.get_param("~verify")
+        client = InteroperabilityClient.from_env(base_url, timeout, verify)
+
+    # Get other ROS parameters.
     objects_root = rospy.get_param("~objects_root")
     update_period = rospy.get_param("~interop_update_period")
-
-    # Initialize interoperability client.
-    client = InteroperabilityClient.from_env(base_url, timeout, verify)
 
     # Wait for server to be reachable, then login.
     client.wait_for_server()
@@ -423,18 +429,20 @@ if __name__ == "__main__":
         rospy.loginfo("Storing object files in {}".format(objects_path))
         create_objects_path(objects_path)
         symlink_objects_path_to_latest(objects_path)
-        objects_dir = local_objects.ObjectsDirectory(objects_path, client)
+        objects_dir = local_objects.ObjectsDirectory(objects_path, client,
+                                                     offline)
     except OSError as e:
         rospy.logfatal(e)
         raise
 
-    try:
-        # Sync up the objects directory.
-        rospy.loginfo("Loading all remote objects...")
-        objects_dir.load_all_remote_objects()
-    except Exception as e:
-        rospy.logfatal(e)
-        raise
+    if not offline:
+        try:
+            # Sync up the objects directory.
+            rospy.loginfo("Loading all remote objects...")
+            objects_dir.load_all_remote_objects()
+        except Exception as e:
+            rospy.logfatal(e)
+            raise
 
     # Set up the objects server.
     objects_server = ObjectsServer(objects_dir)

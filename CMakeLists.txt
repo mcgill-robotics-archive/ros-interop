@@ -60,6 +60,7 @@ catkin_package(
 
 install(
   PROGRAMS
+  scripts/download_mission.py
   scripts/missions_client.py
   scripts/objects_server.py
   scripts/obstacles_client.py

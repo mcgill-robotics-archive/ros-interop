@@ -28,7 +28,7 @@ class Object(object):
             file_id (int): ID associated with this object.
             data (str): The object data that will be written into the object
                 file.
-            client (interop.InteroperabilityClient): Interoperability client
+            client (interop.BaseClient): Interoperability client
                 that will be used to sync the object and its image to the
                 server.
             interop_id (int): Remote ID associated with this object, optional.
@@ -413,19 +413,21 @@ class ObjectsDirectory(object):
     the interop server.
     """
 
-    def __init__(self, path, client):
+    def __init__(self, path, client, offline):
         """Creates a directory for storing objects and images.
 
         Args:
             path (str): Absolute path to the directory of to be created.
             client (interop.InteroperabilityClient): Interoperability client
                 that will be used to handle syncs to the interop server.
+            offline (bool): Whether we're running in offline mode or not.
         """
         self.lock = threading.Lock()
         self.path = path
 
         # Client used to update the interop server.
         self.client = client
+        self.offline = offline
 
         # Highest file id so far.
         self.file_id = 0
@@ -436,6 +438,9 @@ class ObjectsDirectory(object):
 
     def load_all_remote_objects(self):
         """Loads all objects stored remotely to sync up state on startup."""
+        if self.offline:
+            return
+
         remote_objects = self.client.get_all_objects()
         rospy.loginfo("Found %d remote objects", len(remote_objects))
         for object_id, object_ in remote_objects.iteritems():
@@ -456,6 +461,8 @@ class ObjectsDirectory(object):
         self.objects.clear()
 
         # Need to load objects stored remotely.
+        if self.offline:
+            return
         remote_objects = self.client.get_all_objects()
         for object_id, object_ in remote_objects.iteritems():
             try:
@@ -622,8 +629,9 @@ class ObjectsDirectory(object):
         """Syncs all the objects and their images to the interop server."""
         with self.lock:
             # Sync all objects.
-            for object_id, object_ in self.objects.iteritems():
-                object_.sync()
+            if not self.offline:
+                for object_ in self.objects.itervalues():
+                    object_.sync()
 
             # Delete unused objects from the objects dictionary.
             for file_id in list(self.objects):

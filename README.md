@@ -70,6 +70,47 @@ credentials will be stored in plain text in the ROS parameter server. That can
 easily leak to other computers in the same network if your network security is
 misconfigured.
 
+### Offline Mode
+
+The `interop` client can also run in an offline mode which reads mission and
+obstacle information from a file instead of the server. This means that an
+internet connection is not required when operating in this mode.
+
+The mission and obstacle information needs to be encoded in JSON. The
+`download_mission.py` script downloads all the remote mission information in
+the correct format for you.
+
+To download the information, simply run:
+
+```bash
+rosrun interop download_mission.py _base_path:=<base_path>
+```
+
+where `<base_path>` is a directory you want to download the mission and
+obstacle information to.
+
+To then run the `interop` client in offline mode, use the `offline` and
+`base_path` ROS launch arguments as follows:
+
+```bash
+roslaunch interop interop.launch offline:=true base_path:=<base_path>
+```
+
+where `<base_path>` is the full path to the directory holding the mission and
+obstacle information you downloaded. You can avoid setting the `<base_path>` by
+setting the `INTEROP_PATH` environment variable as such:
+
+```bash
+export INTEROP_PATH=<base_path>
+roslaunch interop interop.launch offline:=true
+```
+
+**NOTE**: Offline mode supports all the same functionality as normal operation
+except for a few limitations:
+- Moving obstacles cannot move as the downloaded files cannot change
+- Telemetry works, but all of the information is dropped and not stored anywhere
+- ODLCs are only stored in the local objects directory
+
 ## Nodes
 
 This package has the following nodes available:

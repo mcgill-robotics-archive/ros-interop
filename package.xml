@@ -27,11 +27,12 @@
   <run_depend>geographic_msgs</run_depend>
 
   <!-- Python dependencies -->
+  <run_depend>python-dateutil</run_depend>
+  <run_depend>python-imaging</run_depend>
   <run_depend>python-numpy</run_depend>
   <run_depend>python-requests</run_depend>
   <run_depend>python-responses-pip</run_depend>
-  <run_depend>python-dateutil</run_depend>
-  <run_depend>python-imaging</run_depend>
+  <run_depend>python-six</run_depend>
 
   <!-- Unit tests -->
   <test_depend>rostest</test_depend>

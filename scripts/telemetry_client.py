@@ -8,8 +8,8 @@ import itertools
 import message_filters
 from std_msgs.msg import Float64
 from sensor_msgs.msg import NavSatFix
-from interop import InteroperabilityClient
 from requests.exceptions import ConnectionError, HTTPError, Timeout
+from interop import InteroperabilityClient, OfflineInteroperabilityClient
 
 
 def update_telemetry(navsat_msg, compass_msg):
@@ -80,13 +80,17 @@ if __name__ == "__main__":
     # Initialize node.
     rospy.init_node("telemetry")
 
-    # Get ROS parameters for client.
-    base_url = rospy.get_param("~base_url")
-    timeout = rospy.get_param("~timeout")
-    verify = rospy.get_param("~verify")
-
-    # Initialize interoperability client.
-    client = InteroperabilityClient.from_env(base_url, timeout, verify)
+    # Get server connection information.
+    offline = rospy.get_param("~offline")
+    if offline:
+        base_path = rospy.get_param("~base_path")
+        client = OfflineInteroperabilityClient(base_path)
+        rospy.logwarn("Running in OFFLINE mode")
+    else:
+        base_url = rospy.get_param("~base_url")
+        timeout = rospy.get_param("~timeout")
+        verify = rospy.get_param("~verify")
+        client = InteroperabilityClient.from_env(base_url, timeout, verify)
 
     # Wait for server to be reachable, then login.
     client.wait_for_server()

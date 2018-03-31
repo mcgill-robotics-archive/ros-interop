@@ -237,7 +237,7 @@ class ObstaclesDeserializer(object):
 
     @classmethod
     def from_dict(cls, data, frame, lifetime):
-        """Deserializes obstacle data into two MarkerArrays.
+        """Deserializes obstacle data.
 
         Args:
             data: A dictionary.
@@ -245,7 +245,7 @@ class ObstaclesDeserializer(object):
             lifetime: Lifetime of every Marker in seconds.
 
         Returns:
-            Tuple of two visualization_msgs/MarkerArray, MarkerArray) tuple.
+            Tuple of (GeoSphereArrayStamped, GeoCylinderArrayStamped).
             The first is of moving obstacles, and the latter is of stationary
             obstacles.
         """

@@ -2,11 +2,19 @@
   <!-- Node namespace -->
   <arg name="ns" default="interop" doc="namespace for all nodes"/>
 
-  <!-- Login credentials and request parameters -->
+  <!-- Offline mode -->
+  <arg name="offline" default="false" doc="run in offline mode"/>
+  <arg name="base_path" default="$(optenv INTEROP_PATH)"
+    doc="path to offline mission information" if="$(arg offline)"/>
+
+  <!-- Online mode -->
   <arg name="base_url" default="$(optenv INTEROP_HOST)"
-    doc="base URL of the interop server (e.g. http://localhost:8080)"/>
-  <arg name="timeout" default="1.0" doc="timeout of each request in seconds"/>
-  <arg name="verify" default="true" doc="validate SSL certificates"/>
+    doc="base URL of the interop server (e.g. http://localhost:8080)"
+    unless="$(arg offline)"/>
+  <arg name="timeout" default="1.0" doc="timeout of each request in seconds"
+    unless="$(arg offline)"/>
+  <arg name="verify" default="true" doc="validate SSL certificates"
+    unless="$(arg offline)"/>
 
   <!-- Targets directory settings -->
   <arg name="objects_root"
@@ -68,10 +76,16 @@
           type="obstacles_client.py"
           output="screen"
           respawn="true">
-      <!-- Login credentials and request parameters -->
-      <param name="base_url" value="$(arg base_url)" type="str"/>
-      <param name="timeout" value="$(arg timeout)" type="double"/>
-      <param name="verify" value="$(arg verify)" type="bool"/>
+      <!-- Connection parameters -->
+      <param name="offline" value="$(arg offline)" type="bool"/>
+      <param name="base_path" value="$(arg base_path)" type="str"
+        if="$(arg offline)"/>
+      <param name="base_url" value="$(arg base_url)" type="str"
+        unless="$(arg offline)"/>
+      <param name="timeout" value="$(arg timeout)" type="double"
+        unless="$(arg offline)"/>
+      <param name="verify" value="$(arg verify)" type="bool"
+        unless="$(arg offline)"/>
 
       <!-- Published topics -->
       <param name="moving_topic" value="$(arg moving_topic)"/>
@@ -90,10 +104,16 @@
           type="missions_client.py"
           output="screen"
           respawn="true">
-      <!-- Login credentials and request parameters -->
-      <param name="base_url" value="$(arg base_url)" type="str"/>
-      <param name="timeout" value="$(arg timeout)" type="double"/>
-      <param name="verify" value="$(arg verify)" type="bool"/>
+      <!-- Connection parameters -->
+      <param name="offline" value="$(arg offline)" type="bool"/>
+      <param name="base_path" value="$(arg base_path)" type="str"
+        if="$(arg offline)"/>
+      <param name="base_url" value="$(arg base_url)" type="str"
+        unless="$(arg offline)"/>
+      <param name="timeout" value="$(arg timeout)" type="double"
+        unless="$(arg offline)"/>
+      <param name="verify" value="$(arg verify)" type="bool"
+        unless="$(arg offline)"/>
 
       <!-- Published topics -->
       <param name="flyzones_topic" value="$(arg flyzones_topic)"/>
@@ -120,10 +140,16 @@
           type="telemetry_client.py"
           output="screen"
           respawn="true">
-      <!-- Login credentials and request parameters -->
-      <param name="base_url" value="$(arg base_url)" type="str"/>
-      <param name="timeout" value="$(arg timeout)" type="double"/>
-      <param name="verify" value="$(arg verify)" type="bool"/>
+      <!-- Connection parameters -->
+      <param name="offline" value="$(arg offline)" type="bool"/>
+      <param name="base_path" value="$(arg base_path)" type="str"
+        if="$(arg offline)"/>
+      <param name="base_url" value="$(arg base_url)" type="str"
+        unless="$(arg offline)"/>
+      <param name="timeout" value="$(arg timeout)" type="double"
+        unless="$(arg offline)"/>
+      <param name="verify" value="$(arg verify)" type="bool"
+        unless="$(arg offline)"/>
 
       <!-- Synchronization settings -->
       <param name="sync_queue_size" value="$(arg sync_queue_size)"/>
@@ -140,10 +166,16 @@
           type="objects_server.py"
           output="screen"
           respawn="true">
-      <!-- Login credentials and request parameters -->
-      <param name="base_url" value="$(arg base_url)" type="str"/>
-      <param name="timeout" value="$(arg timeout)" type="double"/>
-      <param name="verify" value="$(arg verify)" type="bool"/>
+      <!-- Connection parameters -->
+      <param name="offline" value="$(arg offline)" type="bool"/>
+      <param name="base_path" value="$(arg base_path)" type="str"
+        if="$(arg offline)"/>
+      <param name="base_url" value="$(arg base_url)" type="str"
+        unless="$(arg offline)"/>
+      <param name="timeout" value="$(arg timeout)" type="double"
+        unless="$(arg offline)"/>
+      <param name="verify" value="$(arg verify)" type="bool"
+        unless="$(arg offline)"/>
 
       <!-- Targets directory settings -->
       <param name="objects_root" value="$(arg objects_root)"/>
