@@ -58,8 +58,8 @@
   <!-- Publication periods -->
   <arg name="obstacles_period" default="0.05"
     doc="period to fetch obstacles in seconds"/>
-  <arg name="mission_info_period" default="1.00"
-    doc="period to fetch mission information in seconds"/>
+  <arg name="mission_info_period" default="0.05"
+    doc="period to publish mission information in seconds"/>
 
   <!-- Frame IDs -->
   <arg name="obstacles_frame" default="earth" doc="obstalces frame ID"/>

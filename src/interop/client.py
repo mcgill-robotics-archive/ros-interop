@@ -795,7 +795,7 @@ class OfflineInteroperabilityClient(BaseClient):
             path: Path to root directory that stores all mission information.
             *args: Additional positional arguments, ignored.
             **kwargs: Additional key-word arguments, ignored.
-        
+
         Raises:
             IOError: On missions or obstacles files not found.
             JSONDecodeError: On JSON deserialization error.
@@ -819,14 +819,14 @@ class OfflineInteroperabilityClient(BaseClient):
 
     def wait_for_server(self):
         """Waits until interoperability server is reachable.
-        
+
         Note: Doesn't do anything since the server is offline.
         """
         pass
 
     def login(self):
         """Authenticates with the server.
-        
+
         Note: Always succeeds since there is no server.
         """
         pass

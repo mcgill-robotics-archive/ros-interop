@@ -1,7 +1,7 @@
 # AUVSI SUAS Interoperability ROS Client
 
 [master]: https://dev.mcgillrobotics.com/buildStatus/icon?job=ros-interop/master
-[master url]: https://dev.mcgillrobotics.com/blue/organizations/jenkins/ros-interop
+[master url]: https://dev.mcgillrobotics.com/job/ros-interop/job/master
 [![master]][master url]
 
 This ROS package provides a client to communicate with the
@@ -108,7 +108,8 @@ roslaunch interop interop.launch offline:=true
 **NOTE**: Offline mode supports all the same functionality as normal operation
 except for a few limitations:
 - Moving obstacles cannot move as the downloaded files cannot change
-- Telemetry works, but all of the information is dropped and not stored anywhere
+- Telemetry works, but all of the information is dropped and not stored
+  anywhere
 - ODLCs are only stored in the local objects directory
 
 ## Nodes
@@ -131,7 +132,8 @@ This by default publishes mission information at 1 Hz to the following topics:
 -   `~search_grid`: Search grid area, `GeoPolygonStamped`.
 -   `~waypoints`: List of waypoints, `WayPoints`.
 -   `~air_drop`: Air drop position, `geographic_msgs/GeoPointStamped`.
--   `~off_axis_obj`: Off axis object position, `geographic_msgs/GeoPointStamped`.
+-   `~off_axis_obj`: Off axis object position,
+    `geographic_msgs/GeoPointStamped`.
 -   `~emergent_obj`: Emergent object last known position,
                           `geographic_msgs/GeoPointStamped`.
 -   `~home`: Home position, `geographic_msgs/GeoPointStamped`.
@@ -180,8 +182,10 @@ export INTEROP_OBJECTS_ROOT=/path/to/object_files
 -   `~image/set`: Sets or updates object image thumbnail, `SetObjectImage`.
 -   `~image/get`: Retrieves object image thumbnail, `GetObjectImage`.
 -   `~image/delete`: Deletes object image thumbnail, `DeleteObjectImage`.
--   `~image/compressed/set`: Sets or updates object image thumbnail with a `CompressedImage`, `SetObjectCompressedImage`.
--   `~image/compressed/get`: Retrieves object image thumbnail as a `CompressedImage`, `GetObjectCompressedImage`.
+-   `~image/compressed/set`: Sets or updates object image thumbnail with a
+    `CompressedImage`, `SetObjectCompressedImage`.
+-   `~image/compressed/get`: Retrieves object image thumbnail as a
+    `CompressedImage`, `GetObjectCompressedImage`.
 
 #### Syncing
 
@@ -196,12 +200,15 @@ The following are the run-time ROS launch arguments available:
 
 -   `base_url`: AUVSI SUAS interop server url, default: `$INTEROP_HOST` if set.
 -   `timeout`: Timeout for each request in seconds, default: `1.0`.
--   `verify`: Whether to verify SSL certificates for HTTPS requests, default: `true`.
+-   `verify`: Whether to verify SSL certificates for HTTPS requests, default:
+    `true`.
 
 #### Local object file directory
 
--   `objects_root`: The parent of all timestamped directories containing object files, default: `$INTEROP_OBJECTS_ROOT` if set, or `~/object_files/`.
--   `interop_update_period`: Duration between attempts to sync the object files of the current run to the interop server, default: `10.0` (i.e. 10.0 s).
+-   `objects_root`: The parent of all timestamped directories containing object
+    files, default: `$INTEROP_OBJECTS_ROOT` if set, or `~/object_files/`.
+-   `interop_update_period`: Duration between attempts to sync the object files
+    of the current run to the interop server, default: `10.0` (i.e. 10.0 s).
 
 #### Subscribed topics
 
@@ -220,12 +227,12 @@ The following are the run-time ROS launch arguments available:
     default: `~mission_info/search_grid`.
 -   `waypoints_topic`: `WayPoints` list of waypoints,
     default: `~mission_info/waypoints`.
--   `air_drop_topic`: `geographic_msgs/GeoPointStamped` position of the air drop object,
-    default: `~mission_info/air_drop`.
--   `emergent_obj_topic`: `geographic_msgs/GeoPointStamped` last known position of the emergent object,
-    default: `~mission_info/emergent_obj`.
--   `off_axis_obj_topic`: `geographic_msgs/GeoPointStamped` position of the off axis object,
-    default: `~mission_info/off_axis_obj`.
+-   `air_drop_topic`: `geographic_msgs/GeoPointStamped` position of the air
+    drop object, default: `~mission_info/air_drop`.
+-   `emergent_obj_topic`: `geographic_msgs/GeoPointStamped` last known position
+    of the emergent object, default: `~mission_info/emergent_obj`.
+-   `off_axis_obj_topic`: `geographic_msgs/GeoPointStamped` position of the off
+    axis object, default: `~mission_info/off_axis_obj`.
 -   `moving_topic`: `GeoSphereArrayStamped` feed of the moving
     obstacles, default: `~obstacles/moving`.
 -   `stationary_topic`: `GeoSphereArrayStamped` feed of the stationary
@@ -236,7 +243,7 @@ The following are the run-time ROS launch arguments available:
 -   `obstacles_period`: Period to request and publish obstacles at in seconds,
     default: `0.05` (i.e., 20 Hz).
 -   `mission_info_period`: Period to publish mission information at
-    in seconds, default: `1` (i.e., 1 Hz).
+    in seconds, default: `0.05` (i.e., 20 Hz).
 
 #### Frame IDs
 
