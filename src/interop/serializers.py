@@ -296,11 +296,12 @@ class TelemetrySerializer(object):
     """Telemetry message serializer."""
 
     @classmethod
-    def from_msg(cls, navsat_msg, compass_msg):
+    def from_msg(cls, navsat_msg, altitude_msg, compass_msg):
         """Serializes telemetry data into a dictionary.
 
         Args:
             navsat_msg: sensor_msgs/NavSatFix message.
+            altitude_msg: mavros_msgs/Altitude message.
             compass_msg: std_msgs/Float64 message in degrees.
 
         Returns:
@@ -309,7 +310,7 @@ class TelemetrySerializer(object):
         return {
             "latitude": float(navsat_msg.latitude),
             "longitude": float(navsat_msg.longitude),
-            "altitude_msl": meters_to_feet(navsat_msg.altitude),
+            "altitude_msl": meters_to_feet(altitude_msg.amsl),
             "uas_heading": float(compass_msg.data)
         }
 

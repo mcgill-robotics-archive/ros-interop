@@ -32,6 +32,8 @@
   <!-- Subscribed topics -->
   <arg name="navsat_topic" default="/mavros/global_position/global"
     doc="topic for vehicle's GPS position to use for telemetry"/>
+  <arg name="altitude_topic" default="/mavros/altitude"
+    doc="topic for vehicle's altitude in meters"/>
   <arg name="compass_topic" default="/mavros/global_position/compass_hdg"
     doc="topic for vehicle's compass heading in degrees"/>
 
@@ -157,6 +159,7 @@
 
       <!-- Subscribed topics -->
       <param name="navsat_topic" value="$(arg navsat_topic)"/>
+      <param name="altitude_topic" value="$(arg altitude_topic)"/>
       <param name="compass_topic" value="$(arg compass_topic)"/>
     </node>
 

@@ -7,20 +7,22 @@ import rospy
 import itertools
 import message_filters
 from std_msgs.msg import Float64
+from mavros_msgs.msg import Altitude
 from sensor_msgs.msg import NavSatFix
 from requests.exceptions import ConnectionError, HTTPError, Timeout
 from interop import InteroperabilityClient, OfflineInteroperabilityClient
 
 
-def update_telemetry(navsat_msg, compass_msg):
+def update_telemetry(navsat_msg, altitude_msg, compass_msg):
     """Telemetry subscription callback.
 
     Args:
         navsat_msg: sensor_msgs/NavSatFix message.
+        altitude_msg: mavros_msgs/Altitude message.
         compass_msg: std_msgs/Float64 message in degrees.
     """
     try:
-        client.post_telemetry(navsat_msg, compass_msg)
+        client.post_telemetry(navsat_msg, altitude_msg, compass_msg)
     except (ConnectionError, Timeout) as e:
         rospy.logwarn(e)
         return
@@ -106,11 +108,13 @@ if __name__ == "__main__":
 
     # Get ROS parameters for subscribed topic names.
     navsat_topic = rospy.get_param("~navsat_topic")
+    altitude_topic = rospy.get_param("~altitude_topic")
     compass_topic = rospy.get_param("~compass_topic")
 
     # Setup synchronized subscribers.
     subscribers = [
         message_filters.Subscriber(navsat_topic, NavSatFix),
+        message_filters.Subscriber(altitude_topic, Altitude),
         message_filters.Subscriber(compass_topic, Float64)
     ]
     synchronizer = UnstampedTimeSynchronizer(subscribers, sync_queue,

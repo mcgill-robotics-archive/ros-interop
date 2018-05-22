@@ -538,11 +538,12 @@ class InteroperabilityClient(BaseClient):
         return serializers.ObstaclesDeserializer.from_dict(
             response.json(), frame, lifetime)
 
-    def post_telemetry(self, navsat_msg, compass_msg):
+    def post_telemetry(self, navsat_msg, altitude_msg, compass_msg):
         """Uploads telemetry information to Interoperability server.
 
         Args:
             navsat_msg: sensor_msgs/NavSatFix message.
+            altitude_msg: mavros_msgs/Altitude message.
             compass_msg: std_msgs/Float64 message in degrees.
 
         Raises:
@@ -551,7 +552,7 @@ class InteroperabilityClient(BaseClient):
             ConnectionError: On connection failure.
         """
         dict_telem = serializers.TelemetrySerializer.from_msg(
-            navsat_msg, compass_msg)
+            navsat_msg, altitude_msg, compass_msg)
         self._post(self.TELEMETRY_PATH, data=dict_telem)
 
     def get_active_mission(self, frame):
@@ -846,13 +847,14 @@ class OfflineInteroperabilityClient(BaseClient):
         return serializers.ObstaclesDeserializer.from_dict(
             self._obstacles, frame, lifetime)
 
-    def post_telemetry(self, navsat_msg, compass_msg):
+    def post_telemetry(self, navsat_msg, altitude_msg, compass_msg):
         """Uploads telemetry information to Interoperability server.
 
         Note: This does nothing as the server is not connected.
 
         Args:
             navsat_msg: sensor_msgs/NavSatFix message.
+            altitude_msg: mavros_msgs/Altitude message.
             compass_msg: std_msgs/Float64 message in degrees.
         """
         pass

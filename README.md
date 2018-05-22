@@ -150,10 +150,10 @@ This also provides the following services to change missions:
 This by default subscribes to telemetry data on the following topics, and
 uploads them to the interoperability server:
 
--   `/mavros/global_position/global`: GPS and altitude data,
-    `sensor_msgs/NavSatFix`.
+-   `/mavros/altitude`: Altitude above mean sea level, `mavros_msgs/Altitude`.
 -   `/mavros/global_position/compass_hdg`: Current heading in degrees relative
     to true north, `std_msgs/Float64`.
+-   `/mavros/global_position/global`: GPS data, `sensor_msgs/NavSatFix`.
 
 ### `objects`
 

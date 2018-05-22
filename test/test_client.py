@@ -8,6 +8,7 @@ import numpy as np
 from unittest import TestCase
 from cv_bridge import CvBridge
 from std_msgs.msg import Float64
+from mavros_msgs.msg import Altitude
 from sensor_msgs.msg import NavSatFix
 from interop.client import InteroperabilityClient
 from mock_server import InteroperabilityMockServer
@@ -76,7 +77,7 @@ class TestInteroperabilityClient(TestCase):
             client = InteroperabilityClient(*client_args)
             client.wait_for_server()
             client.login()
-            client.post_telemetry(NavSatFix(), Float64())
+            client.post_telemetry(NavSatFix(), Altitude(), Float64())
 
     def test_post_object(self):
         """Tests posting object data through client."""

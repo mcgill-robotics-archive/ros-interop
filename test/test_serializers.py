@@ -9,6 +9,7 @@ from unittest import TestCase
 from cv_bridge import CvBridge
 from interop import serializers
 from std_msgs.msg import Float64
+from mavros_msgs.msg import Altitude
 from sensor_msgs.msg import NavSatFix
 from interop.msg import Color, Orientation, Shape, Object, ObjectType
 
@@ -214,11 +215,13 @@ class TestSerializers(TestCase):
         navsat = NavSatFix()
         navsat.latitude = 38.149
         navsat.longitude = -76.432
-        navsat.altitude = 30.48
+        altitude = Altitude()
+        altitude.amsl = 30.48
         compass = Float64(90.0)
 
-        data = serializers.TelemetrySerializer.from_msg(navsat, compass)
-        altitude_msl = serializers.meters_to_feet(navsat.altitude)
+        data = serializers.TelemetrySerializer.from_msg(navsat, altitude,
+                                                        compass)
+        altitude_msl = serializers.meters_to_feet(altitude.amsl)
 
         # Compare.
         self.assertEqual(data["latitude"], navsat.latitude)
