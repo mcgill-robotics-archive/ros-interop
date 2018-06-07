@@ -4,6 +4,7 @@ project(interop)
 find_package(catkin REQUIRED COMPONENTS
   genmsg
   geographic_msgs
+  geometry_msgs
   mavros_msgs
   message_generation
   rospy
@@ -52,6 +53,7 @@ generate_messages(DEPENDENCIES geographic_msgs sensor_msgs std_msgs)
 catkin_package(
   CATKIN_DEPENDS
   geographic_msgs
+  geometry_msgs
   mavros_msgs
   message_generation
   message_runtime

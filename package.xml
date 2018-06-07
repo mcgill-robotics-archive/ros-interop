@@ -16,6 +16,7 @@
   <depend>rospy</depend>
   <depend>genmsg</depend>
   <depend>geographic_msgs</depend>
+  <depend>geometry_msgs</depend>
   <depend>mavros_msgs</depend>
   <depend>message_generation</depend>
   <depend>std_msgs</depend>

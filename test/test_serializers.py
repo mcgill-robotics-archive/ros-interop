@@ -8,9 +8,9 @@ import numpy as np
 from unittest import TestCase
 from cv_bridge import CvBridge
 from interop import serializers
-from std_msgs.msg import Float64
 from mavros_msgs.msg import Altitude
 from sensor_msgs.msg import NavSatFix
+from geometry_msgs.msg import PoseStamped
 from interop.msg import Color, Orientation, Shape, Object, ObjectType
 
 
@@ -217,17 +217,18 @@ class TestSerializers(TestCase):
         navsat.longitude = -76.432
         altitude = Altitude()
         altitude.amsl = 30.48
-        compass = Float64(90.0)
+        pose_stamped = PoseStamped()
+        pose_stamped.pose.orientation.w = 1.0
 
         data = serializers.TelemetrySerializer.from_msg(navsat, altitude,
-                                                        compass)
+                                                        pose_stamped)
         altitude_msl = serializers.meters_to_feet(altitude.amsl)
 
         # Compare.
         self.assertEqual(data["latitude"], navsat.latitude)
         self.assertEqual(data["longitude"], navsat.longitude)
         self.assertEqual(data["altitude_msl"], altitude_msl)
-        self.assertEqual(data["uas_heading"], compass.data)
+        self.assertEqual(data["uas_heading"], 90.0)
 
     def test_object_serializer(self):
         """Tests object serializer."""

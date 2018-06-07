@@ -6,6 +6,7 @@ import cv2
 import rospy
 import numpy as np
 import dateutil.parser
+import tf.transformations
 from dateutil.tz import tzutc
 from datetime import datetime
 from cv_bridge import CvBridge
@@ -296,22 +297,32 @@ class TelemetrySerializer(object):
     """Telemetry message serializer."""
 
     @classmethod
-    def from_msg(cls, navsat_msg, altitude_msg, compass_msg):
+    def from_msg(cls, navsat_msg, altitude_msg, pose_msg):
         """Serializes telemetry data into a dictionary.
 
         Args:
             navsat_msg: sensor_msgs/NavSatFix message.
             altitude_msg: mavros_msgs/Altitude message.
-            compass_msg: std_msgs/Float64 message in degrees.
+            pose_msg: geometry_msgs/PoseStamped message in ENU.
 
         Returns:
             A dictionary.
         """
+        # Convert orientation from east to north.
+        q = [
+            pose_msg.pose.orientation.x,
+            pose_msg.pose.orientation.y,
+            pose_msg.pose.orientation.z,
+            pose_msg.pose.orientation.w,
+        ]
+        yaw = tf.transformations.euler_from_quaternion(q)[2]
+        compass_heading = (450 - np.rad2deg(yaw)) % 360
+
         return {
             "latitude": float(navsat_msg.latitude),
             "longitude": float(navsat_msg.longitude),
             "altitude_msl": meters_to_feet(altitude_msg.amsl),
-            "uas_heading": float(compass_msg.data)
+            "uas_heading": float(compass_heading)
         }
 
 

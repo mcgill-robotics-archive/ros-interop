@@ -151,8 +151,8 @@ This by default subscribes to telemetry data on the following topics, and
 uploads them to the interoperability server:
 
 -   `/mavros/altitude`: Altitude above mean sea level, `mavros_msgs/Altitude`.
--   `/mavros/global_position/compass_hdg`: Current heading in degrees relative
-    to true north, `std_msgs/Float64`.
+-   `/mavros/local_position/pose`: Current pose in ENU,
+    `geometry_msgs/PoseStamped`.
 -   `/mavros/global_position/global`: GPS data, `sensor_msgs/NavSatFix`.
 
 ### `objects`
@@ -215,9 +215,9 @@ The following are the run-time ROS launch arguments available:
 -   `navsat_topic`: `sensor_msgs/NavSatFix` feed of the drone's GPS position to
     transmit to the server in the telemetry message,
     default: `/mavros/global_position/global`.
--   `compass_topic`: `std_msgs/Float64` feed of the drone's heading in degrees
+-   `pose_topic`: `geometry_msgs/PoseStamped` feed of the drone's pose in ENU
     to transmit to the server in the telemetry message,
-    default: `/mavros/global_position/compass_hdg`.
+    default: `/mavros/local_position/pose`.
 
 #### Published topics
 
@@ -262,7 +262,7 @@ _Advanced: shouldn't need to be modified._ This tweaks how incoming messages
 are synchronized in order to be properly paired. For more information, see
 [message filters](https://wiki.ros.org/message_filters/ApproximateTime).
 
--   `sync_queue_size`: Message synchronization queue size, default: `2`.
+-   `sync_queue_size`: Message synchronization queue size, default: `12`.
 -   `max_sync_delay`: Maximum message synchronization delay in seconds,
     default: `1`.
 

@@ -24,7 +24,7 @@
     doc="period to update objects with the server in seconds"/>
 
   <!-- Synchronization settings -->
-  <arg name="sync_queue_size" default="2"
+  <arg name="sync_queue_size" default="12"
     doc="message synchronization queue size"/>
   <arg name="max_sync_delay" default="1"
     doc="maximum message synchronization delay in seconds"/>
@@ -34,8 +34,8 @@
     doc="topic for vehicle's GPS position to use for telemetry"/>
   <arg name="altitude_topic" default="/mavros/altitude"
     doc="topic for vehicle's altitude in meters"/>
-  <arg name="compass_topic" default="/mavros/global_position/compass_hdg"
-    doc="topic for vehicle's compass heading in degrees"/>
+  <arg name="pose_topic" default="/mavros/local_position/pose"
+    doc="topic for vehicle's pose in ENU coordinates"/>
 
   <!-- Published topics -->
   <arg name="moving_topic" default="~moving"
@@ -160,7 +160,7 @@
       <!-- Subscribed topics -->
       <param name="navsat_topic" value="$(arg navsat_topic)"/>
       <param name="altitude_topic" value="$(arg altitude_topic)"/>
-      <param name="compass_topic" value="$(arg compass_topic)"/>
+      <param name="pose_topic" value="$(arg pose_topic)"/>
     </node>
 
     <!-- Target client -->
