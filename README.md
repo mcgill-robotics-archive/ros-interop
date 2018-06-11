@@ -192,6 +192,11 @@ export INTEROP_OBJECTS_ROOT=/path/to/object_files
 -   `~clear`: Clears all local and remote objects, `Trigger`.
 -   `~reload`: Reloads all remote objects, `Trigger`.
 
+#### Notifications
+
+-   `~notification`: Publishes all changes that were submitted to the object
+    server, `ObjectNotification`.
+
 ## Arguments
 
 The following are the run-time ROS launch arguments available:

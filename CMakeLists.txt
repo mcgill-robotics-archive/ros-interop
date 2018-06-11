@@ -27,6 +27,7 @@ add_message_files(FILES
   GeoSphere.msg
   GeoSphereArrayStamped.msg
   Object.msg
+  ObjectNotification.msg
   ObjectType.msg
   Orientation.msg
   Shape.msg
