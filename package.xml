@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="2">
   <name>interop</name>
-  <version>0.19.0</version>
+  <version>0.20.0</version>
   <description>
     Provides a ROS client to communicate with the AUVSI SUAS
     Interoperability server.
