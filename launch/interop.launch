@@ -6,6 +6,8 @@
   <arg name="offline" default="false" doc="run in offline mode"/>
   <arg name="base_path" default="$(optenv INTEROP_PATH)"
     doc="path to offline mission information" if="$(arg offline)"/>
+  <arg name="no_moving_obstacles" default="false"
+    doc="whether to publish moving obstacles or not" if="$(arg offline)"/>
 
   <!-- Online mode -->
   <arg name="base_url" default="$(optenv INTEROP_HOST)"
@@ -88,6 +90,8 @@
         unless="$(arg offline)"/>
       <param name="verify" value="$(arg verify)" type="bool"
         unless="$(arg offline)"/>
+      <param name="no_moving_obstacles" value="$(arg no_moving_obstacles)"
+        type="bool" if="$(arg offline)"/>
 
       <!-- Published topics -->
       <param name="moving_topic" value="$(arg moving_topic)"/>

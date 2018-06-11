@@ -28,7 +28,9 @@ def publish_obstacles(timer_event):
         rospy.logfatal(e)
         return
 
-    moving_pub.publish(moving_obstacles)
+    if not no_moving_obstacles:
+        moving_pub.publish(moving_obstacles)
+
     stationary_pub.publish(stationary_obstacles)
 
 
@@ -40,12 +42,14 @@ if __name__ == "__main__":
     offline = rospy.get_param("~offline")
     if offline:
         base_path = rospy.get_param("~base_path")
+        no_moving_obstacles = rospy.get_param("~no_moving_obstacles")
         client = OfflineInteroperabilityClient(base_path)
         rospy.logwarn("Running in OFFLINE mode")
     else:
         base_url = rospy.get_param("~base_url")
         timeout = rospy.get_param("~timeout")
         verify = rospy.get_param("~verify")
+        no_moving_obstacles = False
         client = InteroperabilityClient.from_env(base_url, timeout, verify)
 
     # Wait for server to be reachable, then login.

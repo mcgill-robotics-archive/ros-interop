@@ -107,10 +107,11 @@ roslaunch interop interop.launch offline:=true
 
 **NOTE**: Offline mode supports all the same functionality as normal operation
 except for a few limitations:
-- Moving obstacles cannot move as the downloaded files cannot change
+- Moving obstacles cannot move as the downloaded files cannot change. You can
+  choose to disable them completely with the `no_moving_obstacles` argument.
 - Telemetry works, but all of the information is dropped and not stored
-  anywhere
-- ODLCs are only stored in the local objects directory
+  anywhere.
+- ODLCs are only stored in the local objects directory.
 
 ## Nodes
 
