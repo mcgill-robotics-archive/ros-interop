@@ -13,9 +13,8 @@ from sensor_msgs.msg import CompressedImage
 from geographic_msgs.msg import GeoPointStamped, GeoPoint
 from std_msgs.msg import Header, Time
 from interop.msg import (Color, FlyZone, FlyZoneArray, Orientation, Shape,
-                         Object, ObjectType, GeoSphere, GeoCylinder,
-                         GeoPolygonStamped, GeoSphereArrayStamped,
-                         GeoCylinderArrayStamped, WayPoints)
+                         Object, ObjectType, GeoCylinder,
+                         GeoPolygonStamped, GeoCylinderArrayStamped, WayPoints)
 
 
 def meters_to_feet(m):
@@ -245,31 +244,12 @@ class ObstaclesDeserializer(object):
             lifetime: Lifetime of every Marker in seconds.
 
         Returns:
-            Tuple of (GeoSphereArrayStamped, GeoCylinderArrayStamped).
-            The first is of moving obstacles, and the latter is of stationary
-            obstacles.
+            GeoCylinderArrayStamped stationary obstacles.
         """
         # Generate base header.
         header = Header()
         header.stamp = rospy.get_rostime()
         header.frame_id = frame
-
-        # Parse moving obstacles, and populate markers with spheres.
-        moving_obstacles = GeoSphereArrayStamped()
-        moving_obstacles.header = header
-        if "moving_obstacles" in data:
-            for obj in data["moving_obstacles"]:
-                # Moving obstacles are spheres.
-                obstacle = GeoSphere()
-
-                # Set scale as radius.
-                obstacle.radius = feet_to_meters(obj["sphere_radius"])
-
-                obstacle.center.latitude = obj["latitude"]
-                obstacle.center.longitude = obj["longitude"]
-                obstacle.center.altitude = feet_to_meters(obj["altitude_msl"])
-
-                moving_obstacles.spheres.append(obstacle)
 
         # Parse stationary obstacles, and populate markers with cylinders.
         stationary_obstacles = GeoCylinderArrayStamped()
@@ -288,7 +268,7 @@ class ObstaclesDeserializer(object):
 
                 stationary_obstacles.cylinders.append(obstacle)
 
-        return (moving_obstacles, stationary_obstacles)
+        return stationary_obstacles
 
 
 class TelemetrySerializer(object):

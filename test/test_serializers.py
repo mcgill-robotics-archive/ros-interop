@@ -152,17 +152,6 @@ class TestSerializers(TestCase):
         """Tests obstacles deserializer."""
         # Set up test data.
         data = {
-            "moving_obstacles": [{
-                "altitude_msl": 189.56748784643966,
-                "latitude": 38.141826869853645,
-                "longitude": -76.43199876559223,
-                "sphere_radius": 150.0
-            }, {
-                "altitude_msl": 250.0,
-                "latitude": 38.14923628783763,
-                "longitude": -76.43238529543882,
-                "sphere_radius": 150.0
-            }],
             "stationary_obstacles": [{
                 "cylinder_height": 750.0,
                 "cylinder_radius": 300.0,
@@ -178,23 +167,11 @@ class TestSerializers(TestCase):
 
         # Deserialize obstacles.
         args = (data, "odom", 1.0)
-        moving, stationary = serializers.ObstaclesDeserializer.from_dict(*args)
+        stationary = serializers.ObstaclesDeserializer.from_dict(*args)
 
         # Compare number of markers.
-        self.assertEqual(len(data["moving_obstacles"]), len(moving.spheres))
         self.assertEqual(
             len(data["stationary_obstacles"]), len(stationary.cylinders))
-
-        # Test moving obstacle properties.
-        for i, sphere in enumerate(moving.spheres):
-            obs = data["moving_obstacles"][i]
-
-            altitude = serializers.feet_to_meters(obs["altitude_msl"])
-            self.assertEqual(sphere.center.latitude, obs["latitude"])
-            self.assertEqual(sphere.center.longitude, obs["longitude"])
-
-            radius = serializers.feet_to_meters(obs["sphere_radius"])
-            self.assertEqual(sphere.radius, radius)
 
         # Test stationary obstacle properties.
         for i, cylinder in enumerate(stationary.cylinders):

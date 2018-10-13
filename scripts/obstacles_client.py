@@ -5,7 +5,7 @@
 import sys
 import rospy
 from requests.exceptions import ConnectionError, HTTPError, Timeout
-from interop.msg import GeoCylinderArrayStamped, GeoSphereArrayStamped
+from interop.msg import GeoCylinderArrayStamped
 from interop import InteroperabilityClient, OfflineInteroperabilityClient
 
 
@@ -16,8 +16,7 @@ def publish_obstacles(timer_event):
         timer_event: ROS TimerEvent.
     """
     try:
-        moving_obstacles, stationary_obstacles = client.get_obstacles(
-            frame, lifetime)
+        stationary_obstacles = client.get_obstacles(frame, lifetime)
     except (ConnectionError, Timeout) as e:
         rospy.logwarn(e)
         return
@@ -28,7 +27,6 @@ def publish_obstacles(timer_event):
         rospy.logfatal(e)
         return
 
-    moving_pub.publish(moving_obstacles)
     stationary_pub.publish(stationary_obstacles)
 
 
@@ -57,12 +55,9 @@ if __name__ == "__main__":
         sys.exit(1)
 
     # Get ROS parameters for published topic names.
-    moving_topic = rospy.get_param("~moving_topic")
     stationary_topic = rospy.get_param("~stationary_topic")
 
     # Setup publishers.
-    moving_pub = rospy.Publisher(
-        moving_topic, GeoSphereArrayStamped, queue_size=1)
     stationary_pub = rospy.Publisher(
         stationary_topic, GeoCylinderArrayStamped, queue_size=1)
 
