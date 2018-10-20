@@ -10,6 +10,7 @@ import errno
 import datetime
 import interop.srv
 from cv_bridge import CvBridgeError
+from interop.msg import ObjectNotification
 from interop import serializers, local_objects
 from std_srvs.srv import Trigger, TriggerResponse
 from interop import InteroperabilityClient, OfflineInteroperabilityClient
@@ -92,6 +93,13 @@ class ObjectsServer(object):
             response.id = file_id
             response.success = True
 
+        if response.success:
+            notification = ObjectNotification()
+            notification.type = ObjectNotification.ADDED_OBJECT
+            notification.id = response.id
+            notification.object = req.object
+            notification_pub.publish(notification)
+
         return response
 
     def get_object(self, req):
@@ -146,6 +154,13 @@ class ObjectsServer(object):
         else:
             response.success = True
 
+        if response.success:
+            notification = ObjectNotification()
+            notification.type = ObjectNotification.UPDATED_OBJECT
+            notification.id = req.id
+            notification.object = req.object
+            notification_pub.publish(notification)
+
         return response
 
     def delete_object(self, req):
@@ -169,6 +184,12 @@ class ObjectsServer(object):
             response.success = False
         else:
             response.success = True
+
+        if response.success:
+            notification = ObjectNotification()
+            notification.type = ObjectNotification.DELETED_OBJECT
+            notification.id = req.id
+            notification_pub.publish(notification)
 
         return response
 
@@ -236,6 +257,17 @@ class ObjectsServer(object):
             else:
                 response.success = True
 
+        if response.success:
+            notification = ObjectNotification()
+            notification.id = req.id
+            if compress:
+                notification.type = ObjectNotification.SET_COMPRESSED_IMAGE
+                notification.compressed_image = req.image
+            else:
+                notification.type = ObjectNotification.SET_IMAGE
+                notification.image = req.image
+            notification_pub.publish(notification)
+
         return response
 
     def get_object_image(self, req, compress=False):
@@ -295,6 +327,12 @@ class ObjectsServer(object):
         else:
             response.success = True
 
+        if response.success:
+            notification = ObjectNotification()
+            notification.id = req.id
+            notification.type = ObjectNotification.DELETE_IMAGE
+            notification_pub.publish(notification)
+
         return response
 
     @trigger_exception_handler()
@@ -310,6 +348,10 @@ class ObjectsServer(object):
         rospy.logwarn("Reloading all remote objects...")
         self.objects_dir.load_all_remote_objects()
 
+        notification = ObjectNotification()
+        notification.type = ObjectNotification.RELOAD_ALL
+        notification_pub.publish(notification)
+
     @trigger_exception_handler()
     def clear_all_objects(self, req):
         """Reloads all remote objects.
@@ -323,6 +365,10 @@ class ObjectsServer(object):
         rospy.logwarn("Clearing all objects...")
         self.objects_dir.clear_all_objects()
         rospy.loginfo("Cleared all objects successfully")
+
+        notification = ObjectNotification()
+        notification.type = ObjectNotification.CLEAR_ALL
+        notification_pub.publish(notification)
 
     def sync(self, rospy_timer_event):
         """Handles calls from rospy.Timer to sync the local objects and images
@@ -450,6 +496,10 @@ if __name__ == "__main__":
     # Set up a timer to periodically update the objects and images
     # on the interop server.
     rospy.Timer(rospy.Duration(update_period), objects_server.sync)
+
+    # Initialize ROS publishers.
+    notification_pub = rospy.Publisher(
+        "~notification", ObjectNotification, queue_size=10)
 
     # Initialize object ROS services.
     rospy.Service("~add", interop.srv.AddObject, objects_server.add_object)

@@ -51,12 +51,13 @@ class BaseClient:
         raise NotImplementedError
 
     @abc.abstractmethod
-    def post_telemetry(self, navsat_msg, compass_msg):
+    def post_telemetry(self, navsat_msg, altitude_msg, pose_msg):
         """Uploads telemetry information to Interoperability server.
 
         Args:
             navsat_msg: sensor_msgs/NavSatFix message.
-            compass_msg: std_msgs/Float64 message in degrees.
+            altitude_msg: mavros_msgs/Altitude message.
+            pose_msg: geometry_msgs/PoseStamped message in ENU.
 
         Raises:
             Timeout: On timeout.
@@ -534,12 +535,13 @@ class InteroperabilityClient(BaseClient):
         return serializers.ObstaclesDeserializer.from_dict(
             response.json(), frame, lifetime)
 
-    def post_telemetry(self, navsat_msg, compass_msg):
+    def post_telemetry(self, navsat_msg, altitude_msg, pose_msg):
         """Uploads telemetry information to Interoperability server.
 
         Args:
             navsat_msg: sensor_msgs/NavSatFix message.
-            compass_msg: std_msgs/Float64 message in degrees.
+            altitude_msg: mavros_msgs/Altitude message.
+            pose_msg: geometry_msgs/PoseStamped message in ENU.
 
         Raises:
             Timeout: On timeout.
@@ -547,7 +549,7 @@ class InteroperabilityClient(BaseClient):
             ConnectionError: On connection failure.
         """
         dict_telem = serializers.TelemetrySerializer.from_msg(
-            navsat_msg, compass_msg)
+            navsat_msg, altitude_msg, pose_msg)
         self._post(self.TELEMETRY_PATH, data=dict_telem)
 
     def get_active_mission(self, frame):
@@ -791,7 +793,7 @@ class OfflineInteroperabilityClient(BaseClient):
             path: Path to root directory that stores all mission information.
             *args: Additional positional arguments, ignored.
             **kwargs: Additional key-word arguments, ignored.
-        
+
         Raises:
             IOError: On missions or obstacles files not found.
             JSONDecodeError: On JSON deserialization error.
@@ -815,14 +817,14 @@ class OfflineInteroperabilityClient(BaseClient):
 
     def wait_for_server(self):
         """Waits until interoperability server is reachable.
-        
+
         Note: Doesn't do anything since the server is offline.
         """
         pass
 
     def login(self):
         """Authenticates with the server.
-        
+
         Note: Always succeeds since there is no server.
         """
         pass
@@ -840,16 +842,18 @@ class OfflineInteroperabilityClient(BaseClient):
         return serializers.ObstaclesDeserializer.from_dict(
             self._obstacles, frame, lifetime)
 
-    def post_telemetry(self, navsat_msg, compass_msg):
+    def post_telemetry(self, navsat_msg, altitude_msg, pose_msg):
         """Uploads telemetry information to Interoperability server.
 
         Note: This does nothing as the server is not connected.
 
         Args:
             navsat_msg: sensor_msgs/NavSatFix message.
-            compass_msg: std_msgs/Float64 message in degrees.
+            altitude_msg: mavros_msgs/Altitude message.
+            pose_msg: geometry_msgs/PoseStamped message in ENU.
         """
-        pass
+        serializers.TelemetrySerializer.from_msg(navsat_msg, altitude_msg,
+                                                 pose_msg)
 
     def get_active_mission(self, frame):
         """Gets active mission.

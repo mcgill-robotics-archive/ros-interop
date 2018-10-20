@@ -38,12 +38,14 @@ if __name__ == "__main__":
     offline = rospy.get_param("~offline")
     if offline:
         base_path = rospy.get_param("~base_path")
+        no_moving_obstacles = rospy.get_param("~no_moving_obstacles")
         client = OfflineInteroperabilityClient(base_path)
         rospy.logwarn("Running in OFFLINE mode")
     else:
         base_url = rospy.get_param("~base_url")
         timeout = rospy.get_param("~timeout")
         verify = rospy.get_param("~verify")
+        no_moving_obstacles = False
         client = InteroperabilityClient.from_env(base_url, timeout, verify)
 
     # Wait for server to be reachable, then login.

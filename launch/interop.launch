@@ -6,6 +6,8 @@
   <arg name="offline" default="false" doc="run in offline mode"/>
   <arg name="base_path" default="$(optenv INTEROP_PATH)"
     doc="path to offline mission information" if="$(arg offline)"/>
+  <arg name="no_moving_obstacles" default="false"
+    doc="whether to publish moving obstacles or not" if="$(arg offline)"/>
 
   <!-- Online mode -->
   <arg name="base_url" default="$(optenv INTEROP_HOST)"
@@ -24,7 +26,7 @@
     doc="period to update objects with the server in seconds"/>
 
   <!-- Synchronization settings -->
-  <arg name="sync_queue_size" default="2"
+  <arg name="sync_queue_size" default="12"
     doc="message synchronization queue size"/>
   <arg name="max_sync_delay" default="1"
     doc="maximum message synchronization delay in seconds"/>
@@ -32,8 +34,10 @@
   <!-- Subscribed topics -->
   <arg name="navsat_topic" default="/mavros/global_position/global"
     doc="topic for vehicle's GPS position to use for telemetry"/>
-  <arg name="compass_topic" default="/mavros/global_position/compass_hdg"
-    doc="topic for vehicle's compass heading in degrees"/>
+  <arg name="altitude_topic" default="/mavros/altitude"
+    doc="topic for vehicle's altitude in meters"/>
+  <arg name="pose_topic" default="/mavros/local_position/pose"
+    doc="topic for vehicle's pose in ENU coordinates"/>
 
   <!-- Published topics -->
   <arg name="stationary_topic" default="~stationary"
@@ -56,8 +60,8 @@
   <!-- Publication periods -->
   <arg name="obstacles_period" default="0.05"
     doc="period to fetch obstacles in seconds"/>
-  <arg name="mission_info_period" default="1.00"
-    doc="period to fetch mission information in seconds"/>
+  <arg name="mission_info_period" default="0.05"
+    doc="period to publish mission information in seconds"/>
 
   <!-- Frame IDs -->
   <arg name="obstacles_frame" default="earth" doc="obstalces frame ID"/>
@@ -84,6 +88,8 @@
         unless="$(arg offline)"/>
       <param name="verify" value="$(arg verify)" type="bool"
         unless="$(arg offline)"/>
+      <param name="no_moving_obstacles" value="$(arg no_moving_obstacles)"
+        type="bool" if="$(arg offline)"/>
 
       <!-- Published topics -->
       <param name="stationary_topic" value="$(arg stationary_topic)"/>
@@ -154,7 +160,8 @@
 
       <!-- Subscribed topics -->
       <param name="navsat_topic" value="$(arg navsat_topic)"/>
-      <param name="compass_topic" value="$(arg compass_topic)"/>
+      <param name="altitude_topic" value="$(arg altitude_topic)"/>
+      <param name="pose_topic" value="$(arg pose_topic)"/>
     </node>
 
     <!-- Target client -->

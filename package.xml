@@ -1,41 +1,36 @@
 <?xml version="1.0"?>
-<package>
+<package format="2">
   <name>interop</name>
-  <version>0.16.1</version>
+  <version>0.20.0</version>
   <description>
-    ros-interop provides a ROS client to communicate with AUVSI SUAS'
+    Provides a ROS client to communicate with the AUVSI SUAS
     Interoperability server.
   </description>
 
-  <maintainer email="mr@anassinator.com">Anass Al</maintainer>
+  <maintainer email="dev@anassinator.com">Anass Al</maintainer>
   <license>GPLv2</license>
-  <author email="mr@anassinator.com">Anass Al</author>
+  <author email="dev@anassinator.com">Anass Al</author>
 
   <buildtool_depend>catkin</buildtool_depend>
-  <build_depend>rospy</build_depend>
-  <build_depend>genmsg</build_depend>
-  <build_depend>std_msgs</build_depend>
-  <build_depend>sensor_msgs</build_depend>
-  <build_depend>geographic_msgs</build_depend>
-  <build_depend>message_generation</build_depend>
 
-  <run_depend>rospy</run_depend>
-  <run_depend>std_msgs</run_depend>
-  <run_depend>sensor_msgs</run_depend>
-  <run_depend>message_runtime</run_depend>
-  <run_depend>message_generation</run_depend>
-  <run_depend>geographic_msgs</run_depend>
+  <depend>rospy</depend>
+  <depend>genmsg</depend>
+  <depend>geographic_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <depend>mavros_msgs</depend>
+  <depend>message_generation</depend>
+  <depend>std_msgs</depend>
+  <depend>sensor_msgs</depend>
 
-  <!-- Python dependencies -->
-  <run_depend>python-dateutil</run_depend>
-  <run_depend>python-imaging</run_depend>
-  <run_depend>python-numpy</run_depend>
-  <run_depend>python-requests</run_depend>
-  <run_depend>python-responses-pip</run_depend>
-  <run_depend>python-six</run_depend>
+  <exec_depend>message_runtime</exec_depend>
+  <exec_depend>python-dateutil</exec_depend>
+  <exec_depend>python-imaging</exec_depend>
+  <exec_depend>python-numpy</exec_depend>
+  <exec_depend>python-requests</exec_depend>
+  <exec_depend>python-responses-pip</exec_depend>
+  <exec_depend>python-six</exec_depend>
 
-  <!-- Unit tests -->
   <test_depend>rostest</test_depend>
 
-  <export> </export>
+  <export></export>
 </package>

@@ -7,8 +7,9 @@ import rosunit
 import numpy as np
 from unittest import TestCase
 from cv_bridge import CvBridge
-from std_msgs.msg import Float64
+from mavros_msgs.msg import Altitude
 from sensor_msgs.msg import NavSatFix
+from geometry_msgs.msg import PoseStamped
 from interop.client import InteroperabilityClient
 from mock_server import InteroperabilityMockServer
 from interop.serializers import ObjectImageSerializer
@@ -62,10 +63,12 @@ class TestInteroperabilityClient(TestCase):
             server.set_telemetry_response()
 
             # Connect client.
+            pose_stamped = PoseStamped()
+            pose_stamped.pose.orientation.w = 1.0
             client = InteroperabilityClient(*client_args)
             client.wait_for_server()
             client.login()
-            client.post_telemetry(NavSatFix(), Float64())
+            client.post_telemetry(NavSatFix(), Altitude(), pose_stamped)
 
     def test_post_object(self):
         """Tests posting object data through client."""

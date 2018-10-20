@@ -4,6 +4,8 @@ project(interop)
 find_package(catkin REQUIRED COMPONENTS
   genmsg
   geographic_msgs
+  geometry_msgs
+  mavros_msgs
   message_generation
   rospy
   sensor_msgs
@@ -25,6 +27,7 @@ add_message_files(FILES
   GeoSphere.msg
   GeoSphereArrayStamped.msg
   Object.msg
+  ObjectNotification.msg
   ObjectType.msg
   Orientation.msg
   Shape.msg
@@ -51,6 +54,8 @@ generate_messages(DEPENDENCIES geographic_msgs sensor_msgs std_msgs)
 catkin_package(
   CATKIN_DEPENDS
   geographic_msgs
+  geometry_msgs
+  mavros_msgs
   message_generation
   message_runtime
   rospy

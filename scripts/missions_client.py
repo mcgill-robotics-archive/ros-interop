@@ -4,17 +4,29 @@
 import sys
 import rospy
 from threading import Lock
-from requests.exceptions import Timeout, ConnectionError, HTTPError
+from functools import partial
+from std_msgs.msg import Header
 from std_srvs.srv import Trigger
 from interop.srv import GetMissionByID
-from interop.msg import FlyZoneArray, WayPoints, GeoPolygonStamped
 from geographic_msgs.msg import GeoPointStamped
+from interop.msg import FlyZoneArray, WayPoints, GeoPolygonStamped
+from requests.exceptions import Timeout, ConnectionError, HTTPError
 from interop import InteroperabilityClient, OfflineInteroperabilityClient
 
 
-def publish_mission(timer):
-    """Requests and publishes the mission information."""
+def publish_mission(event):
+    """Requests and publishes the mission information.
+
+    Args:
+        event (TimerEvent): Timer event (unused).
+    """
     with lock:
+        # Update the time stamp of all the messages manually since we reuse
+        # cached messages, as we don't expect them to change.
+        stamp = rospy.get_rostime()
+        update_stamp(stamp, msgs)
+
+        # Publish.
         flyzones_pub.publish(msgs[0])
         search_grid_pub.publish(msgs[1])
         waypoints_pub.publish(msgs[2])
@@ -22,6 +34,28 @@ def publish_mission(timer):
         off_axis_obj_pub.publish(msgs[4])
         emergent_obj_pub.publish(msgs[5])
         home_pub.publish(msgs[6])
+
+
+def update_stamp(stamp, msg):
+    """Recursively update the time stamp of all the messages.
+
+    Args:
+        stamp (Time): Time stamp to set all header stamps to.
+        msg ([AnyMsg] or AnyMsg): Any ROS message or list of ROS messages.
+    """
+    # If given a list, recursively update each element separately.
+    if hasattr(msg, "__iter__"):
+        map(partial(update_stamp, stamp), msg)
+        return
+
+    # If a header was found, update the time stamp.
+    if isinstance(msg, Header):
+        msg.stamp = stamp
+        return
+
+    # Recursively update all message fields.
+    if hasattr(msg, "__slots__"):
+        map(lambda m: update_stamp(stamp, getattr(msg, m)), msg.__slots__)
 
 
 def get_active_mission(req):
