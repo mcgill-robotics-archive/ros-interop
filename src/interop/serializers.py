@@ -13,8 +13,8 @@ from sensor_msgs.msg import CompressedImage
 from geographic_msgs.msg import GeoPointStamped, GeoPoint
 from std_msgs.msg import Header, Time
 from interop.msg import (Color, FlyZone, FlyZoneArray, Orientation, Shape,
-                         Object, ObjectType, GeoCylinder,
-                         GeoPolygonStamped, GeoCylinderArrayStamped, WayPoints)
+                         Object, ObjectType, GeoCylinder, GeoPolygonStamped,
+                         GeoCylinderArrayStamped, WayPoints)
 
 
 def meters_to_feet(m):
