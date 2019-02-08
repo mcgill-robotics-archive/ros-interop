@@ -40,8 +40,6 @@
     doc="topic for vehicle's pose in ENU coordinates"/>
 
   <!-- Published topics -->
-  <arg name="moving_topic" default="~moving"
-    doc="topic for publishing moving obstacles"/>
   <arg name="stationary_topic" default="~stationary"
     doc="topic for publishing stationary obstacles"/>
   <arg name="flyzones_topic" default="~flyzones"
@@ -94,7 +92,6 @@
         type="bool" if="$(arg offline)"/>
 
       <!-- Published topics -->
-      <param name="moving_topic" value="$(arg moving_topic)"/>
       <param name="stationary_topic" value="$(arg stationary_topic)"/>
 
       <!-- Publication period -->

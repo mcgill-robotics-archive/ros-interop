@@ -25,17 +25,6 @@ class TestInteroperabilityClient(TestCase):
         url = "http://interop"
         client_args = (url, "testuser", "testpass", 1.0)
         json = {
-            "moving_obstacles": [{
-                "altitude_msl": 189.56748784643966,
-                "latitude": 38.141826869853645,
-                "longitude": -76.43199876559223,
-                "sphere_radius": 150.0
-            }, {
-                "altitude_msl": 250.0,
-                "latitude": 38.14923628783763,
-                "longitude": -76.43238529543882,
-                "sphere_radius": 150.0
-            }],
             "stationary_obstacles": [{
                 "cylinder_height": 750.0,
                 "cylinder_radius": 300.0,

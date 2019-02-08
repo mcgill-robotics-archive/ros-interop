@@ -40,9 +40,7 @@ class BaseClient:
             lifetime: Lifetime of every Marker in seconds.
 
         Returns:
-            Tuple of (GeoSphereArrayStamped, GeoCylinderArrayStamped).
-            The first is of moving obstacles, and the latter is of stationary
-            obstacles.
+            GeoCylinderArrayStamped of stationary obstacles.
 
         Raises:
             Timeout: On timeout.
@@ -525,9 +523,7 @@ class InteroperabilityClient(BaseClient):
             lifetime: Lifetime of every Marker in seconds.
 
         Returns:
-            Tuple of (GeoSphereArrayStamped, GeoCylinderArrayStamped).
-            The first is of moving obstacles, and the latter is of stationary
-            obstacles.
+            GeoCylinderArrayStamped of stationary obstacles.
 
         Raises:
             Timeout: On timeout.
@@ -841,9 +837,7 @@ class OfflineInteroperabilityClient(BaseClient):
             lifetime: Lifetime of every Marker in seconds.
 
         Returns:
-            Tuple of (GeoSphereArrayStamped, GeoCylinderArrayStamped).
-            The first is of moving obstacles, and the latter is of stationary
-            obstacles.
+            GeoCylinderArrayStamped of stationary obstacles.
         """
         return serializers.ObstaclesDeserializer.from_dict(
             self._obstacles, frame, lifetime)
